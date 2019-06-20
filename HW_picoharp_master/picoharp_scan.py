@@ -8,59 +8,39 @@ import pickle
 import os.path
 from pyqtgraph.Qt import QtGui, QtCore
 from pyqtgraph.Point import Point
-class OceanOptics_Scan(PiezoStage_Scan):
 
-	name = "OceanOptics_Scan"
+class PicoHarp_Scan(PiezoStage_Scan):
+
+	name = "PicoHarp_Scan"
 
 	def setup(self):
 		PiezoStage_Scan.setup(self)
 
-		self.settings.New("intg_time",dtype=int, unit='ms', initial=3, vmin=3)
-		self.settings.New('correct_dark_counts', dtype=bool, initial=True)
-		self.settings.New("scans_to_avg", dtype=int, initial=1, vmin=1)
+		self.picoharp_hw = self.app.hardware['picoharp']
+		self.pi_device_hw = self.app.hardware['pi_device']
+		#figure out which settings
 
 	def setup_figure(self):
+		#TODO : add picoharp specific settings
 		PiezoStage_Scan.setup_figure(self)
-		spec_hw = self.app.hardware['oceanoptics']
-		details_groupBox = self.set_details_widget(widget = self.settings.New_UI(include=["intg_time", "correct_dark_counts", "scans_to_avg"]))
-		widgets = details_groupBox.findChildren(QtGui.QWidget)
-		intg_time_spinBox = widgets[1]
-		correct_dark_counts_checkBox = widgets[4]
-		#scans_to_avg_spinBox = widgets[6]
-		spec_hw.settings.intg_time.connect_to_widget(intg_time_spinBox)
-		spec_hw.settings.correct_dark_counts.connect_to_widget(correct_dark_counts_checkBox)
-		
-		#spectrometer plot
-		self.graph_layout=pg.GraphicsLayoutWidget()
-		self.plot = self.graph_layout.addPlot(title="Spectrometer Live Reading")
-		self.plot.setLabel('left', 'Intensity', unit='a.u.')
-		self.plot.setLabel('bottom', 'Wavelength', unit='nm')		
-		# # Create PlotDataItem object ( a scatter plot on the axes )
-		self.optimize_plot_line = self.plot.plot([0])
-		
+		#details_groupBox = self.set_details_widget(widget = self.settings.New_UI(include=["intg_time", "correct_dark_counts", "scans_to_avg"]))
+		#widgets = details_groupBox.findChildren(QtGui.QWidget)		
 
 		#image display container, will show sp
 		self.imv = pg.ImageView()
 		self.imv.getView().setAspectLocked(lock=False, ratio=1)
 		self.imv.getView().setMouseEnabled(x=True, y=True)
-		#TODO - connect widget to settings in spectrometer 
 
 	def update_display(self):
 		PiezoStage_Scan.update_display(self)
-		if hasattr(self, 'spec') and hasattr(self, 'pi_device') and hasattr(self, 'y'): #first, check if setup has happened
-			#plot wavelengths vs intensity
-			self.plot.plot(self.spec.wavelengths(), self.y, pen='r', clear=True) #plot wavelength vs intensity
-			self.graph_layout.show()
-			self.graph_layout.window().setWindowFlag(QtCore.Qt.WindowCloseButtonHint, False) #disable closing image view window
-
-			sum_disp_img = self.sum_display_image_map #transpose to use for setImage, which takes 3d array (x, y, intensity)
-			self.img_item.setImage(sum_disp_img)#image=sum_disp_img, autoLevels=True, autoRange=False)
+		if hasattr(self, 'picoharp') and hasattr(self, 'pi_device'):
+			sum_disp_img = self.sum_display_image_map
+			self.img_item.setImage(sum_disp_img)
 			
-			intensities_disp_img = self.intensities_display_image_map
-			self.imv.setImage(img=intensities_disp_img, autoRange=False, autoLevels=True)
+			histogram_disp_img = self.histogram_display_image_map
+			self.imv.setImage(img=histogram_disp_img, autoRange=False, autoLevels=True)
 			self.imv.show()
 			self.imv.window().setWindowFlag(QtCore.Qt.WindowCloseButtonHint, False) #disable closing image view window
-			
 			pg.QtGui.QApplication.processEvents()
 
 
@@ -72,13 +52,15 @@ class OceanOptics_Scan(PiezoStage_Scan):
 
 		Runs until scan is completed or interrupted.
 		"""
-		self.check_filename("_raw_PL_spectra_data.pkl")
+		#self.check_filename("_raw_PL_spectra_data.pkl")
 		
 		self.scan_complete = False
 
 		self.pi_device = self.pi_device_hw.pi_device
-		self.spec = self.spec_hw.spec
+		self.picoharp = self.picoharp_hw.picoharp
 		self.axes = self.pi_device_hw.axes
+
+		###self.sleep_time = min((max(0.1*ph.Tacq*1e-3, 0.010), 0.100))
 
 		x_start = self.settings['x_start']
 		y_start = self.settings['y_start']
@@ -115,7 +97,7 @@ class OceanOptics_Scan(PiezoStage_Scan):
 
 		#Store spectrum for each pixel
 		self.sum_display_image_map = np.zeros((self.x_range, self.y_range), dtype=float)
-		self.intensities_display_image_map = np.zeros((2048, self.x_range, self.y_range), dtype=float)
+		self.histogram_display_image_map = np.zeros((2048, self.x_range, self.y_range), dtype=float)
 		
 		# Move to the starting position
 		self.pi_device.MOV(axes=self.axes, values=[x_start,y_start])
@@ -127,8 +109,7 @@ class OceanOptics_Scan(PiezoStage_Scan):
 			for j in range(self.x_range):
 				if self.interrupt_measurement_called:
 					break
-				self._read_spectrometer()
-				data_array[k,:] = self.y
+				histogram = self.read_picoharp_histogram()
 
 				#make sure the right indices of image arrays are updated
 				index_x = j
@@ -138,8 +119,8 @@ class OceanOptics_Scan(PiezoStage_Scan):
 				if y_step < 0:
 					index_y = self.y_range - i - 1
 
-				self.sum_display_image_map[index_x, index_y] = self.y.sum()
-				self.intensities_display_image_map[:, index_x, index_y] = self.y#intensities_sum
+				self.sum_display_image_map[index_x, index_y] = histogram.sum()
+				self.histogram_display_image_map[:, index_x, index_y] = histogram #intensities_sum
 				self.pi_device.MVR(axes=self.axes[0], values=[x_step])
 				#self.ui.progressBar.setValue(np.floor(100*((k+1)/(x_range*y_range))))
 				#print(100*((k+1)/np.abs((self.x_range*self.y_range))))
@@ -160,30 +141,27 @@ class OceanOptics_Scan(PiezoStage_Scan):
 				break
 
 		self.scan_complete = True;
-		save_dict = {"Wavelengths": self.spec.wavelengths(), "Intensities": data_array,
-				 "Scan Parameters":{"X scan start (um)": x_start, "Y scan start (um)": y_start,
-									"X scan size (um)": x_scan_size, "Y scan size (um)": y_scan_size,
-									"X step size (um)": x_step, "Y step size (um)": y_step},
-									"OceanOptics Parameters":{"Integration Time (ms)": self.spec_hw.settings['intg_time'],
-															  "Scans Averages": self.spec_measure.settings['scans_to_avg'],
-															  "Correct Dark Counts": self.spec_hw.settings['correct_dark_counts']}
-				 }
+		#TODO : figure out saving data
+		# save_dict = {"Wavelengths": self.spec.wavelengths(), "Intensities": data_array,
+		# 		 "Scan Parameters":{"X scan start (um)": x_start, "Y scan start (um)": y_start,
+		# 							"X scan size (um)": x_scan_size, "Y scan size (um)": y_scan_size,
+		# 							"X step size (um)": x_step, "Y step size (um)": y_step},
+		# 							"OceanOptics Parameters":{"Integration Time (ms)": self.spec_hw.settings['intg_time'],
+		# 													  "Scans Averages": self.spec_measure.settings['scans_to_avg'],
+		# 													  "Correct Dark Counts": self.spec_hw.settings['correct_dark_counts']}
+		# 		 }
 
-		pickle.dump(save_dict, open(self.app.settings['save_dir']+"/"+self.app.settings['sample']+"_raw_PL_spectra_data.pkl", "wb"))
+		# pickle.dump(save_dict, open(self.app.settings['save_dir']+"/"+self.app.settings['sample']+"_raw_PL_spectra_data.pkl", "wb"))
 
+	def read_picoharp_histogram(self):
+		self.picoharp.start_histogram()
 
-	def _read_spectrometer(self):
-		'''
-		Read spectrometer according to settings and update self.y (intensities array)
-		'''
-		if hasattr(self, 'spec'):
-			intg_time_ms = self.spec_hw.settings['intg_time']
-			self.spec.integration_time_micros(intg_time_ms*1e3) #seabreeze error checking
-			
-			scans_to_avg = self.spec_measure.settings['scans_to_avg']
-			Int_array = np.zeros(shape=(2048,scans_to_avg))
-			
-			for i in range(scans_to_avg): #software average
-				data = self.spec.spectrum(correct_dark_counts=self.spec_hw.settings['correct_dark_counts'])#acquire wavelengths and intensities from spec
-				Int_array[:,i] = data[1]
-				self.y = np.mean(Int_array, axis=-1)
+		while not self.picoharp.check_done_scanning():
+			if self.picoharp_hw.settings['Tacq'] > 200:
+				self.picoharp.read_histogram_data()
+			time.sleep(.005)###self.sleep_time)  #TODO : figure out sleep time
+		self.picoharp.stop_histogram()
+		#ta = time.time()
+		self.picoharp.read_histogram_data()
+
+		return self.picoharp.histogram_data

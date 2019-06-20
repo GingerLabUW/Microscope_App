@@ -1,0 +1,11 @@
+2019-06-20T16:42:50|CRITICAL|root|Unhandled exception:Traceback (most recent call last):
+  File "Microscope_app.py", line 42, in <module>
+    app = OceanOpticsApp(sys.argv)
+  File "C:\Users\lindat18\AppData\Local\Continuum\miniconda3\envs\scopefoundry\lib\site-packages\ScopeFoundry\base_app.py", line 338, in __init__
+    self.setup()
+  File "Microscope_app.py", line 16, in setup
+    from PiezoStage_hardware import PiezoStageHW
+  File "C:\Users\lindat18\Dropbox\Ginger_Lab\HW_picoharp_master\PiezoStage_hardware.py", line 7, in <module>
+    from HW_PI_PiezoStage.pipython import GCSDevice
+ModuleNotFoundError: No module named 'HW_PI_PiezoStage'
+

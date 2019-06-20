@@ -1,0 +1,9 @@
+2019-06-19T14:52:25|CRITICAL|root|Unhandled exception:Traceback (most recent call last):
+  File "C:\Data\GingerLab\Sarthak\PythonPrograms\MicroscopeApps\HWare\Linda_test\HW_picoharp_master\Microscope_app.py", line 40, in <module>
+    app = OceanOpticsApp(sys.argv)
+  File "C:\Users\Microscope\Anaconda3\lib\site-packages\ScopeFoundry\base_app.py", line 332, in __init__
+    self.setup()
+  File "C:\Data\GingerLab\Sarthak\PythonPrograms\MicroscopeApps\HWare\Linda_test\HW_picoharp_master\Microscope_app.py", line 14, in setup
+    from OceanOptics_hardware import OceanOpticsHW
+ModuleNotFoundError: No module named 'OceanOptics_hardware'
+

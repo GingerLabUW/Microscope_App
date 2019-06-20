@@ -1,0 +1,9 @@
+2019-06-20T16:42:13|CRITICAL|root|Unhandled exception:Traceback (most recent call last):
+  File "Microscope_app.py", line 42, in <module>
+    app = OceanOpticsApp(sys.argv)
+  File "C:\Users\lindat18\AppData\Local\Continuum\miniconda3\envs\scopefoundry\lib\site-packages\ScopeFoundry\base_app.py", line 338, in __init__
+    self.setup()
+  File "Microscope_app.py", line 16, in setup
+    from PiezoStage_hardware import PiezoStageHW
+ModuleNotFoundError: No module named 'PiezoStage_hardware'
+
