@@ -1,0 +1,13 @@
+2019-06-20T10:42:59|CRITICAL|root|Unhandled exception:Traceback (most recent call last):
+  File "Microscope_app.py", line 43, in <module>
+    app = MicroscopeApp(sys.argv)
+  File "C:\Users\lindat18\AppData\Local\Continuum\miniconda3\envs\scopefoundry\lib\site-packages\ScopeFoundry\base_app.py", line 338, in __init__
+    self.setup()
+  File "Microscope_app.py", line 16, in setup
+    from HW_PI_PiezoStage.PiezoStage_hardware import PiezoStageHW
+  File "C:\Users\lindat18\Dropbox\Ginger_Lab\Microscope_App\HW_PI_PiezoStage\PiezoStage_hardware.py", line 7, in <module>
+    from HW_PI_PiezoStage.pipython import GCSDevice
+  File "C:\Users\lindat18\Dropbox\Ginger_Lab\Microscope_App\HW_PI_PiezoStage\pipython\__init__.py", line 5, in <module>
+    import pipython.gcserror
+ModuleNotFoundError: No module named 'pipython'
+

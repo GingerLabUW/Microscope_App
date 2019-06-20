@@ -1,0 +1,12 @@
+2019-06-20T13:24:59|CRITICAL|root|Unhandled exception:Traceback (most recent call last):
+  File "Microscope_app.py", line 44, in <module>
+    app = MicroscopeApp(sys.argv)
+  File "C:\Users\lindat18\AppData\Local\Continuum\miniconda3\envs\scopefoundry\lib\site-packages\ScopeFoundry\base_app.py", line 338, in __init__
+    self.setup()
+  File "Microscope_app.py", line 26, in setup
+    from HW_PI_PiezoStage.OceanOptics_Scan import OceanOptics_Scan
+  File "C:\Users\lindat18\Dropbox\Ginger_Lab\Microscope_App\HW_PI_PiezoStage\OceanOptics_Scan.py", line 31
+    self.plot.setLabel('left', 'Intensity', unit='a.u.')
+                                                       ^
+TabError: inconsistent use of tabs and spaces in indentation
+

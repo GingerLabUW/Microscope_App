@@ -1,0 +1,11 @@
+2019-06-20T11:04:44|CRITICAL|root|Unhandled exception:Traceback (most recent call last):
+  File "Microscope_app.py", line 43, in <module>
+    app = MicroscopeApp(sys.argv)
+  File "C:\Users\lindat18\AppData\Local\Continuum\miniconda3\envs\scopefoundry\lib\site-packages\ScopeFoundry\base_app.py", line 340, in __init__
+    self.setup_default_ui()
+  File "C:\Users\lindat18\AppData\Local\Continuum\miniconda3\envs\scopefoundry\lib\site-packages\ScopeFoundry\base_app.py", line 380, in setup_default_ui
+    measure.setup_figure()
+  File "C:\Users\lindat18\Dropbox\Ginger_Lab\Microscope_App\HW_OceanOptics\OceanOptics_measurement.py", line 67, in setup_figure
+    self.spec_hw.settings.correct_dark_counts.connect_to_widget(self.ui.correct_dark_counts_checkBox)
+AttributeError: 'LQCollection' object has no attribute 'correct_dark_counts'
+

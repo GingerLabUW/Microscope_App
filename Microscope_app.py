@@ -21,8 +21,8 @@ class MicroscopeApp(BaseMicroscopeApp):
         self.add_measurement(OceanOpticsMeasure(self))
         #from PiezoStage_measurement import PiezoStageMeasure
         #self.add_measurement(PiezoStageMeasure(self))
-        from HW_PI_PiezoStage.PiezoStage_measurement_liveImage import PiezoStageMeasureLive
-        self.add_measurement(PiezoStageMeasureLive)
+        from HW_PI_PiezoStage.PiezoStage_Scan import PiezoStage_Scan
+        self.add_measurement(PiezoStage_Scan)
         from HW_PI_PiezoStage.OceanOptics_Scan import OceanOptics_Scan
         self.add_measurement(OceanOptics_Scan)
         # show ui
@@ -32,8 +32,9 @@ class MicroscopeApp(BaseMicroscopeApp):
     def on_close(self): #temp fix for properly closing the additional imageview window
         BaseMicroscopeApp.on_close(self)
         try:
-            liveupdate = self.measurements["oceanoptics_scan_liveupdate"]
-            liveupdate.imv.close()
+            oo_scan = self.measurements["OceanOptics_Scan"]
+            oo_scan.imv.close()
+            oo_scan.graph_layout.close()
         except:
             pass
 

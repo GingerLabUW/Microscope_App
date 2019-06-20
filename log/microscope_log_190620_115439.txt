@@ -1,0 +1,11 @@
+2019-06-20T11:54:41|CRITICAL|root|Unhandled exception:Traceback (most recent call last):
+  File "Microscope_app.py", line 43, in <module>
+    app = MicroscopeApp(sys.argv)
+  File "C:\Users\lindat18\AppData\Local\Continuum\miniconda3\envs\scopefoundry\lib\site-packages\ScopeFoundry\base_app.py", line 340, in __init__
+    self.setup_default_ui()
+  File "C:\Users\lindat18\AppData\Local\Continuum\miniconda3\envs\scopefoundry\lib\site-packages\ScopeFoundry\base_app.py", line 380, in setup_default_ui
+    measure.setup_figure()
+  File "C:\Users\lindat18\Dropbox\Ginger_Lab\Microscope_App\HW_PI_PiezoStage\OceanOptics_Scan.py", line 15, in setup_figure
+    PiezoStageMeasureLive.setup_figure(self)
+NameError: name 'PiezoStageMeasureLive' is not defined
+
