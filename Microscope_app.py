@@ -27,7 +27,13 @@ class MicroscopeApp(BaseMicroscopeApp):
         self.add_measurement(PiezoStage_Scan)
         from HW_OceanOptics.OceanOptics_Scan import OceanOptics_Scan
         self.add_measurement(OceanOptics_Scan)
+
+        from HW_picoharp_master.picoharp_countrate_measure import picoharp_countrate_measure
+        self.add_measurement(picoharp_countrate_measure)
+        from HW_picoharp_master.picoharp_hist_measure import picoharp_histogram
+        self.add_measurement(picoharp_histogram)
         from HW_picoharp_master.picoharp_scan import PicoHarp_Scan
+        self.add_measurement(PicoHarp_Scan)
 
         # show ui
         self.ui.show()
