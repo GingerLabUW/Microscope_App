@@ -483,6 +483,28 @@
       </property>
      </widget>
     </widget>
+    <widget class="QGroupBox" name="details_groupBox">
+     <property name="geometry">
+      <rect>
+       <x>620</x>
+       <y>40</y>
+       <width>421</width>
+       <height>111</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Details</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QPushButton" name="pushButton">
+        <property name="text">
+         <string>PushButton</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </widget>
    <widget class="QGroupBox" name="stage_groupBox">
     <property name="geometry">
@@ -505,7 +527,7 @@
      <x>0</x>
      <y>0</y>
      <width>1112</width>
-     <height>31</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>
