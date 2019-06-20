@@ -1,6 +1,6 @@
 from ScopeFoundry import BaseMicroscopeApp
 
-class OceanOpticsApp(BaseMicroscopeApp):
+class MicroscopeApp(BaseMicroscopeApp):
 
     # this is the name of the microscope that ScopeFoundry uses 
     # when storing data
@@ -38,5 +38,5 @@ class OceanOpticsApp(BaseMicroscopeApp):
 if __name__ == '__main__':
     import sys
     
-    app = OceanOpticsApp(sys.argv)
+    app = MicroscopeApp(sys.argv)
     sys.exit(app.exec_())
