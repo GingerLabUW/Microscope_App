@@ -22,8 +22,13 @@ class OceanOptics_Scan(PiezoStage_Scan):
 	def setup_figure(self):
 		PiezoStage_Scan.setup_figure(self)
 		spec_hw = self.app.hardware['oceanoptics']
-		self.set_details_widget(widget = self.settings.New_UI(include=["intg_time", "correct_dark_counts", "scans_to_avg"]))
-		#TODO - connect to hardware settings
+		details_groupBox = self.set_details_widget(widget = self.settings.New_UI(include=["intg_time", "correct_dark_counts", "scans_to_avg"]))
+		widgets = details_groupBox.findChildren(QtGui.QWidget)
+		intg_time_spinBox = widgets[1]
+		correct_dark_counts_checkBox = widgets[4]
+		#scans_to_avg_spinBox = widgets[6]
+		spec_hw.settings.intg_time.connect_to_widget(intg_time_spinBox)
+		spec_hw.settings.correct_dark_counts.connect_to_widget(correct_dark_counts_checkBox)
 		
 		#spectrometer plot
 		self.graph_layout=pg.GraphicsLayoutWidget()
