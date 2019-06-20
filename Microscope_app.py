@@ -23,6 +23,8 @@ class MicroscopeApp(BaseMicroscopeApp):
         #self.add_measurement(PiezoStageMeasure(self))
         from HW_PI_PiezoStage.PiezoStage_measurement_liveImage import PiezoStageMeasureLive
         self.add_measurement(PiezoStageMeasureLive)
+        from HW_PI_PiezoStage.OceanOptics_Scan import OceanOptics_Scan
+        self.add_measurement(OceanOptics_Scan)
         # show ui
         self.ui.show()
         self.ui.activateWindow()
