@@ -53,10 +53,15 @@ class OceanOptics_Scan(PiezoStage_Scan):
 			self.plot.plot(self.spec.wavelengths(), self.y, pen='r', clear=True) #plot wavelength vs intensity
 			self.graph_layout.show()
 			self.graph_layout.window().setWindowFlag(QtCore.Qt.WindowCloseButtonHint, False) #disable closing image view window
+
+			sum_disp_img = self.sum_display_image_map #transpose to use for setImage, which takes 3d array (x, y, intensity)
+            self.img_item.setImage(sum_disp_img)#image=sum_disp_img, autoLevels=True, autoRange=False)
+			
 			intensities_disp_img = self.intensities_display_image_map
 			self.imv.setImage(img=intensities_disp_img, autoRange=False, autoLevels=True)
 			self.imv.show()
 			self.imv.window().setWindowFlag(QtCore.Qt.WindowCloseButtonHint, False) #disable closing image view window
+			
 			pg.QtGui.QApplication.processEvents()
 
 

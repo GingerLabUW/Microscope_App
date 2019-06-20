@@ -270,16 +270,6 @@ class PiezoStage_Scan(Measurement):
         its update frequency is defined by self.display_update_period
         """
         self.img_item.setPos(self.scan_roi.pos())
-        if hasattr(self, 'spec') and hasattr(self, 'pi_device') and hasattr(self, 'y'): #first, check if setup has happened
-            #plot wavelengths vs intensity
-            #self.plot.plot(self.spec.wavelengths(), self.y, pen='r', clear=True) #plot wavelength vs intensity
-            #pg.QtGui.QApplication.processEvents()
-
-            sum_disp_img = self.sum_display_image_map #transpose to use for setImage, which takes 3d array (x, y, intensity)
-            self.img_item.setImage(sum_disp_img)#image=sum_disp_img, autoLevels=True, autoRange=False)
-            pg.QtGui.QApplication.processEvents()
-            #self.hist_lut.setImageItem(self.img_item)
-            #self.img_item.setRect(self.img_item_rect)
 
         if self.scan_complete:
             self.stage_plot.addItem(self.hLine)
@@ -290,11 +280,7 @@ class PiezoStage_Scan(Measurement):
             middle_y = y + self.settings['y_size']/2
             self.hLine.setPos(middle_y)
             self.vLine.setPos(middle_x)
-
-
         
-
-
     def check_filename(self, append):
         '''
         If no sample name given or duplicate sample name given, fix the problem by appending a unique number.
