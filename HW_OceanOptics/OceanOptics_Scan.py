@@ -138,7 +138,8 @@ class OceanOptics_Scan(PiezoStage_Scan):
 				self.intensities_display_image_map[:, index_x, index_y] = self.y#intensities_sum
 				self.pi_device.MVR(axes=self.axes[0], values=[x_step])
 				#self.ui.progressBar.setValue(np.floor(100*((k+1)/(x_range*y_range))))
-				print(100*((k+1)/np.abs((self.x_range*self.y_range))))
+				#print(100*((k+1)/np.abs((self.x_range*self.y_range))))
+				self.ui.progressBar.setValue( 100 * ((k+1)/np.abs(self.x_range*self.y_range)) )
 				self.pi_device_hw.read_from_hardware()
 				k+=1
 			# TODO
@@ -165,3 +166,20 @@ class OceanOptics_Scan(PiezoStage_Scan):
 				 }
 
 		pickle.dump(save_dict, open(self.app.settings['save_dir']+"/"+self.app.settings['sample']+"_raw_PL_spectra_data.pkl", "wb"))
+
+
+	def _read_spectrometer(self):
+		'''
+		Read spectrometer according to settings and update self.y (intensities array)
+		'''
+		if hasattr(self, 'spec'):
+			intg_time_ms = self.spec_hw.settings['intg_time']
+			self.spec.integration_time_micros(intg_time_ms*1e3) #seabreeze error checking
+			
+			scans_to_avg = self.spec_measure.settings['scans_to_avg']
+			Int_array = np.zeros(shape=(2048,scans_to_avg))
+			
+			for i in range(scans_to_avg): #software average
+				data = self.spec.spectrum(correct_dark_counts=self.spec_hw.settings['correct_dark_counts'])#acquire wavelengths and intensities from spec
+				Int_array[:,i] = data[1]
+				self.y = np.mean(Int_array, axis=-1)

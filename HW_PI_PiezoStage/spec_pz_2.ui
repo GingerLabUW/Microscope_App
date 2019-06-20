@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1112</width>
+    <width>1486</width>
     <height>794</height>
    </rect>
   </property>
@@ -36,6 +36,48 @@
        <bool>true</bool>
       </property>
       <layout class="QGridLayout" name="gridLayout_10">
+       <item row="0" column="1" rowspan="2">
+        <widget class="QGroupBox" name="groupBox_3">
+         <property name="title">
+          <string>Run</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_4">
+          <item row="2" column="0">
+           <widget class="QProgressBar" name="progressBar">
+            <property name="value">
+             <number>0</number>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QPushButton" name="start_scan_pushButton">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>Start scan</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QPushButton" name="interrupt_scan_pushButton">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>Interrupt scan</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
        <item row="0" column="0" rowspan="2">
         <widget class="QGroupBox" name="groupBox_4">
          <property name="title">
@@ -89,19 +131,6 @@
            </layout>
           </item>
          </layout>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QPushButton" name="interrupt_scan_pushButton">
-         <property name="font">
-          <font>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Interrupt scan</string>
-         </property>
         </widget>
        </item>
        <item row="2" column="2">
@@ -165,19 +194,6 @@
          </layout>
         </widget>
        </item>
-       <item row="0" column="1">
-        <widget class="QPushButton" name="start_scan_pushButton">
-         <property name="font">
-          <font>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Start scan</string>
-         </property>
-        </widget>
-       </item>
        <item row="0" column="2" rowspan="2">
         <widget class="QGroupBox" name="details_groupBox">
          <property name="title">
@@ -202,6 +218,30 @@
          <layout class="QGridLayout" name="gridLayout_6">
           <item row="0" column="0" colspan="2">
            <layout class="QGridLayout" name="gridLayout_3">
+            <item row="1" column="5">
+             <widget class="QDoubleSpinBox" name="y_step_doubleSpinBox">
+              <property name="font">
+               <font>
+                <pointsize>8</pointsize>
+               </font>
+              </property>
+              <property name="value">
+               <double>0.100000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="4" alignment="Qt::AlignRight">
+             <widget class="QLabel" name="label_6">
+              <property name="font">
+               <font>
+                <pointsize>8</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>X Step (um)</string>
+              </property>
+             </widget>
+            </item>
             <item row="0" column="1">
              <widget class="QDoubleSpinBox" name="x_start_doubleSpinBox">
               <property name="font">
@@ -268,51 +308,18 @@
               </property>
              </widget>
             </item>
-            <item row="1" column="5">
-             <widget class="QDoubleSpinBox" name="y_step_doubleSpinBox">
+            <item row="0" column="5">
+             <widget class="QDoubleSpinBox" name="x_step_doubleSpinBox">
               <property name="font">
                <font>
                 <pointsize>8</pointsize>
                </font>
+              </property>
+              <property name="singleStep">
+               <double>1.000000000000000</double>
               </property>
               <property name="value">
                <double>0.100000000000000</double>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="4" alignment="Qt::AlignRight">
-             <widget class="QLabel" name="label_6">
-              <property name="font">
-               <font>
-                <pointsize>8</pointsize>
-               </font>
-              </property>
-              <property name="text">
-               <string>X Step (um)</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="2" alignment="Qt::AlignRight">
-             <widget class="QLabel" name="label_5">
-              <property name="font">
-               <font>
-                <pointsize>8</pointsize>
-               </font>
-              </property>
-              <property name="text">
-               <string>X Scan Size (um)</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="0" alignment="Qt::AlignRight">
-             <widget class="QLabel" name="label_9">
-              <property name="font">
-               <font>
-                <pointsize>8</pointsize>
-               </font>
-              </property>
-              <property name="text">
-               <string>X Start (um)</string>
               </property>
              </widget>
             </item>
@@ -340,36 +347,31 @@
               </property>
              </widget>
             </item>
-            <item row="0" column="5">
-             <widget class="QDoubleSpinBox" name="x_step_doubleSpinBox">
+            <item row="0" column="0" alignment="Qt::AlignRight">
+             <widget class="QLabel" name="label_9">
               <property name="font">
                <font>
                 <pointsize>8</pointsize>
                </font>
               </property>
-              <property name="singleStep">
-               <double>1.000000000000000</double>
+              <property name="text">
+               <string>X Start (um)</string>
               </property>
-              <property name="value">
-               <double>0.100000000000000</double>
+             </widget>
+            </item>
+            <item row="0" column="2" alignment="Qt::AlignRight">
+             <widget class="QLabel" name="label_5">
+              <property name="font">
+               <font>
+                <pointsize>8</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>X Scan Size (um)</string>
               </property>
              </widget>
             </item>
            </layout>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_3">
-            <property name="text">
-             <string>Scan progress</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QProgressBar" name="progressBar">
-            <property name="value">
-             <number>0</number>
-            </property>
-           </widget>
           </item>
          </layout>
         </widget>
@@ -392,7 +394,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1112</width>
+     <width>1486</width>
      <height>31</height>
     </rect>
    </property>
@@ -406,7 +408,6 @@
   <tabstop>y_size_doubleSpinBox</tabstop>
   <tabstop>x_step_doubleSpinBox</tabstop>
   <tabstop>y_step_doubleSpinBox</tabstop>
-  <tabstop>start_scan_pushButton</tabstop>
  </tabstops>
  <resources/>
  <connections/>

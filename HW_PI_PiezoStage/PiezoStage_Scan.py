@@ -293,21 +293,7 @@ class PiezoStage_Scan(Measurement):
 
 
         
-    def _read_spectrometer(self):
-        '''
-        Read spectrometer according to settings and update self.y (intensities array)
-        '''
-        if hasattr(self, 'spec'):
-            intg_time_ms = self.spec_hw.settings['intg_time']
-            self.spec.integration_time_micros(intg_time_ms*1e3) #seabreeze error checking
-            
-            scans_to_avg = self.spec_measure.settings['scans_to_avg']
-            Int_array = np.zeros(shape=(2048,scans_to_avg))
-            
-            for i in range(scans_to_avg): #software average
-                data = self.spec.spectrum(correct_dark_counts=self.spec_hw.settings['correct_dark_counts'])#acquire wavelengths and intensities from spec
-                Int_array[:,i] = data[1]
-                self.y = np.mean(Int_array, axis=-1)
+
 
     def check_filename(self, append):
         '''
