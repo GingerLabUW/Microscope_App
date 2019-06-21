@@ -135,15 +135,6 @@ class PiezoStage_Scan(Measurement):
         self.img_item = pg.ImageItem()
         self.stage_plot.addItem(self.img_item)
         
-        #setup image
-        # = np.zeros((3,3))
-        #self.img_item.setImage(image=blank)
-        #x_start = int(self.settings['x_start'])
-        #y_start = int(self.settings['y_start'])
-        #x_size = int(self.settings['x_size'])
-        #y_size = int(self.settings['y_size'])
-        #self.img_item_rect = QtCore.QRectF(x_start, y_start, x_size, y_size)
-        #self.img_item.setRect(self.img_item_rect)
         self.hist_lut.setImageItem(self.img_item) #setup histogram
 
         #arrow showing stage location

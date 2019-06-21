@@ -18,12 +18,11 @@ class PicoHarp_Scan(PiezoStage_Scan):
 
 		self.picoharp_hw = self.app.hardware['picoharp']
 		self.pi_device_hw = self.app.hardware['piezostage']
-		#figure out which settings
+
 		self.settings.New("Tacq", dtype=float, unit="s", si=True, vmin=1e-3, vmax=100*60*60)
 		self.settings.New("Resolution", dtype=int, choices=[("4 ps", 4), ("8 ps", 8), ("16 ps", 16), ("32 ps", 32), ("64 ps", 64), ("128 ps", 128), ("256 ps", 256), ("512 ps", 512)], initial=4)
 		self.settings.New("count_rate0", dtype=int, ro=True, vmin=0, vmax=100e6)
 		self.settings.New("count_rate1", dtype=int, ro=True, vmin=0, vmax=100e6)
-		#estimated scan time #x points * y points * integration time
 
 	def setup_figure(self):
 		PiezoStage_Scan.setup_figure(self)
@@ -51,7 +50,6 @@ class PicoHarp_Scan(PiezoStage_Scan):
 			sum_disp_img = self.sum_display_image_map
 			self.img_item.setImage(sum_disp_img)
 			
-			#histogram_disp_img = self.histogram_display_image_map
 			self.imv.setImage(img=self.hist_data, autoRange=False, autoLevels=True)
 			self.imv.show()
 			self.imv.window().setWindowFlag(QtCore.Qt.WindowCloseButtonHint, False) #disable closing image view window

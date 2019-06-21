@@ -1,0 +1,5 @@
+2019-06-21T14:56:03|CRITICAL|root|Unhandled exception:Traceback (most recent call last):
+  File "C:\Users\lindat18\Dropbox\Ginger_Lab\Microscope_App\HW_PI_PiezoStage\PiezoStage_independent_movement.py", line 25, in open_file
+    filename = QtWidgets.QFileDialog.getOpenFileName(self)
+TypeError: getOpenFileName(parent: QWidget = None, caption: str = '', directory: str = '', filter: str = '', initialFilter: str = '', options: Union[QFileDialog.Options, QFileDialog.Option] = 0): argument 1 has unexpected type 'PiezoStageIndependentMovement'
+

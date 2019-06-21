@@ -35,6 +35,8 @@ class MicroscopeApp(BaseMicroscopeApp):
         from HW_Picoharp.picoharp_scan import PicoHarp_Scan
         self.add_measurement(PicoHarp_Scan)
 
+        from HW_PI_PiezoStage.PiezoStage_independent_movement import PiezoStageIndependentMovement
+        self.add_measurement(PiezoStageIndependentMovement)
         # show ui
         self.ui.show()
         self.ui.activateWindow()

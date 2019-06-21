@@ -8,7 +8,7 @@ from ScopeFoundry import HardwareComponent
 import numpy as np
 
 try:
-    from .pypicoharp import PicoHarp300
+    from HW_Picoharp.pypicoharp.pypicoharp import PicoHarp300
 except Exception as err:
     print("could not load modules for PicoHarp: {}".format(err))
 

@@ -1,0 +1,12 @@
+2019-06-21T15:29:55|CRITICAL|root|Unhandled exception:Traceback (most recent call last):
+  File "Microscope_app.py", line 56, in <module>
+    app = MicroscopeApp(sys.argv)
+  File "C:\Users\lindat18\AppData\Local\Continuum\miniconda3\envs\scopefoundry\lib\site-packages\ScopeFoundry\base_app.py", line 338, in __init__
+    self.setup()
+  File "Microscope_app.py", line 38, in setup
+    from HW_PI_PiezoStage.PiezoStage_independent_movement import PiezoStageIndependentMovement
+  File "C:\Users\lindat18\Dropbox\Ginger_Lab\Microscope_App\HW_PI_PiezoStage\PiezoStage_independent_movement.py", line 27
+    def open_file(self):
+      ^
+IndentationError: expected an indented block
+
