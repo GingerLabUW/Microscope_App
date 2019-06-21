@@ -17,7 +17,7 @@ class PicoHarp_Scan(PiezoStage_Scan):
 		PiezoStage_Scan.setup(self)
 
 		self.picoharp_hw = self.app.hardware['picoharp']
-		self.pi_device_hw = self.app.hardware['pi_device']
+		self.pi_device_hw = self.app.hardware['piezostage']
 		#figure out which settings
 
 	def setup_figure(self):

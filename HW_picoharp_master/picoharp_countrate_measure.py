@@ -29,7 +29,7 @@ class PicoHarpCountrateMeasure(Measurement):
 
         
         # UI 
-        self.ui_filename = sibling_path(__file__,"picoharp_hist_measure_cr.ui")
+        self.ui_filename = sibling_path(__file__,"picoharp_countrate_measure.ui")
         self.ui = load_qt_ui_file(self.ui_filename)
         self.ui.setWindowTitle(self.name)
         

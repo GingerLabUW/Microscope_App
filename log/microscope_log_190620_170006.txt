@@ -1,0 +1,27 @@
+2019-06-20T17:00:07|CRITICAL|root|Unhandled exception:Traceback (most recent call last):
+  File "Microscope_app.py", line 54, in <module>
+    app = MicroscopeApp(sys.argv)
+  File "C:\Users\lindat18\AppData\Local\Continuum\miniconda3\envs\scopefoundry\lib\site-packages\ScopeFoundry\base_app.py", line 338, in __init__
+    self.setup()
+  File "Microscope_app.py", line 32, in setup
+    self.add_measurement(PicoHarpCountrateMeasure)
+  File "C:\Users\lindat18\AppData\Local\Continuum\miniconda3\envs\scopefoundry\lib\site-packages\ScopeFoundry\base_app.py", line 690, in add_measurement
+    measure = measure(app=self)
+  File "C:\Users\lindat18\AppData\Local\Continuum\miniconda3\envs\scopefoundry\lib\site-packages\ScopeFoundry\measurement.py", line 93, in __init__
+    self.setup()
+  File "C:\Users\lindat18\Dropbox\Ginger_Lab\Microscope_App\HW_picoharp_master\picoharp_countrate_measure.py", line 33, in setup
+    self.ui = load_qt_ui_file(self.ui_filename)
+  File "C:\Users\lindat18\AppData\Local\Continuum\miniconda3\envs\scopefoundry\lib\site-packages\ScopeFoundry\helper_funcs.py", line 64, in load_qt_ui_file
+    ui = uic.loadUi(ui_filename)
+  File "C:\Users\lindat18\AppData\Local\Continuum\miniconda3\envs\scopefoundry\lib\site-packages\PyQt5\uic\__init__.py", line 226, in loadUi
+    return DynamicUILoader(package).loadUi(uifile, baseinstance, resource_suffix)
+  File "C:\Users\lindat18\AppData\Local\Continuum\miniconda3\envs\scopefoundry\lib\site-packages\PyQt5\uic\Loader\loader.py", line 72, in loadUi
+    return self.parse(filename, resource_suffix, basedir)
+  File "C:\Users\lindat18\AppData\Local\Continuum\miniconda3\envs\scopefoundry\lib\site-packages\PyQt5\uic\uiparser.py", line 1013, in parse
+    document = parse(filename)
+  File "C:\Users\lindat18\AppData\Local\Continuum\miniconda3\envs\scopefoundry\lib\xml\etree\ElementTree.py", line 1196, in parse
+    tree.parse(source, parser)
+  File "C:\Users\lindat18\AppData\Local\Continuum\miniconda3\envs\scopefoundry\lib\xml\etree\ElementTree.py", line 586, in parse
+    source = open(source, "rb")
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\lindat18\\Dropbox\\Ginger_Lab\\Microscope_App\\HW_picoharp_master\\picoharp_hist_measure_cr.ui'
+

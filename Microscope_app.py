@@ -28,10 +28,10 @@ class MicroscopeApp(BaseMicroscopeApp):
         from HW_OceanOptics.OceanOptics_Scan import OceanOptics_Scan
         self.add_measurement(OceanOptics_Scan)
 
-        from HW_picoharp_master.picoharp_countrate_measure import picoharp_countrate_measure
-        self.add_measurement(picoharp_countrate_measure)
-        from HW_picoharp_master.picoharp_hist_measure import picoharp_histogram
-        self.add_measurement(picoharp_histogram)
+        from HW_picoharp_master.picoharp_countrate_measure import PicoHarpCountrateMeasure
+        self.add_measurement(PicoHarpCountrateMeasure)
+        from HW_picoharp_master.picoharp_hist_measure import PicoHarpHistogramMeasure
+        self.add_measurement(PicoHarpHistogramMeasure)
         from HW_picoharp_master.picoharp_scan import PicoHarp_Scan
         self.add_measurement(PicoHarp_Scan)
 

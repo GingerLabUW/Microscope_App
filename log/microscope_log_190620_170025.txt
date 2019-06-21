@@ -1,0 +1,17 @@
+2019-06-20T17:00:26|CRITICAL|root|Unhandled exception:Traceback (most recent call last):
+  File "Microscope_app.py", line 54, in <module>
+    app = MicroscopeApp(sys.argv)
+  File "C:\Users\lindat18\AppData\Local\Continuum\miniconda3\envs\scopefoundry\lib\site-packages\ScopeFoundry\base_app.py", line 338, in __init__
+    self.setup()
+  File "Microscope_app.py", line 36, in setup
+    self.add_measurement(PicoHarp_Scan)
+  File "C:\Users\lindat18\AppData\Local\Continuum\miniconda3\envs\scopefoundry\lib\site-packages\ScopeFoundry\base_app.py", line 690, in add_measurement
+    measure = measure(app=self)
+  File "C:\Users\lindat18\AppData\Local\Continuum\miniconda3\envs\scopefoundry\lib\site-packages\ScopeFoundry\measurement.py", line 93, in __init__
+    self.setup()
+  File "C:\Users\lindat18\Dropbox\Ginger_Lab\Microscope_App\HW_picoharp_master\picoharp_scan.py", line 20, in setup
+    self.pi_device_hw = self.app.hardware['pi_device']
+  File "C:\Users\lindat18\AppData\Local\Continuum\miniconda3\envs\scopefoundry\lib\site-packages\ScopeFoundry\helper_funcs.py", line 31, in __getitem__
+    return self._odict[key]
+KeyError: 'pi_device'
+
