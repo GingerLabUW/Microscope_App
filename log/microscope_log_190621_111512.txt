@@ -1,0 +1,9 @@
+2019-06-21T11:15:13|CRITICAL|root|Unhandled exception:Traceback (most recent call last):
+  File "Microscope_app.py", line 54, in <module>
+    app = MicroscopeApp(sys.argv)
+  File "C:\Users\lindat18\AppData\Local\Continuum\miniconda3\envs\scopefoundry\lib\site-packages\ScopeFoundry\base_app.py", line 338, in __init__
+    self.setup()
+  File "Microscope_app.py", line 18, in setup
+    from HW_picoharp.picoharp import PicoHarpHW
+ModuleNotFoundError: No module named 'HW_picoharp'
+

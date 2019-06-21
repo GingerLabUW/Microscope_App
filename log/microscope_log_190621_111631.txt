@@ -1,0 +1,12 @@
+2019-06-21T11:16:32|CRITICAL|root|Unhandled exception:Traceback (most recent call last):
+  File "Microscope_app.py", line 54, in <module>
+    app = MicroscopeApp(sys.argv)
+  File "C:\Users\lindat18\AppData\Local\Continuum\miniconda3\envs\scopefoundry\lib\site-packages\ScopeFoundry\base_app.py", line 338, in __init__
+    self.setup()
+  File "Microscope_app.py", line 35, in setup
+    from HW_Picoharp.picoharp_scan import PicoHarp_Scan
+  File "C:\Users\lindat18\Dropbox\Ginger_Lab\Microscope_App\HW_Picoharp\picoharp_scan.py", line 52
+    def pre_run(self):
+                     ^
+IndentationError: unindent does not match any outer indentation level
+

@@ -38,8 +38,6 @@ class OceanOptics_Scan(PiezoStage_Scan):
 		# # Create PlotDataItem object ( a scatter plot on the axes )
 		self.optimize_plot_line = self.plot.plot([0])
 		
-
-		#image display container, will show sp
 		self.imv = pg.ImageView()
 		self.imv.getView().setAspectLocked(lock=False, ratio=1)
 		self.imv.getView().setMouseEnabled(x=True, y=True)
@@ -48,6 +46,9 @@ class OceanOptics_Scan(PiezoStage_Scan):
 	def update_display(self):
 		PiezoStage_Scan.update_display(self)
 		if hasattr(self, 'spec') and hasattr(self, 'pi_device') and hasattr(self, 'y'): #first, check if setup has happened
+			if not self.interrupt_measurement_called:
+				seconds_left = ((self.x_range * self.y_range) - self.pixels_scanned) * self.settings["intg_time"] * 1e-3
+				self.ui.estimated_time_label.setText("Estimated time remaining:", str(seconds_left) + "s")
 			#plot wavelengths vs intensity
 			self.plot.plot(self.spec.wavelengths(), self.y, pen='r', clear=True) #plot wavelength vs intensity
 			self.graph_layout.show()
@@ -122,7 +123,7 @@ class OceanOptics_Scan(PiezoStage_Scan):
 		self.pi_device_hw.read_from_hardware()
 		
 
-		k = 0 #keep track of scan/'pixel' number
+		self.pixels_scanned = 0 #keep track of scan/'pixel' number
 		for i in range(self.y_range):
 			for j in range(self.x_range):
 				if self.interrupt_measurement_called:
@@ -143,9 +144,9 @@ class OceanOptics_Scan(PiezoStage_Scan):
 				self.pi_device.MVR(axes=self.axes[0], values=[x_step])
 				#self.ui.progressBar.setValue(np.floor(100*((k+1)/(x_range*y_range))))
 				#print(100*((k+1)/np.abs((self.x_range*self.y_range))))
-				self.ui.progressBar.setValue( 100 * ((k+1)/np.abs(self.x_range*self.y_range)) )
+				self.ui.progressBar.setValue( 100 * ((self.pixels_scanned+1)/np.abs(self.x_range*self.y_range)) )
 				self.pi_device_hw.read_from_hardware()
-				k+=1
+				self.pixels_scanned+=1
 			# TODO
 			# if statement needs to be modified to keep the stage at the finish y-pos for line scans in x, and same for y
 			if i == self.y_range-1: # this if statement is there to keep the stage at the finish position (in x) and not bring it back like we were doing during the scan 
@@ -159,6 +160,7 @@ class OceanOptics_Scan(PiezoStage_Scan):
 			if self.interrupt_measurement_called:
 				break
 
+		self.ui.estimated_time_label.setText("Estimated time remaining: 0s")
 		self.scan_complete = True;
 		save_dict = {"Wavelengths": self.spec.wavelengths(), "Intensities": data_array,
 				 "Scan Parameters":{"X scan start (um)": x_start, "Y scan start (um)": y_start,
