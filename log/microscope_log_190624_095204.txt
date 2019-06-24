@@ -1,9 +1,0 @@
-2019-06-24T09:52:46|CRITICAL|root|Unhandled exception:Traceback (most recent call last):
-  File "C:\Users\lindat18\AppData\Local\Continuum\miniconda3\envs\scopefoundry\lib\site-packages\ScopeFoundry\measurement.py", line 25, in run
-    self.measurement._thread_run()
-  File "C:\Users\lindat18\AppData\Local\Continuum\miniconda3\envs\scopefoundry\lib\site-packages\ScopeFoundry\measurement.py", line 183, in _thread_run
-    self.run()
-  File "C:\Users\lindat18\Dropbox\Ginger_Lab\Microscope_App\HW_PI_PiezoStage\PiezoStage_independent_movement.py", line 51, in run
-    self.axes = self.pi_device.axes
-AttributeError: 'PiezoStageHW' object has no attribute 'pi_device'
-

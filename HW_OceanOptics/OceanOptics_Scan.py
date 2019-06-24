@@ -8,6 +8,8 @@ import pickle
 import os.path
 from pyqtgraph.Qt import QtGui, QtCore
 from pyqtgraph.Point import Point
+import customplotting.mscope as cpm
+
 class OceanOptics_Scan(PiezoStage_Scan):
 
 	name = "OceanOptics_Scan"
@@ -30,6 +32,10 @@ class OceanOptics_Scan(PiezoStage_Scan):
 		spec_hw.settings.intg_time.connect_to_widget(intg_time_spinBox)
 		spec_hw.settings.correct_dark_counts.connect_to_widget(correct_dark_counts_checkBox)
 		
+		#save data buttons
+		self.ui.save_image_pushButton.clicked.connect(self.save_intensities_image)
+		self.ui.save_array_pushButton.clicked.connect(self.save_intensities_data)
+
 		#spectrometer plot
 		self.graph_layout=pg.GraphicsLayoutWidget()
 		self.plot = self.graph_layout.addPlot(title="Spectrometer Live Reading")
@@ -189,3 +195,12 @@ class OceanOptics_Scan(PiezoStage_Scan):
 				data = self.spec.spectrum(correct_dark_counts=self.spec_hw.settings['correct_dark_counts'])#acquire wavelengths and intensities from spec
 				Int_array[:,i] = data[1]
 				self.y = np.mean(Int_array, axis=-1)
+
+	def save_intensities_data(self):
+		self.check_filename('_oo_intensities.txt')
+		np.savetxt(self.app.settings['save_dir']+"/"+ self.app.settings['sample'] + "_oo_intensities.txt", self.sum_display_image_map, fmt='%f')
+
+	def save_intensities_image(self):
+		image = cpm.plot_confocal(self.sum_display_image_map, figsize=self.settings['x_size']*self.settings['y_size'], stepsize=self.settings['x_step'])
+		self.check_filename('_oo_intensities.png')
+		image.savefig(self.app.settings['save_dir'] + '/' + self.app.settings['sample'] + '_oo_intensities.png', bbox_inches='tight', dpi=300)

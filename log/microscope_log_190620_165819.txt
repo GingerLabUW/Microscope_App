@@ -1,9 +1,0 @@
-2019-06-20T16:58:20|CRITICAL|root|Unhandled exception:Traceback (most recent call last):
-  File "Microscope_app.py", line 54, in <module>
-    app = MicroscopeApp(sys.argv)
-  File "C:\Users\lindat18\AppData\Local\Continuum\miniconda3\envs\scopefoundry\lib\site-packages\ScopeFoundry\base_app.py", line 338, in __init__
-    self.setup()
-  File "Microscope_app.py", line 31, in setup
-    from HW_picoharp_master.picoharp_countrate_measure import picoharp_countrate_measure
-ImportError: cannot import name 'picoharp_countrate_measure'
-

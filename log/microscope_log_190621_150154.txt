@@ -1,5 +1,0 @@
-2019-06-21T15:01:56|CRITICAL|root|Unhandled exception:Traceback (most recent call last):
-  File "C:\Users\lindat18\Dropbox\Ginger_Lab\Microscope_App\HW_PI_PiezoStage\PiezoStage_independent_movement.py", line 27, in open_file
-    fname = QFileDialog.getOpenFileName(self, 'Open file', 'c:\\',"Image files (*.jpg *.gif)")
-NameError: name 'QFileDialog' is not defined
-

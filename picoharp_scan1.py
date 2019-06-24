@@ -8,7 +8,6 @@ import pickle
 import os.path
 from pyqtgraph.Qt import QtGui, QtCore
 from pyqtgraph.Point import Point
-import customplotting.mscope as cpm
 
 class PicoHarp_Scan(PiezoStage_Scan):
 
@@ -37,10 +36,6 @@ class PicoHarp_Scan(PiezoStage_Scan):
 		self.picoharp_hw.settings.Resolution.connect_to_widget(resolution_comboBox)
 		self.picoharp_hw.settings.count_rate0.connect_to_widget(count_rate0_spinBox)
 		self.picoharp_hw.settings.count_rate1.connect_to_widget(count_rate1_spinBox)
-
-		#save data buttons
-		self.ui.save_image_pushButton.clicked.connect(self.save_intensities_image)
-		self.ui.save_array_pushButton.clicked.connect(self.save_intensities_data)
 	
 		self.imv = pg.ImageView()
 		self.imv.getView().setAspectLocked(lock=False, ratio=1)
@@ -173,7 +168,7 @@ class PicoHarp_Scan(PiezoStage_Scan):
 					index_y = self.y_range - i - 1
 
 				data = self.measure_hist()
-				self.time_data[:,x_index, y_index], self.hist_data[:, index_x, index_y] = data			
+				self.time_data[:,x_index, y_index], self.hist_data[:, x_index, y_index] = data			
 				self.sum_display_image_map[index_x, index_y] = sum(sum(data[1]))
 				self.time_data.flush()
 				self.hist_data.flush()
@@ -210,19 +205,10 @@ class PicoHarp_Scan(PiezoStage_Scan):
 			if self.interrupt_measurement_called:
 				break
 			ph.read_histogram_data()
-			self.picoharp_hw.settings.count_rate0.read_from_hardware()
-			self.picoharp_hw.settings.count_rate1.read_from_hardware()
+			ph_hw.settings.count_rate0.read_from_hardware()
+			ph_hw.settings.count_rate1.read_from_hardware()
 			sleep(0.001)
 	
 		ph.stop_histogram()
 		ph.read_histogram_data()
 		return ph.time_array[0:self.num_hist_chans], ph.histogram_data[0:self.num_hist_chans]
-
-	def save_intensities_data(self):
-		self.check_filename('_ph_intensities.txt')
-		np.savetxt(self.app.settings['save_dir']+"/"+ self.app.settings['sample'] + "_ph_intensities.txt", self.sum_display_image_map, fmt='%f')
-
-	def save_intensities_image(self):
-		image = cpm.plot_confocal(self.sum_display_image_map, figsize=self.settings['x_size']*self.settings['y_size'], stepsize=self.settings['x_step'])
-		self.check_filename('_ph_intensities.png')
-		image.savefig(self.app.settings['save_dir'] + '/' + self.app.settings['sample'] + '_ph_intensities.png', bbox_inches='tight', dpi=300)
