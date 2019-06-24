@@ -39,7 +39,7 @@ class PicoHarp_Scan(PiezoStage_Scan):
 		self.picoharp_hw.settings.count_rate1.connect_to_widget(count_rate1_spinBox)
 
 		#save data buttons
-		self.ui.save_image_pushButton.clicked.connect(self.save_intensities_image)
+		#self.ui.save_image_pushButton.clicked.connect(self.save_intensities_image)
 		self.ui.save_array_pushButton.clicked.connect(self.save_intensities_data)
 	
 		self.imv = pg.ImageView()
@@ -73,13 +73,13 @@ class PicoHarp_Scan(PiezoStage_Scan):
 			the temporary filename on disk associated to the memmap.
 
 			"""
-			if hasattr(self,'time_data'):
-				self.time_data._mmap.close()
-				self.hist_data._mmap.close()
-				delattr(self,'time_data')
-				delattr(self,'hist_data')
-				os.remove(self.time_filename)
-				os.remove(self.hist_filename)
+			# if hasattr(self,'time_data'): ###
+			# 	self.time_data._mmap.close()
+			# 	self.hist_data._mmap.close()
+			# 	delattr(self,'time_data')
+			# 	delattr(self,'hist_data')
+			# 	os.remove(self.time_filename)
+			# 	os.remove(self.hist_filename)
 			## set all logged quantities read only
 			#for lqname in "xdim ydim map_size".split():
 			#    self.settings.as_dict()[lqname].change_readonly(True)

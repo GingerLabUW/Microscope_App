@@ -33,7 +33,7 @@ class OceanOptics_Scan(PiezoStage_Scan):
 		spec_hw.settings.correct_dark_counts.connect_to_widget(correct_dark_counts_checkBox)
 		
 		#save data buttons
-		self.ui.save_image_pushButton.clicked.connect(self.save_intensities_image)
+		#self.ui.save_image_pushButton.clicked.connect(self.save_intensities_image)
 		self.ui.save_array_pushButton.clicked.connect(self.save_intensities_data)
 
 		#spectrometer plot
