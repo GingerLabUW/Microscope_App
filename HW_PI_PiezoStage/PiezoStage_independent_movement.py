@@ -37,15 +37,15 @@ class PiezoStageIndependentMovement(Measurement):
 			fname = QtWidgets.QFileDialog.getOpenFileName(self.ui, 'Open file', os.getcwd(),"*.txt")
 			try:
 				self.position_array = np.genfromtxt(fname[0], dtype=None, encoding=None) #convert file contents into np array
-				self.ui.textBrowser.append("Successfully imported from", str(fname[0]))
+				self.ui.textBrowser.append("Successfully imported from " + str(fname[0]))
 			except:
-				print("Error: File containing position array is not formatted correctly.")
+				self.ui.textBrowser.append("Error: File containing position array is not formatted correctly.")
 		except Exception as err:
-			print(format(err))
+			self.ui.textBrowser.append(format(err))
 
 	def run(self):
 		if not hasattr(self, "position_array"):
-			self.ui.textBrowser.append("Must import text file before running..")
+			self.ui.textBrowser.append("Must import text file before running.")
 		else:		
 			self.pi_device = self.pi_device_hw.pi_device
 			self.axes = self.pi_device.axes
@@ -54,7 +54,7 @@ class PiezoStageIndependentMovement(Measurement):
 				if self.interrupt_measurement_called:
 					break
 				move_here = self.position_array[i] #get next point for stage to move to
-				self.pi_device.MOV(axes=self.axes, values=move_here)
-				self.pi_device.read_from_hardware()
+				self.pi_device.MOV(axes=self.axes, values=[move_here[0], move_here[1]])
+				self.pi_device_hw.read_from_hardware()
 				self.ui.textBrowser.append("Point #" + str(i+1) + " complete.")
 				time.sleep(self.settings['sleep_time'])

@@ -195,7 +195,7 @@ class PiezoStage_Scan(Measurement):
     def export_positions(self):
         self.check_filename("_selected_positions.txt")
         trimmed = self.selected_positions[~np.all(self.selected_positions == 0, axis=1)] #get rid of empty rows
-        np.savetxt(self.app.settings['save_dir']+"/"+ self.app.settings['sample'] + "_selected_positions.txt", self.selected_positions, fmt='%f')
+        np.savetxt(self.app.settings['save_dir']+"/"+ self.app.settings['sample'] + "_selected_positions.txt", trimmed, fmt='%f')
 
     def move_to_selected(self):
         '''
