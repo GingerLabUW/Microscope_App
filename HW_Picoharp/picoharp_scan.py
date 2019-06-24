@@ -175,7 +175,7 @@ class PicoHarp_Scan(PiezoStage_Scan):
 					index_y = self.y_range - i - 1
 
 				data = self.measure_hist()
-				self.time_data[:,x_index, y_index], self.hist_data[:, index_x, index_y] = data			
+				self.time_data[:,index_x, index_y], self.hist_data[:, index_x, index_y] = data			
 				self.sum_display_image_map[index_x, index_y] = sum(data[1])
 				####self.time_data.flush()
 				###self.hist_data.flush()
@@ -214,7 +214,7 @@ class PicoHarp_Scan(PiezoStage_Scan):
 			ph.read_histogram_data()
 			self.picoharp_hw.settings.count_rate0.read_from_hardware()
 			self.picoharp_hw.settings.count_rate1.read_from_hardware()
-			sleep(0.001)
+			time.sleep(0.001)
 	
 		ph.stop_histogram()
 		ph.read_histogram_data()

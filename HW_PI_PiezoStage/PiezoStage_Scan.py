@@ -24,7 +24,7 @@ class PiezoStage_Scan(Measurement):
         # This file can be edited graphically with Qt Creator
         # sibling_path function allows python to find a file in the same folder
         # as this python module
-        self.ui_filename = sibling_path(__file__, "spec_pz_2.ui")
+        self.ui_filename = sibling_path(__file__, "stage_scan.ui")
         
         #Load ui file and convert it to a live QWidget of the user interface
         self.ui = load_qt_ui_file(self.ui_filename)

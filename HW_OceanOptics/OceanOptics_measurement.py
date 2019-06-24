@@ -138,14 +138,15 @@ class OceanOpticsMeasure(Measurement):
 				self.y = np.mean(Int_array, axis=-1)
 
 
-	def check_filename(self):
-		'''
-		If no sample name given or duplicate sample name given, fix the problem by appending a unique number.
-		'''
-		samplename = self.app.settings['sample']
-		filename = samplename + "_raw_PL_spectra_data.pkl"
-		directory = self.app.settings['save_dir']
-		if samplename == "":
-			self.app.settings['sample'] = int(time.time())
-		if (os.path.exists(directory+"/"+filename)):
-			self.app.settings['sample'] = samplename + str(int(time.time()))
+    def check_filename(self, append):
+        '''
+        If no sample name given or duplicate sample name given, fix the problem by appending a unique number.
+        append - string to add to sample name (including file extension)
+        '''
+        samplename = self.app.settings['sample']
+        filename = samplename + append
+        directory = self.app.settings['save_dir']
+        if samplename == "":
+            self.app.settings['sample'] = int(time.time())
+        if (os.path.exists(directory+"/"+filename)):
+            self.app.settings['sample'] = samplename + str(int(time.time()))

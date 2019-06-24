@@ -1,2 +1,3 @@
-.pyc
-.txt
+*.pyc
+*.txt
+data/
