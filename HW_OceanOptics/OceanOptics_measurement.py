@@ -97,7 +97,7 @@ class OceanOpticsMeasure(Measurement):
 
 		Runs until measurement is interrupted. Data is continuously saved if checkbox checked.
 		"""
-		self.check_filename()
+		self.check_filename(".txt")
 		self.spec = self.spec_hw.spec
 		while not self.interrupt_measurement_called:
 			self._read_spectrometer()
@@ -117,7 +117,7 @@ class OceanOpticsMeasure(Measurement):
 		save_array = np.zeros(shape=(2048,2))
 		save_array[:,1] = self.y
 		save_array[:,0] = self.spec.wavelengths()
-		self.check_filename()
+		self.check_filename(".txt")
 		np.savetxt(self.app.settings['save_dir']+"/"+self.app.settings['sample']+".txt", save_array, fmt = '%.5f', 
 				   header = 'Wavelength (nm), Intensity (counts)', delimiter = ' ')
 
