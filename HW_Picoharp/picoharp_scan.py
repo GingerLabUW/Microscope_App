@@ -176,12 +176,9 @@ class PicoHarp_Scan(PiezoStage_Scan):
 
 				data = self.measure_hist()
 				self.time_data[:,x_index, y_index], self.hist_data[:, index_x, index_y] = data			
-				#self.sum_display_image_map[index_x, index_y] = sum(sum(data[1]))
-				sum = 0
-				for k in range(hist_len):
-					sum += self.hist_data[k, j, i] ###
-				self.time_data.flush()
-				self.hist_data.flush()
+				self.sum_display_image_map[index_x, index_y] = sum(data[1])
+				####self.time_data.flush()
+				###self.hist_data.flush()
 				
 				self.pi_device.MVR(axes=self.axes[0], values=[x_step])
 				#self.ui.progressBar.setValue(np.floor(100*((k+1)/(x_range*y_range))))
@@ -204,7 +201,7 @@ class PicoHarp_Scan(PiezoStage_Scan):
 
 		self.ui.estimated_time_label.setText("Estimated time remaining: 0s")
 		self.scan_complete = True
-		np.savez_compressed(data_filename,bins=self.time_data,hist=self.hist_data)
+		#np.savez_compressed(data_filename,bins=self.time_data,hist=self.hist_data)
 
 	def measure_hist(self):
 		ph = self.picoharp_hw.picoharp
