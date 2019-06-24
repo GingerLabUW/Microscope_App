@@ -48,10 +48,10 @@ class PicoHarp_Scan(PiezoStage_Scan):
 
 	def update_display(self):
 		PiezoStage_Scan.update_display(self)
-		if hasattr(self, 'picoharp') and hasattr(self, 'pi_device'):
+		if hasattr(self, 'picoharp') and hasattr(self, 'pi_device') and hasattr(self, 'sum_display_image_map'):
 			if not self.interrupt_measurement_called:
 				seconds_left = ((self.x_range * self.y_range) - self.pixels_scanned) * self.settings["Tacq"]
-				self.ui.estimated_time_label.setText("Estimated time remaining:", str(seconds_left) + "s")
+				self.ui.estimated_time_label.setText("Estimated time remaining: " + str(seconds_left) + "s")
 			sum_disp_img = self.sum_display_image_map
 			self.img_item.setImage(sum_disp_img)
 			
@@ -148,9 +148,11 @@ class PicoHarp_Scan(PiezoStage_Scan):
 		hist_len = self.num_hist_chans
 
 		#Use memmaps to use less memory and store data into disk
-		self.hist_data= np.memmap(self.hist_filename,dtype='float32',mode='w+',shape=(hist_len, self.x_range, self.y_range))#len(XX[0,:]),len(YY[:,0])))
-		self.time_data= np.memmap(self.time_filename,dtype='float32',mode='w+',shape=(hist_len, self.x_range, self.y_range))#len(XX[0,:]),len(YY[:,0])))
+		#self.hist_data= np.memmap(self.hist_filename,dtype='float32',mode='w+',shape=(hist_len, self.x_range, self.y_range))#len(XX[0,:]),len(YY[:,0])))
+		#self.time_data= np.memmap(self.time_filename,dtype='float32',mode='w+',shape=(hist_len, self.x_range, self.y_range))#len(XX[0,:]),len(YY[:,0]))) ###TODO: memmap throwing errors
 
+		self.hist_data = np.zeros(shape=(hist_len, self.x_range, self.y_range)) ###use array instead of memmap for now
+		self.time_data = np.zeros(shape=(hist_len, self.x_range, self.y_range))
 		#Store histogram sums for each pixel
 		self.sum_display_image_map = np.zeros((self.x_range, self.y_range), dtype=float)
 		
@@ -174,7 +176,10 @@ class PicoHarp_Scan(PiezoStage_Scan):
 
 				data = self.measure_hist()
 				self.time_data[:,x_index, y_index], self.hist_data[:, index_x, index_y] = data			
-				self.sum_display_image_map[index_x, index_y] = sum(sum(data[1]))
+				#self.sum_display_image_map[index_x, index_y] = sum(sum(data[1]))
+				sum = 0
+				for k in range(hist_len):
+					sum += self.hist_data[k, j, i] ###
 				self.time_data.flush()
 				self.hist_data.flush()
 				
@@ -222,7 +227,7 @@ class PicoHarp_Scan(PiezoStage_Scan):
 		self.check_filename('_ph_intensities.txt')
 		np.savetxt(self.app.settings['save_dir']+"/"+ self.app.settings['sample'] + "_ph_intensities.txt", self.sum_display_image_map, fmt='%f')
 
-	def save_intensities_image(self):
-		image = cpm.plot_confocal(self.sum_display_image_map, figsize=self.settings['x_size']*self.settings['y_size'], stepsize=self.settings['x_step'])
-		self.check_filename('_ph_intensities.png')
-		image.savefig(self.app.settings['save_dir'] + '/' + self.app.settings['sample'] + '_ph_intensities.png', bbox_inches='tight', dpi=300)
+	# def save_intensities_image(self):
+	# 	image = cpm.plot_confocal(self.sum_display_image_map, figsize=self.settings['x_size']*self.settings['y_size'], stepsize=self.settings['x_step'])
+	# 	self.check_filename('_ph_intensities.png')
+	# 	image.savefig(self.app.settings['save_dir'] + '/' + self.app.settings['sample'] + '_ph_intensities.png', bbox_inches='tight', dpi=300)

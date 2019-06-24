@@ -200,7 +200,7 @@ class OceanOptics_Scan(PiezoStage_Scan):
 		self.check_filename('_oo_intensities.txt')
 		np.savetxt(self.app.settings['save_dir']+"/"+ self.app.settings['sample'] + "_oo_intensities.txt", self.sum_display_image_map, fmt='%f')
 
-	def save_intensities_image(self):
-		image = cpm.plot_confocal(self.sum_display_image_map, figsize=self.settings['x_size']*self.settings['y_size'], stepsize=self.settings['x_step'])
-		self.check_filename('_oo_intensities.png')
-		image.savefig(self.app.settings['save_dir'] + '/' + self.app.settings['sample'] + '_oo_intensities.png', bbox_inches='tight', dpi=300)
+	# def save_intensities_image(self):
+	# 	image = cpm.plot_confocal(self.sum_display_image_map, figsize=self.settings['x_size']*self.settings['y_size'], stepsize=self.settings['x_step'])
+	# 	self.check_filename('_oo_intensities.png')
+	# 	image.savefig(self.app.settings['save_dir'] + '/' + self.app.settings['sample'] + '_oo_intensities.png', bbox_inches='tight', dpi=300)
