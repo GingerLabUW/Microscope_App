@@ -260,8 +260,10 @@ class PiezoStage_Scan(Measurement):
         This function runs repeatedly and automatically during the measurement run.
         its update frequency is defined by self.display_update_period
         """
-        self.img_item.setPos(self.scan_roi.pos())
-
+        roi_pos = self.scan_roi.pos()
+        self.img_item_rect = QtCore.QRectF(roi_pos[0], roi_pos[1], self.settings['x_size'], self.settings['y_size'])
+        self.img_item.setRect(self.img_item_rect)
+        
         if self.scan_complete:
             self.stage_plot.addItem(self.hLine)
             self.stage_plot.addItem(self.vLine)
