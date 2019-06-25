@@ -70,6 +70,10 @@ class OceanOptics_Scan(PiezoStage_Scan):
 			self.imv.show()
 			self.imv.window().setWindowFlag(QtCore.Qt.WindowCloseButtonHint, False) #disable closing image view window
 			
+			#update progress bar
+			progress = 100 * ((self.pixels_scanned+1)/np.abs(self.x_range*self.y_range))
+			self.ui.progressBar.setValue(progress)
+			self.set_progress(progress)
 			pg.QtGui.QApplication.processEvents()
 
 
@@ -150,9 +154,6 @@ class OceanOptics_Scan(PiezoStage_Scan):
 				self.sum_display_image_map[index_x, index_y] = self.y.sum()
 				self.intensities_display_image_map[:, index_x, index_y] = self.y#intensities_sum
 				self.pi_device.MVR(axes=self.axes[0], values=[x_step])
-				#self.ui.progressBar.setValue(np.floor(100*((k+1)/(x_range*y_range))))
-				#print(100*((k+1)/np.abs((self.x_range*self.y_range))))
-				self.ui.progressBar.setValue( 100 * ((self.pixels_scanned+1)/np.abs(self.x_range*self.y_range)) )
 				self.pi_device_hw.read_from_hardware()
 				self.pixels_scanned+=1
 			# TODO

@@ -56,10 +56,13 @@ class PicoHarp_Scan(PiezoStage_Scan):
 				self.ui.estimated_time_label.setText("Estimated time remaining: " + str(seconds_left) + "s")
 			sum_disp_img = self.sum_display_image_map
 			self.img_item.setImage(sum_disp_img)
-			
 			self.imv.setImage(img=self.hist_data, autoRange=False, autoLevels=True)
 			self.imv.show()
 			self.imv.window().setWindowFlag(QtCore.Qt.WindowCloseButtonHint, False) #disable closing image view window
+
+			progress = 100 * ((self.pixels_scanned+1)/np.abs(self.x_range*self.y_range))
+			self.ui.progressBar.setValue(progress)
+			self.set_progress(progress)
 			pg.QtGui.QApplication.processEvents()
 
 	def pre_run(self):
@@ -183,9 +186,6 @@ class PicoHarp_Scan(PiezoStage_Scan):
 				###self.hist_data.flush()
 				
 				self.pi_device.MVR(axes=self.axes[0], values=[x_step])
-				#self.ui.progressBar.setValue(np.floor(100*((k+1)/(x_range*y_range))))
-				#print(100*((k+1)/np.abs((self.x_range*self.y_range))))
-				self.ui.progressBar.setValue( 100 * ((self.pixels_scanned+1)/np.abs(self.x_range*self.y_range)) )
 				self.pi_device_hw.read_from_hardware()
 				self.pixels_scanned+=1
 			# TODO
@@ -223,7 +223,7 @@ class PicoHarp_Scan(PiezoStage_Scan):
 		return ph.time_array[0:self.num_hist_chans], ph.histogram_data[0:self.num_hist_chans]
 
 	def save_intensities_data(self):
-		self.save_intensities_data(self.sum_display_image_map, 'ph')
+		super.save_intensities_data(self.sum_display_image_map, 'ph')
 
 	def save_intensities_image(self):
-		self.save_intensities_image(self.sum_display_image_map, 'ph')
+		super.save_intensities_image(self.sum_display_image_map, 'ph')

@@ -86,6 +86,7 @@ class PiezoStage_Scan(Measurement):
         self.settings.y_clicked.connect_to_widget(self.ui.y_clicked_doubleSpinBox)
         self.settings.lock_position.connect_to_widget(self.ui.lock_position_checkBox)
         self.settings.save_positions.connect_to_widget(self.ui.save_positions_checkBox)
+        self.settings.progress.connect_to_widget(self.ui.progressBar)
         self.ui.move_to_selected_pushButton.clicked.connect(self.move_to_selected)
         self.ui.export_positions_pushButton.clicked.connect(self.export_positions)
 
@@ -267,6 +268,8 @@ class PiezoStage_Scan(Measurement):
         self.img_item.setRect(self.img_item_rect)
 
         if self.scan_complete:
+            self.ui.progressBar.setValue(100)
+            self.set_progress(100)
             self.stage_plot.addItem(self.hLine)
             self.stage_plot.addItem(self.vLine)
 
