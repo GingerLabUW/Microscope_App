@@ -63,6 +63,7 @@ class PicoHarpHW(HardwareComponent):
 #        LQ["Binning"].hardware_set_func      = PH.write_Binning
 #        LQ["Binning"].hardware_read_func     = lambda PH=PH: PH.Binning
 
+        LQ["Resolution"].hardware_set_func = PH.set_Resolution ###
         LQ["Resolution"].hardware_read_func     = PH.read_Resolution
         
         LQ["SyncDivider"].hardware_set_func  = PH.write_SyncDivider

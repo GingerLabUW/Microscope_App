@@ -168,6 +168,10 @@ class PicoHarp300(object):
 #        return self.Resolution
         self.time_array = numpy.arange(self.HISTCHAN, dtype=float)*phlib.PH_GetResolution(self.devnum)
         return phlib.PH_GetResolution(self.devnum)
+
+    def set_Resolution(self, resolution): ###
+        self.Resolution = int(resolution)
+        return self.Resolution
 	
     def write_SyncOffset(self, SyncOffset):
         """

@@ -45,6 +45,7 @@ class PicoHarpCountrateMeasure(Measurement):
         #ph.settings.histogram_channels.connect_bidir_to_widget(self.ui.histogram_channels_doubleSpinBox)
         ph_hw.settings.count_rate0.connect_to_widget(self.ui.ch0_label)#doubleSpinBox)
         ph_hw.settings.count_rate1.connect_to_widget(self.ui.ch1_label)#doubleSpinBox)
+        ph_hw.settings.Resolution.connect_to_widget(self.ui.resolution_comboBox)
         
         
         S.save_h5.connect_bidir_to_widget(self.ui.save_h5_checkBox)
