@@ -134,6 +134,8 @@ class PiezoStage_Scan(Measurement):
         #image on stage plot, will show intensity sums
         self.img_item = pg.ImageItem()
         self.stage_plot.addItem(self.img_item)
+        blank = np.zeros((3,3))
+        self.img_item.setImage(image=blank) #placeholder image
         
         self.hist_lut.setImageItem(self.img_item) #setup histogram
 
@@ -263,7 +265,7 @@ class PiezoStage_Scan(Measurement):
         roi_pos = self.scan_roi.pos()
         self.img_item_rect = QtCore.QRectF(roi_pos[0], roi_pos[1], self.settings['x_size'], self.settings['y_size'])
         self.img_item.setRect(self.img_item_rect)
-        
+
         if self.scan_complete:
             self.stage_plot.addItem(self.hLine)
             self.stage_plot.addItem(self.vLine)
