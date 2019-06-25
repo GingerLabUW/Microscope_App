@@ -27,6 +27,8 @@ class PicoHarp_Scan(PiezoStage_Scan):
 
 	def setup_figure(self):
 		PiezoStage_Scan.setup_figure(self)
+		self.ui.save_array_pushButton.clicked.connect(self.save_intensities_data)
+        self.ui.save_image_pushButton.clicked.connect(self.save_intensities_image)
 		details_groupBox = self.set_details_widget(widget = self.settings.New_UI(include=["Tacq", "Resolution", "count_rate0", "count_rate1"]))
 		widgets = details_groupBox.findChildren(QtGui.QWidget)		
 		tacq_spinBox = widgets[1]
@@ -221,10 +223,7 @@ class PicoHarp_Scan(PiezoStage_Scan):
 		return ph.time_array[0:self.num_hist_chans], ph.histogram_data[0:self.num_hist_chans]
 
 	def save_intensities_data(self):
-		self.check_filename('_ph_intensities.txt')
-		np.savetxt(self.app.settings['save_dir']+"/"+ self.app.settings['sample'] + "_ph_intensities.txt", self.sum_display_image_map, fmt='%f')
+		self.save_intensities_data(self.sum_display_image_map, 'ph')
 
-	# def save_intensities_image(self):
-	# 	image = cpm.plot_confocal(self.sum_display_image_map, figsize=self.settings['x_size']*self.settings['y_size'], stepsize=self.settings['x_step'])
-	# 	self.check_filename('_ph_intensities.png')
-	# 	image.savefig(self.app.settings['save_dir'] + '/' + self.app.settings['sample'] + '_ph_intensities.png', bbox_inches='tight', dpi=300)
+	def save_intensities_image(self):
+		self.save_intensities_image(self.sum_display_image_map, 'ph')

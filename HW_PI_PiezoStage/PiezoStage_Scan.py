@@ -305,3 +305,22 @@ class PiezoStage_Scan(Measurement):
         #return replace_widget_in_layout(self.ui.details_groupBox,details_ui)
         self.ui.details_groupBox.layout().addWidget(self.details_ui)
         return self.details_ui
+
+    def save_intensities_data(self, intensities_array, hw_name):
+        """
+        intensities_array - array of intensities to save
+        hw_name - string that describes intensities source (ie. oo for oceanoptics, ph for picoharp) 
+        """
+        append = '_' + hw_name + '_intensity_sums.txt' #string to append to sample name
+        self.check_filename(append)
+        np.savetxt(self.app.settings['save_dir']+"/"+ self.app.settings['sample'] + append, intensities_array, fmt='%f')
+
+    def save_intensities_image(self, intensities_array, hw_name):
+        """
+        intensities_array - array of intensities to save as image
+        hw_name - string that describes intensities source (ie. oo for oceanoptics, ph for picoharp) 
+        """
+        append = '_' + hw_name + '_intensity_sums.png'
+        cpm.plot_confocal(intensities_array, stepsize=self.settings['x_step'])
+        self.check_filename(append)
+        cpm.plt.savefig(self.app.settings['save_dir'] + '/' + self.app.settings['sample'] + append, bbox_inches='tight', dpi=300)

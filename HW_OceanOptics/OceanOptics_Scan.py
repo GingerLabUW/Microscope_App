@@ -23,6 +23,8 @@ class OceanOptics_Scan(PiezoStage_Scan):
 
 	def setup_figure(self):
 		PiezoStage_Scan.setup_figure(self)
+		self.ui.save_array_pushButton.clicked.connect(self.save_intensities_data)
+        self.ui.save_image_pushButton.clicked.connect(self.save_intensities_image)
 		spec_hw = self.app.hardware['oceanoptics']
 		details_groupBox = self.set_details_widget(widget = self.settings.New_UI(include=["intg_time", "correct_dark_counts", "scans_to_avg"]))
 		widgets = details_groupBox.findChildren(QtGui.QWidget)
@@ -197,10 +199,7 @@ class OceanOptics_Scan(PiezoStage_Scan):
 				self.y = np.mean(Int_array, axis=-1)
 
 	def save_intensities_data(self):
-		self.check_filename('_oo_intensities.txt')
-		np.savetxt(self.app.settings['save_dir']+"/"+ self.app.settings['sample'] + "_oo_intensities.txt", self.sum_display_image_map, fmt='%f')
+		self.save_intensities_data(self.sum_display_image_map, 'oo')
 
-	# def save_intensities_image(self):
-	# 	image = cpm.plot_confocal(self.sum_display_image_map, figsize=self.settings['x_size']*self.settings['y_size'], stepsize=self.settings['x_step'])
-	# 	self.check_filename('_oo_intensities.png')
-	# 	image.savefig(self.app.settings['save_dir'] + '/' + self.app.settings['sample'] + '_oo_intensities.png', bbox_inches='tight', dpi=300)
+	def save_intensities_image(self):
+		self.save_intensities_image(self.sum_display_image_map, 'oo')
