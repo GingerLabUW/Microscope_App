@@ -23,17 +23,27 @@ class PicoHarpHistogramMeasure(Measurement):
         
         S.New('save_h5', dtype=bool, initial=True)
         S.New('continuous', dtype=bool, initial=False)
-        
-        # hardware
-        ph_hw = self.picoharp_hw = self.app.hardware['picoharp']
 
-        
         # UI 
         self.ui_filename = sibling_path(__file__,"picoharp_hist_measure.ui")
         self.ui = load_qt_ui_file(self.ui_filename)
         self.ui.setWindowTitle(self.name)
         
-        
+        #self.gui.ui.picoharp_acquire_one_pushButton.clicked.connect(self.start)
+        #self.gui.ui.picoharp_interrupt_pushButton.clicked.connect(self.interrupt)
+    
+    def setup_figure(self):
+#         self.fig = self.gui.add_figure("picoharp_live", self.gui.ui.picoharp_plot_widget)
+#                     
+#         self.ax = self.fig.add_subplot(111)
+#         self.plotline, = self.ax.semilogy([0,20], [1,65535])
+#         self.ax.set_ylim(1e-1,1e5)
+#         self.ax.set_xlabel("Time (ns)")
+#         self.ax.set_ylabel("Counts")
+
+        # hardware
+        ph_hw = self.picoharp_hw = self.app.hardware['picoharp']
+
         #connect events
         S.progress.connect_bidir_to_widget(self.ui.progressBar)
         self.ui.start_pushButton.clicked.connect(self.start)
@@ -46,21 +56,9 @@ class PicoHarpHistogramMeasure(Measurement):
         ph_hw.settings.count_rate0.connect_to_widget(self.ui.ch0_label)#doubleSpinBox) ###
         ph_hw.settings.count_rate1.connect_to_widget(self.ui.ch1_label)#doubleSpinBox) ###
         ph_hw.settings.Resolution.connect_to_widget(self.ui.resolution_comboBox)
-        
-        
         S.save_h5.connect_bidir_to_widget(self.ui.save_h5_checkBox)
-        #self.gui.ui.picoharp_acquire_one_pushButton.clicked.connect(self.start)
-        #self.gui.ui.picoharp_interrupt_pushButton.clicked.connect(self.interrupt)
-    
-    def setup_figure(self):
-#         self.fig = self.gui.add_figure("picoharp_live", self.gui.ui.picoharp_plot_widget)
-#                     
-#         self.ax = self.fig.add_subplot(111)
-#         self.plotline, = self.ax.semilogy([0,20], [1,65535])
-#         self.ax.set_ylim(1e-1,1e5)
-#         self.ax.set_xlabel("Time (ns)")
-#         self.ax.set_ylabel("Counts")
-        
+        self.ui.save_data_pushButton(self.save_hist_data)
+
         self.graph_layout = pg.GraphicsLayoutWidget()    
         
         self.plot = self.graph_layout.addPlot()
@@ -132,3 +130,12 @@ class PicoHarpHistogramMeasure(Measurement):
         self.plotdata.setData(ph.time_array*1e-3, ph.histogram_data+1)
         print(ph.time_array)
         #self.fig.canvas.draw()
+
+    def save_hist_data(self):
+        ph = self.picoharp
+        hist_data = np.zeros((ph.time_array.shape[0], 2))
+        hist_data[:,0] = ph.time_array #set first column with time data
+        hist_data[:,1] = ph.histogram_data #set second column with histogram data
+        append = '_histogram_data.txt' #string to append to sample name
+        self.check_filename(append)
+        np.savetxt(self.app.settings['save_dir']+"/"+ self.app.settings['sample'] + append, hist_data, fmt='%f')
