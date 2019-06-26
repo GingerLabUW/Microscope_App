@@ -109,7 +109,7 @@ class PicoHarp300(object):
 
         self.Tacq = self.set_Tacq(Tacq)
         
-        #self.write_Binning(Binning)
+        self.write_Binning(Binning) ##
         self.write_SyncOffset(SyncOffset)
         self.write_SyncDivider(SyncDivider)
         self.write_InputCFD(0, CFDLevel0, CFDZeroCross0)
@@ -155,23 +155,23 @@ class PicoHarp300(object):
     def write_CFDZeroCross1(self, zerocross):
         self.write_InputCFD(1, self.CFDLevel[1], zerocross)
         
-#    def write_Binning(self, Binning):
-#        self.Binning = int(Binning)
-#        self.handle_err(phlib.PH_SetBinning(self.devnum, self.Binning))
-#        self.read_Resolution()
-#        self.time_array = numpy.arange(self.HISTCHAN, dtype=float)*self.Resolution
+    def write_Binning(self, Binning): ##
+        self.Binning = int(Binning)
+        self.handle_err(phlib.PH_SetRange(self.devnum, self.Binning))
+        self.read_Resolution()
+        self.time_array = numpy.arange(self.HISTCHAN, dtype=float)*self.Resolution
         
     def read_Resolution(self):
 #        r = c_double(0)
 #        self.handle_err(phlib.PH_GetResolution(self.devnum))#, byref(r)))
 #        self.Resolution = r.value
 #        return self.Resolution
-        self.time_array = numpy.arange(self.HISTCHAN, dtype=float)*phlib.PH_GetResolution(self.devnum)
+        #self.time_array = numpy.arange(self.HISTCHAN, dtype=float)*phlib.PH_GetResolution(self.devnum)
         return phlib.PH_GetResolution(self.devnum)
 
-    def set_Resolution(self, resolution): ###
-        self.Resolution = int(resolution)
-        return self.Resolution
+    # def set_Resolution(self, resolution): ###
+    #     self.Resolution = int(resolution)
+    #     return self.Resolution
 	
     def write_SyncOffset(self, SyncOffset):
         """
