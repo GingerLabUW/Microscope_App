@@ -48,7 +48,6 @@ class PiezoStage_Scan(Measurement):
         self.settings.New('lock_position', dtype=bool, initial=False)
         self.settings.New('save_positions', dtype=bool, initial=False)
         
-        
         # Define how often to update display during a run
         self.display_update_period = 0.1 
         

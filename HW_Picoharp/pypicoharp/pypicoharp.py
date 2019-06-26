@@ -143,6 +143,7 @@ class PicoHarp300(object):
         if self.debug: logger.debug( "write_InputCFD {} {} {}".format( chan, level, zerocross))
         #self.handle_err(phlib.PH_SetInputCFD(self.devnum, chan, int(level), int(zerocross)))
         self.handle_err(phlib.PH_SetCFDZeroCross(self.devnum, chan, int(zerocross)))
+        
     def write_CFDLevel0(self, level):
         self.write_InputCFD(0, level, self.CFDZeroCross[0])
         
@@ -159,7 +160,7 @@ class PicoHarp300(object):
         self.Binning = int(Binning)
         self.handle_err(phlib.PH_SetRange(self.devnum, self.Binning))
         self.read_Resolution()
-        self.time_array = numpy.arange(self.HISTCHAN, dtype=float)*self.Resolution
+        self.time_array = numpy.arange(self.HISTCHAN, dtype=float)*self.read_Resolution()
         
     def read_Resolution(self):
 #        r = c_double(0)
@@ -167,7 +168,8 @@ class PicoHarp300(object):
 #        self.Resolution = r.value
 #        return self.Resolution
         #self.time_array = numpy.arange(self.HISTCHAN, dtype=float)*phlib.PH_GetResolution(self.devnum)
-        return phlib.PH_GetResolution(self.devnum)
+        self.Resolution = phlib.PH_GetResolution(self.devnum)
+        return self.Resolution
 
     # def set_Resolution(self, resolution): ###
     #     self.Resolution = int(resolution)
@@ -185,6 +187,7 @@ class PicoHarp300(object):
 #        cr = c_int(-1)
 #        self.handle_err(phlib.PH_GetCountRate(self.devnum, chan))#, byref(cr)))
 #        self.Countrate[chan] = cr.value
+        self.Countrate[chan] = phlib.PH_GetCountRate(self.devnum, chan)
         return phlib.PH_GetCountRate(self.devnum, chan)
     
     def read_count_rate0(self):

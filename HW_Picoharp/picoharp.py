@@ -23,9 +23,10 @@ class PicoHarpHW(HardwareComponent):
 
 
         self.settings.New("Tacq", dtype=float, unit="s", si=True, vmin=1e-3, vmax=100*60*60)
-        self.settings.New("Binning", dtype=int, choices=[(str(x), x) for x in range(0,8)]) ##binning/range
+        self.settings.New("Binning", dtype=int, choices=[(str(x), x) for x in range(0,8)]) ##binning/range todo: connect binning and resolution
         #self.settings.New("Resolution", dtype=int, unit="ps", si=False)
         self.settings.New("Resolution", dtype=int, choices=[("4 ps", 4), ("8 ps", 8), ("16 ps", 16), ("32 ps", 32), ("64 ps", 64), ("128 ps", 128), ("256 ps", 256), ("512 ps", 512)], initial=4)
+
         self.settings.New("SyncDivider", dtype=int, choices=[("1",1),("2",2),("4",4),("8",8)])
         self.settings.New("SyncOffset", dtype=int, vmin=-99999, vmax=99999, si=False)
         
