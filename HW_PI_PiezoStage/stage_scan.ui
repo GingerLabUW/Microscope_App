@@ -97,7 +97,7 @@
           <string>Scan settings</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_6">
-          <item row="0" column="0" colspan="2">
+          <item row="1" column="0" colspan="2">
            <layout class="QGridLayout" name="gridLayout_3">
             <item row="1" column="5">
              <widget class="QDoubleSpinBox" name="y_step_doubleSpinBox">
@@ -250,6 +250,31 @@
               <property name="text">
                <string>X Scan Size (um)</string>
               </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="0" column="0">
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <item>
+             <widget class="QLabel" name="label_3">
+              <property name="text">
+               <string>Scan direction</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="scan_comboBox">
+              <item>
+               <property name="text">
+                <string>XY</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>YX</string>
+               </property>
+              </item>
              </widget>
             </item>
            </layout>

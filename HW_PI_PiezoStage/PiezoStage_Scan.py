@@ -32,6 +32,7 @@ class PiezoStage_Scan(Measurement):
         # Measurement Specific Settings
         # This setting allows the option to save data to an h5 data file during a run
         # All settings are automatically added to the Microscope user interface
+        self.settings.New("scan_direction", dtype=str, choices=[('XY'), ('YX')])
 
         self.settings.New('x_start', dtype=float, unit='um', vmin=0)
         self.settings.New('y_start', dtype=float, unit='um', vmin=0)
@@ -75,6 +76,7 @@ class PiezoStage_Scan(Measurement):
 
         self.pi_device_hw.settings.x_position.connect_to_widget(self.ui.x_pos_doubleSpinBox)
         self.pi_device_hw.settings.y_position.connect_to_widget(self.ui.y_pos_doubleSpinBox)
+        self.settings.scan_direction.connect_to_widget(self.ui.scan_comboBox)
         self.settings.x_start.connect_to_widget(self.ui.x_start_doubleSpinBox)
         self.settings.y_start.connect_to_widget(self.ui.y_start_doubleSpinBox)    
         self.settings.x_size.connect_to_widget(self.ui.x_size_doubleSpinBox)
