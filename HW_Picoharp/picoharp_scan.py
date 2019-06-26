@@ -197,7 +197,8 @@ class PicoHarp_Scan(PiezoStage_Scan):
                 self.pi_device.MVR(axes=self.axes[1], values=[y_step])
                 self.pi_device.MOV(axes=self.axes[0], values=[x_start])
                 self.pi_device_hw.read_from_hardware()
-
+            self.time_data.flush()
+            self.hist_data.flush()
             if self.interrupt_measurement_called:
                 break
 
