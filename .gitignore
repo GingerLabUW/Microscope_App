@@ -1,5 +1,5 @@
 *.pyc
 *.txt
-**/data/
-**/log/
-**/__pycache__/                                 
+**/data
+**/log
+**/__pycache__
