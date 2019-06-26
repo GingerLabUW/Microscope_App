@@ -41,6 +41,7 @@ class PicoHarpHistogramMeasure(Measurement):
 #         self.ax.set_xlabel("Time (ns)")
 #         self.ax.set_ylabel("Counts")
 
+        S = self.settings
         # hardware
         ph_hw = self.picoharp_hw = self.app.hardware['picoharp']
 
@@ -57,7 +58,7 @@ class PicoHarpHistogramMeasure(Measurement):
         ph_hw.settings.count_rate1.connect_to_widget(self.ui.ch1_label)#doubleSpinBox) ###
         ph_hw.settings.Resolution.connect_to_widget(self.ui.resolution_comboBox)
         S.save_h5.connect_bidir_to_widget(self.ui.save_h5_checkBox)
-        self.ui.save_data_pushButton(self.save_hist_data)
+        self.ui.save_data_pushButton.clicked.connect(self.save_hist_data)
 
         self.graph_layout = pg.GraphicsLayoutWidget()    
         

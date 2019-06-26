@@ -42,7 +42,8 @@ class PicoHarpCountrateMeasure(Measurement):
 #         self.ax.set_xlabel("Time (ns)")
 #         self.ax.set_ylabel("Counts")
         
-
+        S = self.settings
+        
         # hardware
         ph_hw = self.picoharp_hw = self.app.hardware['picoharp']
 
