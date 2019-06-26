@@ -153,11 +153,11 @@ class PicoHarp_Scan(PiezoStage_Scan):
         hist_len = self.num_hist_chans
 
         #Use memmaps to use less memory and store data into disk
-        #self.hist_data= np.memmap(self.hist_filename,dtype='float32',mode='w+',shape=(hist_len, self.x_range, self.y_range))#len(XX[0,:]),len(YY[:,0])))
-        #self.time_data= np.memmap(self.time_filename,dtype='float32',mode='w+',shape=(hist_len, self.x_range, self.y_range))#len(XX[0,:]),len(YY[:,0]))) ###TODO: memmap throwing errors
+        self.hist_data= np.memmap(self.hist_filename,dtype='float32',mode='w+',shape=(hist_len, self.x_range, self.y_range))#len(XX[0,:]),len(YY[:,0])))
+        self.time_data= np.memmap(self.time_filename,dtype='float32',mode='w+',shape=(hist_len, self.x_range, self.y_range))#len(XX[0,:]),len(YY[:,0]))) ###TODO: memmap throwing errors
 
-        self.hist_data = np.zeros(shape=(hist_len, self.x_range, self.y_range)) ###use array instead of memmap for now
-        self.time_data = np.zeros(shape=(hist_len, self.x_range, self.y_range))
+        #self.hist_data = np.zeros(shape=(hist_len, self.x_range, self.y_range)) ###use array instead of memmap for now
+        #self.time_data = np.zeros(shape=(hist_len, self.x_range, self.y_range))
         #Store histogram sums for each pixel
         self.sum_display_image_map = np.zeros((self.x_range, self.y_range), dtype=float)
         
