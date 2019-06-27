@@ -9,6 +9,7 @@ import os.path
 from pyqtgraph.Qt import QtGui, QtCore
 from pyqtgraph.Point import Point
 import customplotting.mscope as cpm
+import math
 
 class PicoHarp_Scan(PiezoStage_Scan):
 
@@ -41,12 +42,13 @@ class PicoHarp_Scan(PiezoStage_Scan):
         self.picoharp_hw.settings.count_rate1.connect_to_widget(count_rate1_spinBox)
 
         #save data buttons
-        #self.ui.save_image_pushButton.clicked.connect(self.save_intensities_image)
+        self.ui.save_image_pushButton.clicked.connect(self.save_intensities_image)
         self.ui.save_array_pushButton.clicked.connect(self.save_intensities_data)
     
         self.imv = pg.ImageView()
         self.imv.getView().setAspectLocked(lock=False, ratio=1)
         self.imv.getView().setMouseEnabled(x=True, y=True)
+
 
     def update_display(self):
         PiezoStage_Scan.update_display(self)
