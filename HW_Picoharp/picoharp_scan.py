@@ -41,7 +41,7 @@ class PicoHarp_Scan(PiezoStage_Scan):
         self.picoharp_hw.settings.count_rate1.connect_to_widget(count_rate1_spinBox)
 
         #save data buttons
-        #self.ui.save_image_pushButton.clicked.connect(self.save_intensities_image)
+        self.ui.save_image_pushButton.clicked.connect(self.save_intensities_image)
         self.ui.save_array_pushButton.clicked.connect(self.save_intensities_data)
     
         self.imv = pg.ImageView()

@@ -6,6 +6,8 @@ Created on Apr 1, 2014
 from __future__ import absolute_import, print_function
 from ScopeFoundry import HardwareComponent
 import numpy as np
+import math
+from pyqtgraph.Qt import QtCore
 
 try:
     from HW_Picoharp.pypicoharp.pypicoharp import PicoHarp300
@@ -38,6 +40,16 @@ class PicoHarpHW(HardwareComponent):
         self.settings.New("stop_on_overflow", dtype=bool)
         
         self.histogram_channels = self.settings.New("histogram_channels", dtype=int, ro=False, vmin=0, vmax=2**16, initial=2**16, si=False)
+
+        self.settings.Resolution.updated_value.connect(self.update_binning, QtCore.Qt.UniqueConnection)
+        self.settings.Binning.updated_value.connect(self.update_resolution, QtCore.Qt.UniqueConnection)
+
+    def update_binning(self):
+        self.settings['Binning'] = math.log(self.settings['Resolution'], 2) - 2
+
+    def update_resolution(self):
+        self.settings['Resolution'] = math.pow(2, self.settings['Binning'] + 2)
+
 
     def connect(self):
         if self.settings['debug_mode']: self.log.info( "Connecting to PicoHarp" )
