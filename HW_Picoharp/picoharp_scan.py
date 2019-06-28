@@ -56,8 +56,7 @@ class PicoHarp_Scan(PiezoStage_Scan):
             if not self.interrupt_measurement_called:
                 seconds_left = ((self.x_range * self.y_range) - self.pixels_scanned) * self.settings["Tacq"]
                 self.ui.estimated_time_label.setText("Estimated time remaining: " + str(seconds_left) + "s")
-            sum_disp_img = self.sum_display_image_map
-            self.img_item.setImage(sum_disp_img)
+            self.img_item.setImage(self.sum_intensities_image_map)
             self.imv.setImage(img=self.hist_data, autoRange=False, autoLevels=True)
             self.imv.show()
             self.imv.window().setWindowFlag(QtCore.Qt.WindowCloseButtonHint, False) #disable closing image view window
@@ -68,78 +67,36 @@ class PicoHarp_Scan(PiezoStage_Scan):
             pg.QtGui.QApplication.processEvents()
 
     def pre_run(self):
-            """
-            numpy memmaps do not play well when being overwritten if they aren't closed.
-            However, any call to the memmap after it has closed will crash the Python program.
-            Since the run() function runs on a thread that constantly calls update_display() which
-            calls the memmaps to plot the data, then the program will crash if the garbage collection
-            is done in the main run thread.
-
-            Therefore, before the program runs and the update_display() function is called, we should
-            check whether the memmaps exist. If they do, we need to close them, delete them and then remove
-            the temporary filename on disk associated to the memmap.
-
-            """
-            # if hasattr(self,'time_data'): ###
-            #     self.time_data._mmap.close()
-            #     self.hist_data._mmap.close()
-            #     delattr(self,'time_data')
-            #     delattr(self,'hist_data')
-            #     os.remove(self.time_filename)
-            #     os.remove(self.hist_filename)
-            ## set all logged quantities read only
-            #for lqname in "xdim ydim map_size".split():
-            #    self.settings.as_dict()[lqname].change_readonly(True)
-            #compute relevant scan parameters and move the APT motors to the start point of the scan
-            #self.compute_scan_params()
-            self.num_hist_chans = self.app.hardware['picoharp'].calc_num_hist_chans()
-            #self.ui.time_remaining_disp.setText(self.calc_time_left())
-            #self.move_to_start()
-    
-    def run(self):
         """
-        Runs when measurement is started. Runs in a separate thread from GUI.
-        It should not update the graphical interface directly, and should only
-        focus on data acquisition.
+        numpy memmaps do not play well when being overwritten if they aren't closed.
+        However, any call to the memmap after it has closed will crash the Python program.
+        Since the run() function runs on a thread that constantly calls update_display() which
+        calls the memmaps to plot the data, then the program will crash if the garbage collection
+        is done in the main run thread.
 
-        Runs until scan is completed or interrupted.
+        Therefore, before the program runs and the update_display() function is called, we should
+        check whether the memmaps exist. If they do, we need to close them, delete them and then remove
+        the temporary filename on disk associated to the memmap.
+
         """
-        #self.check_filename("_raw_PL_spectra_data.pkl")
-        
-        self.scan_complete = False
-
-        self.pi_device = self.pi_device_hw.pi_device
+        # if hasattr(self,'time_data'): ###
+        #     self.time_data._mmap.close()
+        #     self.hist_data._mmap.close()
+        #     delattr(self,'time_data')
+        #     delattr(self,'hist_data')
+        #     os.remove(self.time_filename)
+        #     os.remove(self.hist_filename)
+        ## set all logged quantities read only
+        #for lqname in "xdim ydim map_size".split():
+        #    self.settings.as_dict()[lqname].change_readonly(True)
+        #compute relevant scan parameters and move the APT motors to the start point of the scan
+        #self.compute_scan_params()
+        PiezoStage_Scan.pre_run() #setup scan paramters
+        self.num_hist_chans = self.app.hardware['picoharp'].calc_num_hist_chans()
+        #self.ui.time_remaining_disp.setText(self.calc_time_left())
+        #self.move_to_start()
         self.picoharp = self.picoharp_hw.picoharp
-        self.axes = self.pi_device_hw.axes
-
         ###self.sleep_time = min((max(0.1*ph.Tacq*1e-3, 0.010), 0.100))
-
-        x_start = self.settings['x_start']
-        y_start = self.settings['y_start']
-        
-        x_scan_size = self.settings['x_size']
-        y_scan_size = self.settings['y_size']
-        
-        x_step = self.settings['x_step']
-        y_step = self.settings['y_step']
-        
-        if y_scan_size == 0:
-            y_scan_size = 1#self.settings['y_size'] = 1
-            y_step = 1#self.settings['y_step'] = 1
-        
-        if x_scan_size == 0:
-            x_scan_size = 1#self.settings['x_size'] = 1
-            x_step = 1#self.settings['x_step'] = 1
-        
-        if y_step == 0:
-            y_step = 1#self.settings['y_step'] = 1
-            
-        if x_step == 0:
-            x_step = 1#self.settings['x_step'] = 1
-
-        #number of scans in x and y
-        self.y_range = np.abs(int(np.ceil(y_scan_size/y_step)))
-        self.x_range = np.abs(int(np.ceil(x_scan_size/x_step)))
 
         # XX, YY = np.meshgrid(np.arange(0,  x_scan_size, x_step),np.arange(0, y_scan_size, y_step))
   #       YY = YY+y_start
@@ -161,51 +118,20 @@ class PicoHarp_Scan(PiezoStage_Scan):
         #self.hist_data = np.zeros(shape=(hist_len, self.x_range, self.y_range)) ###use array instead of memmap for now
         #self.time_data = np.zeros(shape=(hist_len, self.x_range, self.y_range))
         #Store histogram sums for each pixel
-        self.sum_display_image_map = np.zeros((self.x_range, self.y_range), dtype=float)
-        
-        # Move to the starting position
-        self.pi_device.MOV(axes=self.axes, values=[x_start,y_start])
-        self.pi_device_hw.read_from_hardware()
+        self.sum_intensities_image_map = np.zeros((self.x_range, self.y_range), dtype=float)
 
-        self.pixels_scanned = 0 #keep track of scan/'pixel' number
-        for i in range(self.y_range):
-            for j in range(self.x_range):
-                if self.interrupt_measurement_called:
-                    break
+    def scan_measure(self):
+        """
+        Data collection for each pixel.
+        """
+        data = self.measure_hist()
+        self.time_data[:,index_x, index_y], self.hist_data[:, index_x, index_y] = data            
+        self.sum_intensities_image_map[index_x, index_y] = sum(data[1])
+        self.time_data.flush()
+        self.hist_data.flush()
 
-                #make sure the right indices of image arrays are updated
-                index_x = j
-                index_y = i
-                if x_step < 0:
-                    index_x = self.x_range - j - 1
-                if y_step < 0:
-                    index_y = self.y_range - i - 1
-
-                data = self.measure_hist()
-                self.time_data[:,index_x, index_y], self.hist_data[:, index_x, index_y] = data            
-                self.sum_display_image_map[index_x, index_y] = sum(data[1])
-                ####self.time_data.flush()
-                ###self.hist_data.flush()
-                
-                self.pi_device.MVR(axes=self.axes[0], values=[x_step])
-                self.pi_device_hw.read_from_hardware()
-                self.pixels_scanned+=1
-            # TODO
-            # if statement needs to be modified to keep the stage at the finish y-pos for line scans in x, and same for y
-            if i == self.y_range-1: # this if statement is there to keep the stage at the finish position (in x) and not bring it back like we were doing during the scan 
-                self.pi_device.MVR(axes=self.axes[1], values=[y_step])
-                self.pi_device_hw.read_from_hardware()
-            else:                
-                self.pi_device.MVR(axes=self.axes[1], values=[y_step])
-                self.pi_device.MOV(axes=self.axes[0], values=[x_start])
-                self.pi_device_hw.read_from_hardware()
-            self.time_data.flush()
-            self.hist_data.flush()
-            if self.interrupt_measurement_called:
-                break
-
-        self.ui.estimated_time_label.setText("Estimated time remaining: 0s")
-        self.scan_complete = True
+    def post_run(self):
+        pass
         #np.savez_compressed(data_filename,bins=self.time_data,hist=self.hist_data)
 
     def measure_hist(self):
@@ -226,7 +152,7 @@ class PicoHarp_Scan(PiezoStage_Scan):
         return ph.time_array[0:self.num_hist_chans], ph.histogram_data[0:self.num_hist_chans]
 
     def save_intensities_data(self):
-        PiezoStage_Scan.save_intensities_data(self.sum_display_image_map, 'ph')
+        PiezoStage_Scan.save_intensities_data(self.sum_intensities_image_map, 'ph')
 
     def save_intensities_image(self):
-        PiezoStage_Scan.save_intensities_image(self.sum_display_image_map, 'ph')
+        PiezoStage_Scan.save_intensities_image(self.sum_intensities_image_map, 'ph')
