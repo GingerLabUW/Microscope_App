@@ -62,9 +62,11 @@ class OceanOptics_Scan(PiezoStage_Scan):
 			self.graph_layout.show()
 			self.graph_layout.window().setWindowFlag(QtCore.Qt.WindowCloseButtonHint, False) #disable closing image view window
 
-			self.img_item.setImage(self.sum_intensities_image_map)#image=sum_disp_img, autoLevels=True, autoRange=False)
+			sum_disp_img = self.sum_display_image_map #transpose to use for setImage, which takes 3d array (x, y, intensity)
+			self.img_item.setImage(sum_disp_img)#image=sum_disp_img, autoLevels=True, autoRange=False)
 			
-			self.imv.setImage(img=self.spectrum_image_map, autoRange=False, autoLevels=True)
+			intensities_disp_img = self.intensities_display_image_map
+			self.imv.setImage(img=intensities_disp_img, autoRange=False, autoLevels=True)
 			self.imv.show()
 			self.imv.window().setWindowFlag(QtCore.Qt.WindowCloseButtonHint, False) #disable closing image view window
 			
@@ -74,42 +76,144 @@ class OceanOptics_Scan(PiezoStage_Scan):
 			self.set_progress(progress)
 			pg.QtGui.QApplication.processEvents()
 
-	def pre_run(self):
-		PiezoStage_Scan.pre_run() #setup scan parameters
+
+	def run(self):
+		"""
+		Runs when measurement is started. Runs in a separate thread from GUI.
+		It should not update the graphical interface directly, and should only
+		focus on data acquisition.
+
+		Runs until scan is completed or interrupted.
+		"""
 		self.check_filename("_raw_PL_spectra_data.pkl")
 		
-		self.spec = self.spec_hw.spec
+		self.scan_complete = False
 
+		self.pi_device = self.pi_device_hw.pi_device
+		self.spec = self.spec_hw.spec
+		self.axes = self.pi_device_hw.axes
+
+		x_start = self.settings['x_start']
+		y_start = self.settings['y_start']
+		
+		x_scan_size = self.settings['x_size']
+		y_scan_size = self.settings['y_size']
+		
+		x_step = self.settings['x_step']
+		y_step = self.settings['y_step']
+		
+		if y_scan_size == 0:
+			y_scan_size = 1#self.settings['y_size'] = 1
+			y_step = 1#self.settings['y_step'] = 1
+		
+		if x_scan_size == 0:
+			x_scan_size = 1#self.settings['x_size'] = 1
+			x_step = 1#self.settings['x_step'] = 1
+		
+		if y_step == 0:
+			y_step = 1#self.settings['y_step'] = 1
+			
+		if x_step == 0:
+			x_step = 1#self.settings['x_step'] = 1
+			
+		#number of scans in x and y
+		self.y_range = np.abs(int(np.ceil(y_scan_size/y_step)))
+		self.x_range = np.abs(int(np.ceil(x_scan_size/x_step)))
+		
 		# Define empty array for saving intensities
-		self.data_array = np.zeros(shape=(self.x_range*self.y_range,2048))
+		data_array = np.zeros(shape=(self.x_range*self.y_range,2048))
 
 		# Define empty array for image map
-		self.sum_intensities_image_map = np.zeros((self.x_range, self.y_range), dtype=float) #store sum of intensities for each pixel
-		self.spectrum_image_map = np.zeros((2048, self.x_range, self.y_range), dtype=float) #Store spectrum for each pixel
+		#self.sum_display_image_map = np.zeros((y_range, x_range), dtype=float)
+
+		#Store spectrum for each pixel
+		self.sum_display_image_map = np.zeros((self.x_range, self.y_range), dtype=float)
+		self.intensities_display_image_map = np.zeros((2048, self.x_range, self.y_range), dtype=float)
 		
-	def scan_measure(self):
-		"""
-		Data collection for each pixel.
-		"""
-		self._read_spectrometer()
-		self.data_array[self.pixels_scanned,:] = self.y
-		self.sum_intensities_image_map[index_x, index_y] = self.y.sum()
-		self.spectrum_image_map[:, index_x, index_y] = self.y
-	
-	def post_run(self):
-		"""
-		Export data.
-		"""
-		save_dict = {"Wavelengths": self.spec.wavelengths(), "Intensities": self.data_array,
-				 "Scan Parameters":{"X scan start (um)": self.x_start, "Y scan start (um)": self.y_start,
-									"X scan size (um)": self.x_scan_size, "Y scan size (um)": self.y_scan_size,
-									"X step size (um)": self.x_step, "Y step size (um)": self.y_step},
+		# Move to the starting position
+		self.pi_device.MOV(axes=self.axes, values=[x_start,y_start])
+		self.pi_device_hw.read_from_hardware()
+		
+
+		self.pixels_scanned = 0 #keep track of scan/'pixel' number
+		if (self.ui.scan_comboBox.currentText() == 'XY'): #todo - add to settings sidebar once this is tested
+			for i in range(self.y_range):
+				for j in range(self.x_range):
+					if self.interrupt_measurement_called:
+						break
+					self._read_spectrometer()
+					data_array[self.pixels_scanned,:] = self.y
+
+					#make sure the right indices of image arrays are updated
+					index_x = j
+					index_y = i
+					if x_step < 0:
+						index_x = self.x_range - j - 1
+					if y_step < 0:
+						index_y = self.y_range - i - 1
+
+					self.sum_display_image_map[index_x, index_y] = self.y.sum()
+					self.intensities_display_image_map[:, index_x, index_y] = self.y#intensities_sum
+					self.pi_device.MVR(axes=self.axes[0], values=[x_step])
+					self.pi_device_hw.read_from_hardware()
+					self.pixels_scanned+=1
+				# TODO
+				# if statement needs to be modified to keep the stage at the finish y-pos for line scans in x, and same for y
+				if i == self.y_range-1: # this if statement is there to keep the stage at the finish position (in x) and not bring it back like we were doing during the scan 
+					self.pi_device.MVR(axes=self.axes[1], values=[y_step])
+					self.pi_device_hw.read_from_hardware()
+				else:                
+					self.pi_device.MVR(axes=self.axes[1], values=[y_step])
+					self.pi_device.MOV(axes=self.axes[0], values=[x_start])
+					self.pi_device_hw.read_from_hardware()
+				if self.interrupt_measurement_called:
+					break
+		elif (self.ui.scan_comboBox.currentText() == 'YX'):
+			for i in range(self.x_range):
+				for j in range(self.y_range):
+					if self.interrupt_measurement_called:
+						break
+					self._read_spectrometer()
+					data_array[self.pixels_scanned,:] = self.y
+
+					#make sure the right indices of image arrays are updated
+					index_x = i
+					index_y = j
+					if x_step < 0:
+						index_x = self.x_range - i - 1
+					if y_step < 0:
+						index_y = self.y_range - j - 1
+
+					self.sum_display_image_map[index_x, index_y] = self.y.sum()
+					self.intensities_display_image_map[:, index_x, index_y] = self.y#intensities_sum
+					self.pi_device.MVR(axes=self.axes[1], values=[y_step])
+					self.pi_device_hw.read_from_hardware()
+					self.pixels_scanned+=1
+				# TODO
+				# if statement needs to be modified to keep the stage at the finish y-pos for line scans in x, and same for y
+				if j == self.x_range-1: # this if statement is there to keep the stage at the finish position (in x) and not bring it back like we were doing during the scan 
+					self.pi_device.MVR(axes=self.axes[0], values=[x_step])
+					self.pi_device_hw.read_from_hardware()
+				else:                
+					self.pi_device.MVR(axes=self.axes[0], values=[x_step])
+					self.pi_device.MOV(axes=self.axes[1], values=[y_start])
+					self.pi_device_hw.read_from_hardware()
+				if self.interrupt_measurement_called:
+					break
+
+		self.ui.estimated_time_label.setText("Estimated time remaining: 0s")
+		self.scan_complete = True;
+		save_dict = {"Wavelengths": self.spec.wavelengths(), "Intensities": data_array,
+				 "Scan Parameters":{"X scan start (um)": x_start, "Y scan start (um)": y_start,
+									"X scan size (um)": x_scan_size, "Y scan size (um)": y_scan_size,
+									"X step size (um)": x_step, "Y step size (um)": y_step},
 									"OceanOptics Parameters":{"Integration Time (ms)": self.spec_hw.settings['intg_time'],
 															  "Scans Averages": self.spec_measure.settings['scans_to_avg'],
 															  "Correct Dark Counts": self.spec_hw.settings['correct_dark_counts']}
 				 }
 
 		pickle.dump(save_dict, open(self.app.settings['save_dir']+"/"+self.app.settings['sample']+"_raw_PL_spectra_data.pkl", "wb"))
+
 
 	def _read_spectrometer(self):
 		'''
@@ -128,7 +232,7 @@ class OceanOptics_Scan(PiezoStage_Scan):
 				self.y = np.mean(Int_array, axis=-1)
 
 	def save_intensities_data(self):
-		PiezoStage_Scan.save_intensities_data(self.sum_intensities_image_map, 'oo')
+		PiezoStage_Scan.save_intensities_data(self.sum_display_image_map, 'oo')
 
 	def save_intensities_image(self):
-		PiezoStage_Scan.save_intensities_image(self.sum_intensities_image_map, 'oo')
+		PiezoStage_Scan.save_intensities_image(self.sum_display_image_map, 'oo')
