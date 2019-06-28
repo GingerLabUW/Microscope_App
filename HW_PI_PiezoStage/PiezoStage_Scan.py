@@ -366,7 +366,7 @@ class PiezoStage_Scan(Measurement):
 					self.pixels_scanned+=1
 				# TODO
 				# if statement needs to be modified to keep the stage at the finish y-pos for line scans in x, and same for y
-				if j == self.x_range-1: # this if statement is there to keep the stage at the finish position (in x) and not bring it back like we were doing during the scan 
+				if i == self.x_range-1: # this if statement is there to keep the stage at the finish position (in x) and not bring it back like we were doing during the scan 
 					self.pi_device.MVR(axes=self.axes[0], values=[self.x_step])
 					self.pi_device_hw.read_from_hardware()
 				else:                
