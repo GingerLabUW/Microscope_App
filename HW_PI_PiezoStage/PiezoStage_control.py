@@ -65,8 +65,8 @@ class PiezoStageControl(Measurement):
 	def update_display(self):
 		x_pos = self.pi_device_hw.settings['x_position']
 		y_pos = self.pi_device_hw.settings['y_position']
-		self.ui.x_label.setText(x_pos)
-		self.ui.y_label.setText(y_pos)
+		self.ui.x_label.setText(str(x_pos))
+		self.ui.y_label.setText(str(y_pos))
 		self.current_stage_pos_arrow.setPos(x_pos, y_pos)
 	
 	def run(self):
