@@ -32,7 +32,7 @@ class PiezoStage_Scan(Measurement):
 		# Measurement Specific Settings
 		# This setting allows the option to save data to an h5 data file during a run
 		# All settings are automatically added to the Microscope user interface
-		self.settings.New("scan_direction", dtype=str, choices=[('XY'), ('YX')])
+		self.settings.New("scan_direction", dtype=str, choices=[('XY', 'XY'), ('YX', 'YX')], initial='XY')
 
 		self.settings.New('x_start', dtype=float, unit='um', vmin=0)
 		self.settings.New('y_start', dtype=float, unit='um', vmin=0)
@@ -326,12 +326,12 @@ class PiezoStage_Scan(Measurement):
 					if self.interrupt_measurement_called:
 						break
 					#make sure the right indices of image arrays are updated
-					index_x = j
-					index_y = i
+					self.index_x = j
+					self.index_y = i
 					if self.x_step < 0:
-						index_x = self.x_range - j - 1
+						self.index_x = self.x_range - j - 1
 					if self.y_step < 0:
-						index_y = self.y_range - i - 1
+						self.index_y = self.y_range - i - 1
 					self.scan_measure() #defined in hardware-specific scans
 					self.pi_device.MVR(axes=self.axes[0], values=[self.x_step])
 					self.pi_device_hw.read_from_hardware()
@@ -354,12 +354,12 @@ class PiezoStage_Scan(Measurement):
 						break
 
 					#make sure the right indices of image arrays are updated
-					index_x = i
-					index_y = j
+					self.index_x = i
+					self.index_y = j
 					if self.x_step < 0:
-						index_x = self.x_range - i - 1
+						self.index_x = self.x_range - i - 1
 					if self.y_step < 0:
-						index_y = self.y_range - j - 1
+						self.index_y = self.y_range - j - 1
 					self.scan_measure()
 					self.pi_device.MVR(axes=self.axes[1], values=[self.y_step])
 					self.pi_device_hw.read_from_hardware()

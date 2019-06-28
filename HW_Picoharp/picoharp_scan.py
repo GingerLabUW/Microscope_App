@@ -89,7 +89,7 @@ class PicoHarp_Scan(PiezoStage_Scan):
         #    self.settings.as_dict()[lqname].change_readonly(True)
         #compute relevant scan parameters and move the APT motors to the start point of the scan
         #self.compute_scan_params()
-        PiezoStage_Scan.pre_run() #setup scan paramters
+        PiezoStage_Scan.pre_run(self) #setup scan paramters
         self.num_hist_chans = self.app.hardware['picoharp'].calc_num_hist_chans()
         #self.ui.time_remaining_disp.setText(self.calc_time_left())
         #self.move_to_start()
@@ -101,11 +101,12 @@ class PicoHarp_Scan(PiezoStage_Scan):
   #       XX = XX+x_start
 
         dirname = self.app.settings['save_dir']
+        
+        self.check_filename('_histdata.dat')
         sample_filename = self.app.settings['sample']
-        self.check_filename('histdata.dat')
-        self.hist_filename = os.path.join(dirname, sample_filename + 'histdata.dat')
-        self.check_filename('timedata.dat')
-        self.time_filename = os.path.join(dirname,  sample_filename + 'timedata.dat')
+        self.hist_filename = os.path.join(dirname, sample_filename + '_histdata.dat')
+        self.check_filename('_timedata.dat')
+        self.time_filename = os.path.join(dirname,  sample_filename + '_timedata.dat')
         
         hist_len = self.num_hist_chans
 
@@ -123,8 +124,8 @@ class PicoHarp_Scan(PiezoStage_Scan):
         Data collection for each pixel.
         """
         data = self.measure_hist()
-        self.time_data[:,index_x, index_y], self.hist_data[:, index_x, index_y] = data            
-        self.sum_intensities_image_map[index_x, index_y] = sum(data[1])
+        self.time_data[:, self.index_x, self.index_y], self.hist_data[:, self.index_x, self.index_y] = data            
+        self.sum_intensities_image_map[self.index_x, self.index_y] = sum(data[1])
         self.time_data.flush()
         self.hist_data.flush()
 

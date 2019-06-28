@@ -75,7 +75,7 @@ class OceanOptics_Scan(PiezoStage_Scan):
 			pg.QtGui.QApplication.processEvents()
 
 	def pre_run(self):
-		PiezoStage_Scan.pre_run() #setup scan parameters
+		PiezoStage_Scan.pre_run(self) #setup scan parameters
 		self.check_filename("_raw_PL_spectra_data.pkl")
 		
 		self.spec = self.spec_hw.spec
@@ -93,8 +93,8 @@ class OceanOptics_Scan(PiezoStage_Scan):
 		"""
 		self._read_spectrometer()
 		self.data_array[self.pixels_scanned,:] = self.y
-		self.sum_intensities_image_map[index_x, index_y] = self.y.sum()
-		self.spectrum_image_map[:, index_x, index_y] = self.y
+		self.sum_intensities_image_map[self.index_x, self.index_y] = self.y.sum()
+		self.spectrum_image_map[:, self.index_x, self.index_y] = self.y
 	
 	def post_run(self):
 		"""
