@@ -50,7 +50,7 @@ class PicoHarp_Scan(PiezoStage_Scan):
 
     def update_display(self):
         PiezoStage_Scan.update_display(self)
-        if hasattr(self, 'picoharp') and hasattr(self, 'pi_device') and hasattr(self, 'sum_display_image_map'):
+        if hasattr(self, 'sum_intensities_image_map'):
             if not self.interrupt_measurement_called:
                 seconds_left = ((self.x_range * self.y_range) - self.pixels_scanned) * self.settings["Tacq"]
                 self.ui.estimated_time_label.setText("Estimated time remaining: " + str(seconds_left) + "s")
@@ -124,7 +124,7 @@ class PicoHarp_Scan(PiezoStage_Scan):
         Data collection for each pixel.
         """
         data = self.measure_hist()
-        self.time_data[:, self.index_x, self.index_y], self.hist_data[:, self.index_x, self.index_y] = data            
+        self.time_data[:, self.index_x, self.index_y], self.hist_data[:, self.index_x, self.index_y] = data
         self.sum_intensities_image_map[self.index_x, self.index_y] = sum(data[1])
         self.time_data.flush()
         self.hist_data.flush()
