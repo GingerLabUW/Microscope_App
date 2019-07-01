@@ -146,8 +146,8 @@ class PicoHarp_Scan(PiezoStage_Scan):
   #       XX = XX+x_start
 
         dirname = self.app.settings['save_dir']
-        sample_filename = self.app.settings['sample']
         self.check_filename('histdata.dat')
+        sample_filename = self.app.settings['sample']
         self.hist_filename = os.path.join(dirname, sample_filename + 'histdata.dat')
         self.check_filename('timedata.dat')
         self.time_filename = os.path.join(dirname,  sample_filename + 'timedata.dat')
