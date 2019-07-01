@@ -48,7 +48,7 @@ class PiezoStageIndependentMovement(Measurement):
 			self.ui.textBrowser.append("Must import text file before running.")
 		else:		
 			self.pi_device = self.pi_device_hw.pi_device
-			self.axes = self.pi_device.axes
+			self.axes = self.pi_device.axes[0:2]
 			num_points = self.position_array.shape[0] #get number of rows = number of points
 			for i in range(num_points):
 				if self.interrupt_measurement_called:
