@@ -51,23 +51,30 @@ class PiezoStageControl(Measurement):
 		self.stage_plot.addItem(self.current_stage_pos_arrow)
 		
 	def move_up(self):
-		self.pi_device.MVR(axes=self.axes[1], values=[self.settings['step_size']])
+		if hasattr(self, 'pi_device') and hasattr(self, 'axes'):
+			self.pi_device.MVR(axes=self.axes[1], values=[self.settings['step_size']])
+			self.pi_device_hw.read_from_hardware()
 
 	def move_right(self):
-		self.pi_device.MVR(axes=self.axes[0], values=[self.settings['step_size']])
+		if hasattr(self, 'pi_device') and hasattr(self, 'axes'):
+			self.pi_device.MVR(axes=self.axes[0], values=[self.settings['step_size']])
+			self.pi_device_hw.read_from_hardware()
 
 	def move_down(self):
-		self.pi_device.MVR(axes=self.axes[1], values=[-self.settings['step_size']])
+		if hasattr(self, 'pi_device') and hasattr(self, 'axes'):
+			self.pi_device.MVR(axes=self.axes[1], values=[-self.settings['step_size']])
+			self.pi_device_hw.read_from_hardware()
 
 	def move_left(self):
-		self.pi_device.MVR(axes=self.axes[0], values=[-self.settings['step_size']])
+		if hasattr(self, 'pi_device') and hasattr(self, 'axes'):
+			self.pi_device.MVR(axes=self.axes[0], values=[-self.settings['step_size']])
+			self.pi_device_hw.read_from_hardware()
 
 	def update_display(self):
 		x_pos = self.pi_device_hw.settings['x_position']
 		y_pos = self.pi_device_hw.settings['y_position']
-		self.ui.x_label.setText(str(x_pos))
-		self.ui.y_label.setText(str(y_pos))
 		self.current_stage_pos_arrow.setPos(x_pos, y_pos)
 	
 	def run(self):
 		self.pi_device = self.pi_device_hw.pi_device
+		self.axes = self.pi_device.axes
