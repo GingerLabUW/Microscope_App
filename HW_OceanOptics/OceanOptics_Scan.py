@@ -76,10 +76,9 @@ class OceanOptics_Scan(PiezoStage_Scan):
 
 	def pre_run(self):
 		PiezoStage_Scan.pre_run(self) #setup scan parameters
+		self.spec = self.spec_hw.spec
 		self.check_filename("_raw_PL_spectra_data.pkl")
 		
-		self.spec = self.spec_hw.spec
-
 		# Define empty array for saving intensities
 		self.data_array = np.zeros(shape=(self.x_range*self.y_range,2048))
 
@@ -128,7 +127,8 @@ class OceanOptics_Scan(PiezoStage_Scan):
 				self.y = np.mean(Int_array, axis=-1)
 
 	def save_intensities_data(self):
-		PiezoStage_Scan.save_intensities_data(self.sum_intensities_image_map, 'oo')
+		transposed = np.transpose(self.sum_intensities_image_map)
+		PiezoStage_Scan.save_intensities_data(transposed, 'oo')
 
 	def save_intensities_image(self):
 		PiezoStage_Scan.save_intensities_image(self.sum_intensities_image_map, 'oo')

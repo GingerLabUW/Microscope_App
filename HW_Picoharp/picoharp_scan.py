@@ -90,10 +90,13 @@ class PicoHarp_Scan(PiezoStage_Scan):
         #compute relevant scan parameters and move the APT motors to the start point of the scan
         #self.compute_scan_params()
         PiezoStage_Scan.pre_run(self) #setup scan paramters
+        self.picoharp = self.picoharp_hw.picoharp
+        self.check_filename("_raw_PL_hist_data.pkl")
+
         self.num_hist_chans = self.app.hardware['picoharp'].calc_num_hist_chans()
         #self.ui.time_remaining_disp.setText(self.calc_time_left())
         #self.move_to_start()
-        self.picoharp = self.picoharp_hw.picoharp
+        
         ###self.sleep_time = min((max(0.1*ph.Tacq*1e-3, 0.010), 0.100))
 
         # XX, YY = np.meshgrid(np.arange(0,  x_scan_size, x_step),np.arange(0, y_scan_size, y_step))
@@ -130,7 +133,17 @@ class PicoHarp_Scan(PiezoStage_Scan):
         self.hist_data.flush()
 
     def post_run(self):
-        pass
+        """
+        Export data.
+        """
+        save_dict = {"Histogram data": self.hist_data, "Time data": self.time_data,
+                 "Scan Parameters":{"X scan start (um)": self.x_start, "Y scan start (um)": self.y_start,
+                                    "X scan size (um)": self.x_scan_size, "Y scan size (um)": self.y_scan_size,
+                                    "X step size (um)": self.x_step, "Y step size (um)": self.y_step},
+                                    "PicoHarp Parameters":{"Acquisition Time (s)": self.settings['Tacq'],
+                                                              "Resolution": self.settings['Resolution']} }
+
+        pickle.dump(save_dict, open(self.app.settings['save_dir']+"/"+self.app.settings['sample']+"_raw_PL_hist_data.pkl", "wb"))
         #np.savez_compressed(data_filename,bins=self.time_data,hist=self.hist_data)
 
     def measure_hist(self):
@@ -151,7 +164,8 @@ class PicoHarp_Scan(PiezoStage_Scan):
         return ph.time_array[0:self.num_hist_chans], ph.histogram_data[0:self.num_hist_chans]
 
     def save_intensities_data(self):
-        PiezoStage_Scan.save_intensities_data(self.sum_intensities_image_map, 'ph')
+        transposed = np.transpose(self.sum_intensities_image_map)
+        PiezoStage_Scan.save_intensities_data(transposed, 'ph')
 
     def save_intensities_image(self):
         PiezoStage_Scan.save_intensities_image(self.sum_intensities_image_map, 'ph')
