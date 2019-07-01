@@ -4,7 +4,7 @@ import numpy as np
 import pickle
 import sys
 import seabreeze.spectrometers as sb
-from pipython import GCSDevice
+from HW_PI_PiezoStage.pipython import GCSDevice
 import time
 from ScopeFoundry import HardwareComponent
 

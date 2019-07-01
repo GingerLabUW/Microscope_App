@@ -1,2 +1,6 @@
-.pyc
-.txt
+*.pyc
+*.txt
+**/data
+**/log
+**/__pycache__
+__pycache__/
