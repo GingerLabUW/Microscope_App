@@ -33,6 +33,8 @@ class MicroscopeApp(BaseMicroscopeApp):
 
         from HW_PI_PiezoStage.PiezoStage_independent_movement import PiezoStageIndependentMovement
         self.add_measurement(PiezoStageIndependentMovement)
+        from HW_PI_PiezoStage.PiezoStage_control import PiezoStageControl
+        self.add_measurement(PiezoStageControl)
         # show ui
         self.ui.show()
         self.ui.activateWindow()
