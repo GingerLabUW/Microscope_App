@@ -264,6 +264,9 @@ class PiezoStage_Scan(Measurement):
 		self.pi_device = self.pi_device_hw.pi_device
 		self.axes = self.pi_device_hw.axes
 
+		for lqname in "scan_direction x_start y_start x_size y_size x_step y_step".split():
+			self.settings.as_dict()[lqname].change_readonly(True)
+
 		self.x_start = self.settings['x_start']
 		self.y_start = self.settings['y_start']
 		
@@ -377,6 +380,10 @@ class PiezoStage_Scan(Measurement):
 					break
 		self.scan_complete = True
 		
+	def post_run(self):
+		for lqname in "scan_direction x_start y_start x_size y_size x_step y_step".split():
+			self.settings.as_dict()[lqname].change_readonly(False)
+			
 	def scan_measure(self):
 		'''
 		Not defined in this class. This is defined in hardware-specific scans that inherit this class.

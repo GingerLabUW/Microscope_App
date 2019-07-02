@@ -136,6 +136,7 @@ class PicoHarp_Scan(PiezoStage_Scan):
         """
         Export data.
         """
+        PiezoStage_Scan.post_run(self)
         save_dict = {"Histogram data": self.hist_data, "Time data": self.time_data,
                  "Scan Parameters":{"X scan start (um)": self.x_start, "Y scan start (um)": self.y_start,
                                     "X scan size (um)": self.x_scan_size, "Y scan size (um)": self.y_scan_size,
