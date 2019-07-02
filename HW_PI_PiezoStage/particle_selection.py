@@ -37,7 +37,7 @@ class ParticleSelection(Measurement):
 		self.origin_x = 0 
 		self.origin_y = 0
 
-		###self.pi_device_hw = self.app.hardware['piezostage']
+		self.pi_device_hw = self.app.hardware['piezostage']
 
 	def setup_figure(self):
 		
@@ -166,9 +166,8 @@ class ParticleSelection(Measurement):
 			print(format(err))
 
 	def move_stage(self):
-		# if hasattr(self, 'pi_device'):
-		# 	self.pi_device.MVR(axes=self.axes, values=[self.settings['dX'], self.settings['dY']])
-		pass
+		if hasattr(self, 'pi_device'):
+			self.pi_device.MVR(axes=self.axes, values=[self.settings['dX'], self.settings['dY']])
 
 	def export_points(self):
 		self.check_filename("_selected_particle_positions.txt")
@@ -188,6 +187,5 @@ class ParticleSelection(Measurement):
 			self.app.settings['sample'] = samplename + str(int(time.time()))
 
 	def run(self):
-		###self.pi_device = self.pi_device_hw.pi_device
-		###self.axes = self.pi_device_hw.axes[0:2]
-		pass
+		self.pi_device = self.pi_device_hw.pi_device
+		self.axes = self.pi_device_hw.axes[0:2]
