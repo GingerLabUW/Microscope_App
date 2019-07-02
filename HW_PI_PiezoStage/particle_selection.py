@@ -17,7 +17,7 @@ class ParticleSelection(Measurement):
 		#Load ui file and convert it to a live QWidget of the user interface
 		self.ui = load_qt_ui_file(self.ui_filename)
 
-		self.settings.New('Magnification', dtype=float, choices=[("50x", 50),("75x", 75),("100x", 100)], initial=75)
+		self.settings.New('Magnification', dtype=float, choices=[("50x", 50),("75x", 75),("100x", 100), ("150x", 150)], initial=75)
 		self.settings.New('W1', dtype=float)
 		self.settings.New('H1', dtype=float)
 		self.settings.New('W2', dtype=float)
@@ -27,8 +27,9 @@ class ParticleSelection(Measurement):
 		self.settings.New('dX', dtype=float, ro=True)
 		self.settings.New('dY', dtype=float, ro=True)
 
-		#placeholder values
-		self.scaling_factor = 1
+		self.PIXEL_SIZE = 7.4
+
+		self.scaling_factor = self.calc_scaling_factor() #initial scaling factor
 
 		#for selecting multiple points
 		self.point_counter = 0
@@ -89,12 +90,7 @@ class ParticleSelection(Measurement):
 
 	def update_positions(self):
 		#placeholder values for scaling_factor
-		if self.settings['Magnification'] == 50:
-			self.scaling_factor = 1
-		elif self.settings['Magnification'] == 75:
-			self.scaling_factor = 1
-		elif self.settings['Magnification'] == 100:
-			self.scaling_factor = 1
+		self.scaling_factor = self.calc_scaling_factor()
 
 		self.settings['dW'] = self.settings['W2'] - self.settings['W1']
 		self.settings['dH'] = self.settings['H2'] - self.settings['H1']
@@ -102,6 +98,9 @@ class ParticleSelection(Measurement):
 		self.settings['dY'] = self.settings['dH'] * self.scaling_factor
 		self.arrow1.setPos(self.settings['W1'], self.settings['H1'])
 		self.arrow2.setPos(self.settings['W2'], self.settings['H2'])
+
+	def calc_scaling_factor(self):
+		return self.PIXEL_SIZE/self.settings['Magnification']
 
 	def switch_arrows(self):
 		"""

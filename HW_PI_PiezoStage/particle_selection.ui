@@ -100,86 +100,37 @@
           <layout class="QGridLayout" name="gridLayout_6">
            <item row="0" column="0">
             <layout class="QGridLayout" name="gridLayout_5">
-             <item row="4" column="0" alignment="Qt::AlignRight">
-              <widget class="QLabel" name="label_8">
-               <property name="text">
-                <string>dX:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="0" alignment="Qt::AlignRight">
-              <widget class="QLabel" name="label_3">
-               <property name="text">
-                <string>W2:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="2" alignment="Qt::AlignRight">
-              <widget class="QLabel" name="label_2">
-               <property name="text">
-                <string>H1:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0" alignment="Qt::AlignRight">
-              <widget class="QLabel" name="label">
-               <property name="text">
-                <string>W1:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="2" alignment="Qt::AlignRight">
-              <widget class="QLabel" name="label_4">
-               <property name="text">
-                <string>H2:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <widget class="QDoubleSpinBox" name="w1_spinBox"/>
-             </item>
-             <item row="3" column="2" alignment="Qt::AlignRight">
-              <widget class="QLabel" name="label_6">
-               <property name="text">
-                <string>dH:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="1">
-              <widget class="QDoubleSpinBox" name="w2_spinBox"/>
-             </item>
-             <item row="0" column="0">
-              <widget class="QRadioButton" name="point1_radioButton">
-               <property name="text">
-                <string>First point</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
+             <item row="0" column="2">
               <widget class="QRadioButton" name="point2_radioButton">
                <property name="text">
                 <string>Second point</string>
                </property>
               </widget>
              </item>
-             <item row="4" column="2" alignment="Qt::AlignRight">
+             <item row="2" column="3">
+              <widget class="QDoubleSpinBox" name="h1_spinBox"/>
+             </item>
+             <item row="5" column="2" alignment="Qt::AlignRight">
               <widget class="QLabel" name="label_10">
                <property name="text">
                 <string>dY:</string>
                </property>
               </widget>
              </item>
-             <item row="3" column="0" alignment="Qt::AlignRight">
-              <widget class="QLabel" name="label_5">
+             <item row="5" column="1">
+              <widget class="QLabel" name="dx_label">
                <property name="text">
-                <string>dW:</string>
+                <string>0</string>
                </property>
               </widget>
              </item>
-             <item row="1" column="3">
-              <widget class="QDoubleSpinBox" name="h1_spinBox"/>
+             <item row="3" column="3">
+              <widget class="QDoubleSpinBox" name="h2_spinBox"/>
              </item>
              <item row="3" column="1">
+              <widget class="QDoubleSpinBox" name="w2_spinBox"/>
+             </item>
+             <item row="4" column="1">
               <widget class="QLabel" name="dw_label">
                <property name="text">
                 <string>0</string>
@@ -187,28 +138,77 @@
               </widget>
              </item>
              <item row="4" column="3">
-              <widget class="QLabel" name="dy_label">
-               <property name="text">
-                <string>0</string>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="3">
               <widget class="QLabel" name="dh_label">
                <property name="text">
                 <string>0</string>
                </property>
               </widget>
              </item>
-             <item row="4" column="1">
-              <widget class="QLabel" name="dx_label">
+             <item row="4" column="0" alignment="Qt::AlignRight">
+              <widget class="QLabel" name="label_5">
+               <property name="text">
+                <string>dW:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="3">
+              <widget class="QLabel" name="dy_label">
                <property name="text">
                 <string>0</string>
                </property>
               </widget>
              </item>
-             <item row="2" column="3">
-              <widget class="QDoubleSpinBox" name="h2_spinBox"/>
+             <item row="2" column="2" alignment="Qt::AlignRight">
+              <widget class="QLabel" name="label_2">
+               <property name="text">
+                <string>H1:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="2" alignment="Qt::AlignRight">
+              <widget class="QLabel" name="label_4">
+               <property name="text">
+                <string>H2:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0" alignment="Qt::AlignRight">
+              <widget class="QLabel" name="label">
+               <property name="text">
+                <string>W1:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="2" alignment="Qt::AlignRight">
+              <widget class="QLabel" name="label_6">
+               <property name="text">
+                <string>dH:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="0" alignment="Qt::AlignRight">
+              <widget class="QLabel" name="label_8">
+               <property name="text">
+                <string>dX:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0" alignment="Qt::AlignRight">
+              <widget class="QLabel" name="label_3">
+               <property name="text">
+                <string>W2:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QDoubleSpinBox" name="w1_spinBox"/>
+             </item>
+             <item row="0" column="1">
+              <widget class="QRadioButton" name="point1_radioButton">
+               <property name="text">
+                <string>First point</string>
+               </property>
+              </widget>
              </item>
             </layout>
            </item>
