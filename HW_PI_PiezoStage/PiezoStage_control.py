@@ -20,7 +20,8 @@ class PiezoStageControl(Measurement):
 		self.settings.New('step_size', dtype=float, unit='um', vmin=.001)
 
 		self.pi_device_hw = self.app.hardware['piezostage']
-
+		
+		
 	def setup_figure(self):
 		
 		self.pi_device_hw.settings.x_position.connect_to_widget(self.ui.x_label)
@@ -28,7 +29,7 @@ class PiezoStageControl(Measurement):
 		
 		self.settings.step_size.connect_to_widget(self.ui.step_size_spinBox)
 
-		self.ui.up_pushButton.clicked.connect(self.start)
+		self.ui.up_pushButton.clicked.connect(self.start) #TODO - bug: stage doesn't move until AFTER first click.
 		self.ui.right_pushButton.clicked.connect(self.start)
 		self.ui.down_pushButton.clicked.connect(self.start)
 		self.ui.left_pushButton.clicked.connect(self.start)
@@ -47,9 +48,10 @@ class PiezoStageControl(Measurement):
 
 		self.current_stage_pos_arrow = pg.ArrowItem()
 		self.current_stage_pos_arrow.setZValue(100)
-		self.current_stage_pos_arrow.setPos(50, 50)
+		self.current_stage_pos_arrow.setPos(self.pi_device_hw.settings['x_position'], self.pi_device_hw.settings['y_position'])
 		self.stage_plot.addItem(self.current_stage_pos_arrow)
-		
+
+				
 	def move_up(self):
 		if hasattr(self, 'pi_device') and hasattr(self, 'axes'):
 			self.pi_device.MVR(axes=self.axes[1], values=[self.settings['step_size']])

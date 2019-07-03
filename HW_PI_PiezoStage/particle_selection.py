@@ -54,8 +54,8 @@ class ParticleSelection(Measurement):
 
 		self.ui.load_image_pushButton.clicked.connect(self.load_image)
 		self.ui.export_pushButton.clicked.connect(self.export_points)
-		self.ui.move_stage_pushButton.clicked.connect(self.move_stage)
 		self.ui.move_stage_pushButton.clicked.connect(self.start)
+		
 
 		self.image_layout=pg.GraphicsLayoutWidget()
 		self.ui.image_groupBox.layout().addWidget(self.image_layout)
@@ -169,10 +169,10 @@ class ParticleSelection(Measurement):
 		except Exception as err:
 			print(format(err))
 
-	def move_stage(self):
-		if hasattr(self, 'pi_device'):
-			self.pi_device.MVR(axes=self.axes, values=[self.settings['dX'], self.settings['dY']])
-
+#	def move_stage(self):
+#		print(hasattr(self, 'pi_device'))
+#		if hasattr(self, 'pi_device'):
+			
 	def export_points(self):
 		self.check_filename("_selected_particle_positions.txt")
 		np.savetxt(self.app.settings['save_dir']+"/"+ self.app.settings['sample'] + "_selected_particle_positions.txt", np.asarray(self.selected_positions), fmt='%f')
@@ -193,3 +193,5 @@ class ParticleSelection(Measurement):
 	def run(self):
 		self.pi_device = self.pi_device_hw.pi_device
 		self.axes = self.pi_device_hw.axes[0:2]
+		self.pi_device.MVR(axes=self.axes, values=[self.settings['dX'], self.settings['dY']])
+		self.pi_device_hw.read_from_hardware()
