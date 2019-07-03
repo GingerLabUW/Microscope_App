@@ -23,8 +23,7 @@ class OceanOptics_Scan(PiezoStage_Scan):
 
 	def setup_figure(self):
 		PiezoStage_Scan.setup_figure(self)
-		self.ui.save_array_pushButton.clicked.connect(self.save_intensities_data)
-		self.ui.save_image_pushButton.clicked.connect(self.save_intensities_image)
+
 		spec_hw = self.app.hardware['oceanoptics']
 		details_groupBox = self.set_details_widget(widget = self.settings.New_UI(include=["intg_time", "correct_dark_counts", "scans_to_avg"]))
 		widgets = details_groupBox.findChildren(QtGui.QWidget)

@@ -434,7 +434,7 @@ class PiezoStage_Scan(Measurement):
 		"""
 		append = '_' + hw_name + '_intensity_sums.txt' #string to append to sample name
 		self.check_filename(append)
-		transposed = intensities_array
+		transposed = np.transpose(intensities_array)
 		np.savetxt(self.app.settings['save_dir']+"/"+ self.app.settings['sample'] + append, transposed, fmt='%f')
 
 	def save_intensities_image(self, intensities_array, hw_name):
