@@ -165,8 +165,7 @@ class PicoHarp_Scan(PiezoStage_Scan):
         return ph.time_array[0:self.num_hist_chans], ph.histogram_data[0:self.num_hist_chans]
 
     def save_intensities_data(self):
-        transposed = np.transpose(self.sum_intensities_image_map)
-        PiezoStage_Scan.save_intensities_data(transposed, 'ph')
+        PiezoStage_Scan.save_intensities_data(self, self.sum_intensities_image_map, 'ph')
 
     def save_intensities_image(self):
-        PiezoStage_Scan.save_intensities_image(self.sum_intensities_image_map, 'ph')
+        PiezoStage_Scan.save_intensities_image(self, self.sum_intensities_image_map, 'ph')

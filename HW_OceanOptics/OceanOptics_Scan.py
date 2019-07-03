@@ -128,8 +128,7 @@ class OceanOptics_Scan(PiezoStage_Scan):
 				self.y = np.mean(Int_array, axis=-1)
 
 	def save_intensities_data(self):
-		transposed = np.transpose(self.sum_intensities_image_map)
-		PiezoStage_Scan.save_intensities_data(transposed, 'oo')
+		PiezoStage_Scan.save_intensities_data(self, self.sum_intensities_image_map, 'oo')
 
 	def save_intensities_image(self):
-		PiezoStage_Scan.save_intensities_image(self.sum_intensities_image_map, 'oo')
+		PiezoStage_Scan.save_intensities_image(self, self.sum_intensities_image_map, 'oo')

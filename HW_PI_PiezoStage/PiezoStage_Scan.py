@@ -7,6 +7,7 @@ import pickle
 import os.path
 from pyqtgraph.Qt import QtGui, QtCore
 from pyqtgraph.Point import Point
+import customplotting.mscope as cpm
 
 class PiezoStage_Scan(Measurement):
 	name = "PiezoStage_Scan"
@@ -117,8 +118,8 @@ class PiezoStage_Scan(Measurement):
 
 		#region of interest - allows user to select scan area
 		self.scan_roi = pg.ROI([0,0],[25, 25], movable=True)
-		self.scan_roi.addScaleHandle([1, 1], [0, 0])
-		self.scan_roi.addScaleHandle([0, 0], [1, 1])        
+		self.handle1 = self.scan_roi.addScaleHandle([1, 1], [0, 0])
+		self.handle2 = self.scan_roi.addScaleHandle([0, 0], [1, 1])        
 		self.scan_roi.sigRegionChangeFinished.connect(self.mouse_update_scan_roi)
 		self.stage_plot.addItem(self.scan_roi)
 
@@ -264,6 +265,9 @@ class PiezoStage_Scan(Measurement):
 		self.pi_device = self.pi_device_hw.pi_device
 		self.axes = self.pi_device_hw.axes
 
+		self.scan_roi.removeHandle(self.handle1)
+		self.scan_roi.removeHandle(self.handle2)
+		self.scan_roi.translatable = False
 		for lqname in "scan_direction x_start y_start x_size y_size x_step y_step".split():
 			self.settings.as_dict()[lqname].change_readonly(True)
 
@@ -381,6 +385,9 @@ class PiezoStage_Scan(Measurement):
 		self.scan_complete = True
 		
 	def post_run(self):
+		self.handle1 = self.scan_roi.addScaleHandle([1, 1], [0, 0])
+		self.handle2 = self.scan_roi.addScaleHandle([0, 0], [1, 1])
+		self.scan_roi.translatable = True
 		for lqname in "scan_direction x_start y_start x_size y_size x_step y_step".split():
 			self.settings.as_dict()[lqname].change_readonly(False)
 			
@@ -427,7 +434,8 @@ class PiezoStage_Scan(Measurement):
 		"""
 		append = '_' + hw_name + '_intensity_sums.txt' #string to append to sample name
 		self.check_filename(append)
-		np.savetxt(self.app.settings['save_dir']+"/"+ self.app.settings['sample'] + append, intensities_array, fmt='%f')
+		transposed = intensities_array
+		np.savetxt(self.app.settings['save_dir']+"/"+ self.app.settings['sample'] + append, transposed, fmt='%f')
 
 	def save_intensities_image(self, intensities_array, hw_name):
 		"""
