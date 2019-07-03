@@ -54,6 +54,7 @@ class ParticleSelection(Measurement):
 
 		self.ui.load_image_pushButton.clicked.connect(self.load_image)
 		self.ui.export_pushButton.clicked.connect(self.export_points)
+		self.ui.clear_pushButton.clicked.connect(self.clear_selections)
 		self.ui.move_stage_pushButton.clicked.connect(self.start)
 		
 
@@ -138,9 +139,9 @@ class ParticleSelection(Measurement):
 					if self.point_counter == 1:
 						self.origin_x = mousePoint.x()
 						self.origin_y = mousePoint.y()
-						self.ui.textBrowser.append("Using (" + str(round(mousePoint.x(),3)) + ", " + str(round(mousePoint.y(),3)) + ") as origin." )
-				x_point = mousePoint.x() - self.origin_x
-				y_point = mousePoint.y() - self.origin_y
+						#self.ui.textBrowser.append("Using (" + str(round(mousePoint.x(),3)) + ", " + str(round(mousePoint.y(),3)) + ") as origin." )
+				x_point = (mousePoint.x() - self.origin_x) * self.scaling_factor
+				y_point = (mousePoint.y() - self.origin_y) * self.scaling_factor
 				self.selected_positions.append([x_point, y_point]) #add point to exportable list
 				text = "Point #" + str(self.point_counter) + " at (" + str(round(x_point, 3)) + ", " + str(round(y_point, 3)) + ")"
 				self.ui.textBrowser.append(text)
@@ -177,6 +178,13 @@ class ParticleSelection(Measurement):
 		self.check_filename("_selected_particle_positions.txt")
 		np.savetxt(self.app.settings['save_dir']+"/"+ self.app.settings['sample'] + "_selected_particle_positions.txt", np.asarray(self.selected_positions), fmt='%f')
 
+	def clear_selections(self):
+		self.point_counter = 0
+		self.selected_positions = []
+		self.origin_x = 0 
+		self.origin_y = 0
+		self.ui.textBrowser.append("Selections cleared.")
+		
 	def check_filename(self, append):
 		'''
 		If no sample name given or duplicate sample name given, fix the problem by appending a unique number.
