@@ -34,7 +34,7 @@ class ParticleSelection(Measurement):
 
 		#for selecting multiple points
 		self.point_counter = 0
-		self.selected_positions = []
+		self.relative_movements = []
 		self.origin_x = 0 
 		self.origin_y = 0
 
@@ -53,7 +53,7 @@ class ParticleSelection(Measurement):
 		self.settings.dY.connect_to_widget(self.ui.dy_label)
 
 		self.ui.load_image_pushButton.clicked.connect(self.load_image)
-		self.ui.export_pushButton.clicked.connect(self.export_points)
+		self.ui.export_pushButton.clicked.connect(self.export_relative_movements)
 		self.ui.clear_pushButton.clicked.connect(self.clear_selections)
 		self.ui.move_stage_pushButton.clicked.connect(self.start)
 		
@@ -134,17 +134,40 @@ class ParticleSelection(Measurement):
 					self.settings['H2'] = mousePoint.y()
 			elif self.ui.tabWidget.currentIndex() == 1: #if on "particle selection" tab
 				self.arrow_last_pos.setPos(mousePoint)
-				self.point_counter += 1
-				if self.ui.first_point_checkBox.isChecked(): #if checked, set first point as origin
-					if self.point_counter == 1:
-						self.origin_x = mousePoint.x()
-						self.origin_y = mousePoint.y()
-						#self.ui.textBrowser.append("Using (" + str(round(mousePoint.x(),3)) + ", " + str(round(mousePoint.y(),3)) + ") as origin." )
-				x_point = (mousePoint.x() - self.origin_x) * self.scaling_factor
-				y_point = (mousePoint.y() - self.origin_y) * self.scaling_factor
-				self.selected_positions.append([x_point, y_point]) #add point to exportable list
-				text = "Point #" + str(self.point_counter) + " at (" + str(round(x_point, 3)) + ", " + str(round(y_point, 3)) + ")"
+				
+				if self.point_counter == 0: #if first point
+					self.prev_point = mousePoint
+					text = "Starting point selected."
+
+					#store initial stage position and first point for later bounds-checking 
+					self.pi_x_start = self.pi_device_hw.settings['x_position']
+					self.pi_y_start = self.pi_device_hw.settings['y_position']
+					self.x_origin = mousePoint.x()
+					self.y_origin = mousePoint.y()
+					self.point_counter += 1
+				else: #if second point or more
+					x_point_check = (mousePoint.x() - self.x_origin) * self.scaling_factor + self.pi_x_start #get projected stage position
+					y_point_check = (mousePoint.y() - self.y_origin) * self.scaling_factor + self.pi_y_start
+					if x_point_check < 0 or x_point_check > 100 or y_point_check < 0 or y_point_check > 100: #stage bounds checking
+						text = self.ui.textBrowser("This point " + str(x_point_check) + ", " + str(y_point_check) + ") is out of stage bounds.")
+					else: # if not out of stage bounds, carry on with point selection
+						self.point_counter += 1
+						x_difference = (mousePoint.x() - self.prev_point.x()) * self.scaling_factor #get difference between current and previous points
+						y_difference = (mousePoint.y() - self.prev_point.y()) * self.scaling_factor
+						self.relative_movements.append([x_difference, y_difference])
+						text = "Relative movement #" + str(self.point_counter) + " of (" + str(round(x_difference,3)) + ", " str(round(y_difference,3)) + ")"
+						self.prev_point = mousePoint #save this point for the next calculation
+
 				self.ui.textBrowser.append(text)
+
+				# if self.ui.first_point_checkBox.isChecked(): #if checked, set first point as origin
+				# 	if self.point_counter == 1:
+				# 		self.origin_x = mousePoint.x()
+				# 		self.origin_y = mousePoint.y()
+				# 		#self.ui.textBrowser.append("Using (" + str(round(mousePoint.x(),3)) + ", " + str(round(mousePoint.y(),3)) + ") as origin." )
+				# x_point = (mousePoint.x() - self.origin_x) * self.scaling_factor
+				# y_point = (mousePoint.y() - self.origin_y) * self.scaling_factor
+
 
 
 	def load_image(self):
@@ -174,13 +197,13 @@ class ParticleSelection(Measurement):
 #		print(hasattr(self, 'pi_device'))
 #		if hasattr(self, 'pi_device'):
 			
-	def export_points(self):
+	def export_relative_movements(self):
 		self.check_filename("_selected_particle_positions.txt")
-		np.savetxt(self.app.settings['save_dir']+"/"+ self.app.settings['sample'] + "_selected_particle_positions.txt", np.asarray(self.selected_positions), fmt='%f')
+		np.savetxt(self.app.settings['save_dir']+"/"+ self.app.settings['sample'] + "_selected_particle_positions.txt", np.asarray(self.relative_movements), fmt='%f')
 
 	def clear_selections(self):
 		self.point_counter = 0
-		self.selected_positions = []
+		self.relative_movements = []
 		self.origin_x = 0 
 		self.origin_y = 0
 		self.ui.textBrowser.append("Selections cleared.")
