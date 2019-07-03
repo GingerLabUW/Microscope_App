@@ -1,6 +1,7 @@
 from ScopeFoundry import Measurement
 from ScopeFoundry.helper_funcs import sibling_path, load_qt_ui_file
 import pyqtgraph as pg
+from PIL import Image
 import numpy as np
 import time
 import pickle
@@ -151,15 +152,18 @@ class ParticleSelection(Measurement):
 		"""
 		try:
 			file = QtWidgets.QFileDialog.getOpenFileName(self.ui, 'Open file', os.getcwd())#"*.txt")
-			self.image_array = np.genfromtxt(file[0], dtype=None, encoding=None)
+			#self.image_array = np.genfromtxt(file[0], dtype=None, encoding=None)
+			image = Image.open(file[0])
+			image = image.rotate(-90, expand=True)
+			image_array = np.asarray(image)
 			try:
-				self.image.setImage(image=self.image_array)
-				width = self.image_array.shape[0]
-				height = self.image_array.shape[1]
+				self.image.setImage(image=image_array)
+				width = image_array.shape[0]
+				height = image_array.shape[1]
 				self.image_plot.setXRange(0, width)
 				self.image_plot.setYRange(0, height)
 				self.image_plot.setLimits(xMin=0, xMax=width, yMin=0, yMax=height)
-				self.image.setRect(0, 0, width, height)
+				#self.image.setRect(0, 0, width, height)
 			except:
 				print("")
 		except Exception as err:
