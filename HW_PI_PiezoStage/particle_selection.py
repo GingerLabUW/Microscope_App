@@ -8,6 +8,7 @@ import pickle
 import os.path
 from pyqtgraph.Qt import QtGui, QtCore, QtWidgets
 from pyqtgraph.Point import Point
+from PiezoStage_Scan.PiezoStage_Scan import check_filename
 
 class ParticleSelection(Measurement):
 	name = 'particleselection'
@@ -56,26 +57,30 @@ class ParticleSelection(Measurement):
 		self.ui.export_pushButton.clicked.connect(self.export_relative_movements)
 		self.ui.clear_pushButton.clicked.connect(self.clear_selections)
 		self.ui.move_stage_pushButton.clicked.connect(self.start)
-		
 
+		#plot where selected image will be displayed
 		self.image_layout=pg.GraphicsLayoutWidget()
 		self.ui.image_groupBox.layout().addWidget(self.image_layout)
 		self.image_plot = self.image_layout.addPlot(title="")
 		self.image_plot.setAspectLocked(lock=True, ratio=1)
 
+		#image item
 		self.image = pg.ImageItem()
 		self.image_plot.addItem(self.image)
 		self.image.setPos(0, 0)
 
+		#arrow showing location of first selected point
 		self.arrow1 = pg.ArrowItem()
 		self.arrow1.setPos(0,0)
 		self.image_plot.addItem(self.arrow1)
 
+		#arrow showing location of second selected point
 		self.arrow2 = pg.ArrowItem()
 		self.arrow2.setPos(0,0)
 		self.arrow2.setStyle(brush='r')
 		self.image_plot.addItem(self.arrow2)
 
+		#when selecting multiple points, arrow showing location of last selected point
 		self.arrow_last_pos = pg.ArrowItem()
 		self.arrow_last_pos.setPos(0,0)
 		self.image_plot.addItem(self.arrow_last_pos)
@@ -87,21 +92,26 @@ class ParticleSelection(Measurement):
 		self.settings.H2.updated_value.connect(self.update_positions)
 		self.settings.Magnification.updated_value.connect(self.update_positions)
 
-		self.image_plot.scene().sigMouseClicked.connect(self.image_click)
-		self.ui.tabWidget.currentChanged.connect(self.switch_arrows)
+		self.image_plot.scene().sigMouseClicked.connect(self.image_click) #setup plot click signal
+		self.ui.tabWidget.currentChanged.connect(self.switch_arrows) #setup tab switch signal
 
 	def update_positions(self):
-		#placeholder values for scaling_factor
+		"""
+		Keep scaling factor, arrows, and x/y positions updated 
+		"""
 		self.scaling_factor = self.calc_scaling_factor()
 
 		self.settings['dW'] = self.settings['W2'] - self.settings['W1']
-		self.settings['dH'] = self.settings['H2'] - self.settings['H1']
+		self.settings['dH'] = (self.settings['H2'] - self.settings['H1']) * -1 #invert sign of dH since image has been flipped vertically
 		self.settings['dX'] = self.settings['dW'] * self.scaling_factor
 		self.settings['dY'] = self.settings['dH'] * self.scaling_factor
 		self.arrow1.setPos(self.settings['W1'], self.settings['H1'])
 		self.arrow2.setPos(self.settings['W2'], self.settings['H2'])
 
 	def calc_scaling_factor(self):
+		"""
+		Calculate scaling factor
+		"""
 		return self.PIXEL_SIZE/self.settings['Magnification']
 
 	def switch_arrows(self):
@@ -125,6 +135,7 @@ class ParticleSelection(Measurement):
 		mousePoint = self.image_plot.vb.mapSceneToView(pos)
 
 		if self.image_plot.sceneBoundingRect().contains(pos) and self.ui.select_point_checkBox.isChecked():
+
 			if self.ui.tabWidget.currentIndex() == 0: #if on "2 points" tab
 				if  self.ui.point1_radioButton.isChecked():
 					self.settings['W1'] = mousePoint.x()
@@ -132,6 +143,7 @@ class ParticleSelection(Measurement):
 				elif self.ui.point2_radioButton.isChecked():
 					self.settings['W2'] = mousePoint.x()
 					self.settings['H2'] = mousePoint.y()
+			
 			elif self.ui.tabWidget.currentIndex() == 1: #if on "particle selection" tab
 				self.arrow_last_pos.setPos(mousePoint)
 				
@@ -178,18 +190,19 @@ class ParticleSelection(Measurement):
 			file = QtWidgets.QFileDialog.getOpenFileName(self.ui, 'Open file', os.getcwd())#"*.txt")
 			#self.image_array = np.genfromtxt(file[0], dtype=None, encoding=None)
 			image = Image.open(file[0])
-			image = image.rotate(-90, expand=True)
+			image = image.rotate(-90, expand=True) #rotate since pyqtgraph's setImage is column-major
 			image_array = np.asarray(image)
 			try:
 				self.image.setImage(image=image_array)
 				width = image_array.shape[0]
 				height = image_array.shape[1]
+
+				#set limits for zooming/panning
 				self.image_plot.setXRange(0, width)
 				self.image_plot.setYRange(0, height)
 				self.image_plot.setLimits(xMin=0, xMax=width, yMin=0, yMax=height)
-				#self.image.setRect(0, 0, width, height)
 			except:
-				print("")
+				pass
 		except Exception as err:
 			print(format(err))
 
@@ -198,30 +211,36 @@ class ParticleSelection(Measurement):
 #		if hasattr(self, 'pi_device'):
 			
 	def export_relative_movements(self):
-		self.check_filename("_selected_particle_positions.txt")
+		PiezoStage_Scan.check_filename(self, "_selected_particle_positions.txt") #make sure filename doesn't already exist
 		np.savetxt(self.app.settings['save_dir']+"/"+ self.app.settings['sample'] + "_selected_particle_positions.txt", np.asarray(self.relative_movements), fmt='%f')
 
 	def clear_selections(self):
+		"""
+		Reset multiple point selection.
+		"""
 		self.point_counter = 0
 		self.relative_movements = []
 		self.origin_x = 0 
 		self.origin_y = 0
 		self.ui.textBrowser.append("Selections cleared.")
 		
-	def check_filename(self, append):
-		'''
-		If no sample name given or duplicate sample name given, fix the problem by appending a unique number.
-		append - string to add to sample name (including file extension)
-		'''
-		samplename = self.app.settings['sample']
-		filename = samplename + append
-		directory = self.app.settings['save_dir']
-		if samplename == "":
-			self.app.settings['sample'] = int(time.time())
-		if (os.path.exists(directory+"/"+filename)):
-			self.app.settings['sample'] = samplename + str(int(time.time()))
+	# def check_filename(self, append):
+	# 	'''
+	# 	If no sample name given or duplicate sample name given, fix the problem by appending a unique number.
+	# 	append - string to add to sample name (including file extension)
+	# 	'''
+	# 	samplename = self.app.settings['sample']
+	# 	filename = samplename + append
+	# 	directory = self.app.settings['save_dir']
+	# 	if samplename == "":
+	# 		self.app.settings['sample'] = int(time.time())
+	# 	if (os.path.exists(directory+"/"+filename)):
+	# 		self.app.settings['sample'] = samplename + str(int(time.time()))
 
 	def run(self):
+		"""
+		Move stage from first selected point to the second point, assuming piezo stage is already at first point.
+		"""
 		self.pi_device = self.pi_device_hw.pi_device
 		self.axes = self.pi_device_hw.axes[0:2]
 		self.pi_device.MVR(axes=self.axes, values=[self.settings['dX'], self.settings['dY']])

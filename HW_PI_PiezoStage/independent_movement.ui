@@ -38,27 +38,6 @@
        <item row="2" column="1">
         <widget class="QDoubleSpinBox" name="sleep_time_spinBox"/>
        </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="label_3">
-         <property name="text">
-          <string>Movement type</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="QComboBox" name="movement_type_comboBox">
-         <item>
-          <property name="text">
-           <string>Absolute</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Relative</string>
-          </property>
-         </item>
-        </widget>
-       </item>
       </layout>
      </widget>
     </item>
@@ -124,7 +103,7 @@
      <x>0</x>
      <y>0</y>
      <width>612</width>
-     <height>21</height>
+     <height>31</height>
     </rect>
    </property>
   </widget>

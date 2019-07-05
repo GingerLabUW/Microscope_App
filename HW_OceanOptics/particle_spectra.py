@@ -13,6 +13,7 @@ import pickle
 import os.path
 
 class ParticleSpectra(Measurement):
+
     def setup(self):
         self.name = 'particle_spectra'
         self.ui_filename = sibling_path(__file__, "particle_spectra.ui")
@@ -54,7 +55,7 @@ class ParticleSpectra(Measurement):
     
     def array_from_file(self):
         '''
-        Prompts the user to select a text file containing the list of positions.
+        Prompts the user to select a text file containing the list of relative movements.
         '''
         try:
             fname = QtWidgets.QFileDialog.getOpenFileName(self.ui, 'Open file', os.getcwd(),"*.txt")
@@ -77,6 +78,9 @@ class ParticleSpectra(Measurement):
             pg.QtGui.QApplication.processEvents()
 
     def run(self):
+        """
+        Iterates through list of relative movements in given file, taking a spectrometer reading at each point. 
+        """
         if not hasattr(self, "movements_array"):
             self.ui.textBrowser.append("Must import text file before running.")
         else:
@@ -85,28 +89,28 @@ class ParticleSpectra(Measurement):
             self.axes = self.pi_device.axes[0:2]
             num_points = self.movements_array.shape[0] #get number of rows = number of points
             
-            OceanOpticsMeasure.check_filename(self, "_particle_position1.txt")
+            OceanOpticsMeasure.check_filename(self, "_particle_position1.txt") #make sure filename doesn't already exist
             
             #first spectrometer reading before stage movements
             OceanOpticsMeasure._read_spectrometer(self)
             save_array = np.zeros(shape=(2048, 2))
             save_array[:,0] = self.spec.wavelengths()
             save_array[:,1] = self.y                   
-            np.savetxt(self.app.settings['save_dir']+"/"+self.app.settings['sample']+ "_particle_position1.txt", save_array, fmt = '%.5f', header = 'Wavelength (nm), Intensity (counts)', delimiter = ' ')
+            np.savetxt(self.app.settings['save_dir']+"/"+self.app.settings['sample']+ "_particle_position1.txt", save_array, fmt = '%.5f',
+                header = 'Wavelength (nm), Intensity (counts)', delimiter = ' ')
         
             for i in range(num_points):
                 if self.interrupt_measurement_called:
                     break
                 rel_mov = self.movements_array[i]
-                self.pi_device.MVR(axes=self.axes, values=[rel_mov[0], rel_mov[1]])
+                self.pi_device.MVR(axes=self.axes, values=[rel_mov[0], rel_mov[1]]) #move stage
                 
                 OceanOpticsMeasure._read_spectrometer(self)
                 save_array = np.zeros(shape=(2048, 2))
                 save_array[:,0] = self.spec.wavelengths()
                 save_array[:,1] = self.y                   
-                np.savetxt(self.app.settings['save_dir']+"/"+self.app.settings['sample']+ "_particle_position" + str(i+2) + ".txt", save_array, fmt = '%.5f', header = 'Wavelength (nm), Intensity (counts)', delimiter = ' ')
+                np.savetxt(self.app.settings['save_dir']+"/"+self.app.settings['sample']+ "_particle_position" + str(i+2) + ".txt", save_array, fmt = '%.5f',
+                    header = 'Wavelength (nm), Intensity (counts)', delimiter = ' ') #save the reading at each position in txt file
+                
                 self.pi_device_hw.read_from_hardware()
                 self.ui.textBrowser.append("Movement #" + str(i+1) + " complete.")
-                
-
-          
