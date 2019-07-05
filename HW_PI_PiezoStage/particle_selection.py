@@ -149,13 +149,13 @@ class ParticleSelection(Measurement):
 					x_point_check = (mousePoint.x() - self.x_origin) * self.scaling_factor + self.pi_x_start #get projected stage position
 					y_point_check = (mousePoint.y() - self.y_origin) * self.scaling_factor + self.pi_y_start
 					if x_point_check < 0 or x_point_check > 100 or y_point_check < 0 or y_point_check > 100: #stage bounds checking
-						text = self.ui.textBrowser("This point " + str(x_point_check) + ", " + str(y_point_check) + ") is out of stage bounds.")
+						text = self.ui.textBrowser.append("This point is out of stage bounds.")
 					else: # if not out of stage bounds, carry on with point selection
 						self.point_counter += 1
 						x_difference = (mousePoint.x() - self.prev_point.x()) * self.scaling_factor #get difference between current and previous points
 						y_difference = (mousePoint.y() - self.prev_point.y()) * self.scaling_factor
 						self.relative_movements.append([x_difference, y_difference])
-						text = "Relative movement #" + str(self.point_counter) + " of (" + str(round(x_difference,3)) + ", " str(round(y_difference,3)) + ")"
+						text = "Relative movement #" + str(self.point_counter - 1) + " of (" + str(round(x_difference,3)) + ", " + str(round(y_difference,3)) + ")"
 						self.prev_point = mousePoint #save this point for the next calculation
 
 				self.ui.textBrowser.append(text)
