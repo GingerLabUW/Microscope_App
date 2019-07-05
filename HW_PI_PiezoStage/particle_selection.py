@@ -8,7 +8,7 @@ import pickle
 import os.path
 from pyqtgraph.Qt import QtGui, QtCore, QtWidgets
 from pyqtgraph.Point import Point
-from PiezoStage_Scan.PiezoStage_Scan import check_filename
+from .PiezoStage_Scan import PiezoStage_Scan
 
 class ParticleSelection(Measurement):
 	name = 'particleselection'
