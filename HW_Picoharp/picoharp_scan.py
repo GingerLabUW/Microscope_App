@@ -6,7 +6,7 @@ import numpy as np
 import time
 import pickle
 import os.path
-from pyqtgraph.Qt import QtGui, QtCore
+from pyqtgraph.Qt import QtGui, QtCore, QtWidgets
 from pyqtgraph.Point import Point
 import customplotting.mscope as cpm
 
@@ -30,15 +30,16 @@ class PicoHarp_Scan(PiezoStage_Scan):
         self.ui.save_array_pushButton.clicked.connect(self.save_intensities_data)
         self.ui.save_image_pushButton.clicked.connect(self.save_intensities_image)
         details_groupBox = self.set_details_widget(widget = self.settings.New_UI(include=["Tacq", "Resolution", "count_rate0", "count_rate1"]))
-        widgets = details_groupBox.findChildren(QtGui.QWidget)        
+        widgets = details_groupBox.findChildren(QtGui.QWidget)
+        print(widgets) 
         tacq_spinBox = widgets[1]
         resolution_comboBox = widgets[4]
-        count_rate0_spinBox = widgets[6]
-        count_rate1_spinBox = widgets[9]
+        count_rate0_spinBox = widgets[13] # previously index 6
+        count_rate1_spinBox = widgets[16] #previous index 9
         self.picoharp_hw.settings.Tacq.connect_to_widget(tacq_spinBox)
         self.picoharp_hw.settings.Resolution.connect_to_widget(resolution_comboBox)
-        self.picoharp_hw.settings.count_rate0.connect_to_widget(count_rate0_spinBox)
-        self.picoharp_hw.settings.count_rate1.connect_to_widget(count_rate1_spinBox)
+        #self.picoharp_hw.settings.count_rate0.connect_to_widget(count_rate0_spinBox)
+        #self.picoharp_hw.settings.count_rate1.connect_to_widget(count_rate1_spinBox)
 
         #save data buttons
         self.ui.save_image_pushButton.clicked.connect(self.save_intensities_image)

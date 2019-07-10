@@ -211,8 +211,8 @@ class ParticleSelection(Measurement):
 #		if hasattr(self, 'pi_device'):
 			
 	def export_relative_movements(self):
-		PiezoStage_Scan.check_filename(self, "_selected_particle_positions.txt") #make sure filename doesn't already exist
-		np.savetxt(self.app.settings['save_dir']+"/"+ self.app.settings['sample'] + "_selected_particle_positions.txt", np.asarray(self.relative_movements), fmt='%f')
+		PiezoStage_Scan.check_filename(self, "_selected_relative_movements.txt") #make sure filename doesn't already exist
+		np.savetxt(self.app.settings['save_dir']+"/"+ self.app.settings['sample'] + "_selected_relative_movements.txt", np.asarray(self.relative_movements), fmt='%f')
 
 	def clear_selections(self):
 		"""
