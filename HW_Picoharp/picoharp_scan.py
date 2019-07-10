@@ -31,7 +31,6 @@ class PicoHarp_Scan(PiezoStage_Scan):
         self.ui.save_image_pushButton.clicked.connect(self.save_intensities_image)
         details_groupBox = self.set_details_widget(widget = self.settings.New_UI(include=["Tacq", "Resolution", "count_rate0", "count_rate1"]))
         widgets = details_groupBox.findChildren(QtGui.QWidget)
-        print(widgets) 
         tacq_spinBox = widgets[1]
         resolution_comboBox = widgets[4]
         count_rate0_spinBox = widgets[13] # previously index 6
