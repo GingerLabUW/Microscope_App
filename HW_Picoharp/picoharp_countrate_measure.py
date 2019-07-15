@@ -88,8 +88,7 @@ class PicoHarpCountrateMeasure(Measurement):
 #            self.plot.enableAutoRange()
             #self.plot.setRange(disableAutoRange=False)
             #self.plot.setXLimits(xMin=0, xMax=None)
-        
-        print(ph.Tacq)
+
         sleep_time = self.display_update_period###min((max(0.1*ph.Tacq*1e-3, 0.010), 0.100)) # check every 1/10 of Tacq with limits of 10ms and 100ms
         #print("sleep_time", sleep_time, np.max(0.1*ph.Tacq*1e-3, 0.010))
         
@@ -168,3 +167,16 @@ class PicoHarpCountrateMeasure(Measurement):
         append = '_countrate_data.txt' #string to append to sample name
         self.check_filename(append)
         np.savetxt(self.app.settings['save_dir']+"/"+ self.app.settings['sample'] + append, cr_data, fmt='%f')
+
+    def check_filename(self, append):
+        '''
+        If no sample name given or duplicate sample name given, fix the problem by appending a unique number.
+        append - string to add to sample name (including file extension)
+        '''
+        samplename = self.app.settings['sample']
+        filename = samplename + append
+        directory = self.app.settings['save_dir']
+        if samplename == "":
+            self.app.settings['sample'] = int(time.time())
+        if (os.path.exists(directory+"/"+filename)):
+            self.app.settings['sample'] = samplename + str(int(time.time()))
