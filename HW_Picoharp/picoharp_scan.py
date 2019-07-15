@@ -33,8 +33,8 @@ class PicoHarp_Scan(PiezoStage_Scan):
         widgets = details_groupBox.findChildren(QtGui.QWidget)
         tacq_spinBox = widgets[1]
         resolution_comboBox = widgets[4]
-        count_rate0_spinBox = widgets[13] # previously index 6
-        count_rate1_spinBox = widgets[16] #previous index 9
+        count_rate0_spinBox = widgets[6]
+        count_rate1_spinBox = widgets[9]
         self.picoharp_hw.settings.Tacq.connect_to_widget(tacq_spinBox)
         self.picoharp_hw.settings.Resolution.connect_to_widget(resolution_comboBox)
         #self.picoharp_hw.settings.count_rate0.connect_to_widget(count_rate0_spinBox)
