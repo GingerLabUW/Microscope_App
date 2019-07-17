@@ -143,6 +143,7 @@ class OceanOpticsMeasure(Measurement):
                 Int_array[:,i] = data[1]
                 self.y = np.mean(Int_array, axis=-1)
                 self.elapsed_time += self.spec_hw.settings['intg_time'] #ms
+            self.elapsed_time = 0
 
 
 
