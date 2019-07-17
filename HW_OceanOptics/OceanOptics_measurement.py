@@ -108,7 +108,6 @@ class OceanOpticsMeasure(Measurement):
         self.elapsed_time = 0 #ms
         while not self.interrupt_measurement_called:
             self._read_spectrometer()
-            self.elapsed_time = 0
             self.save_array[:,1] = self.y
             if self.ui.save_every_spec_checkBox.isChecked(): #while interrupt not called, inside, have an if for if interrupt is called 
                 self.save_array[:,0] = self.spec.wavelengths()
