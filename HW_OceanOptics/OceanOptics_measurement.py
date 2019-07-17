@@ -86,7 +86,7 @@ class OceanOpticsMeasure(Measurement):
         This function runs repeatedly and automatically during the measurement run.
         its update frequency is defined by self.display_update_period
         """
-        if hasattr(self, 'spec'):
+        if hasattr(self, 'spec') and hasattr(self, 'y'):
             time_remaining = (self.total_time - self.elapsed_time) #ms
             self.ui.time_remaining_label.setText("%.2f" % (time_remaining * 1e-3) + "s") #in seconds
             self.ui.progressBar.setValue(time_remaining/self.total_time)
@@ -143,6 +143,7 @@ class OceanOpticsMeasure(Measurement):
                 Int_array[:,i] = data[1]
                 self.y = np.mean(Int_array, axis=-1)
                 self.elapsed_time += self.spec_hw.settings['intg_time'] #ms
+
 
 
     def check_filename(self, append):
