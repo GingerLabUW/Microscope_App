@@ -3,6 +3,7 @@ from ScopeFoundry.helper_funcs import sibling_path, load_qt_ui_file
 import numpy as np
 import time
 import pyqtgraph as pg
+import os
 
 # TODO h5 save
 

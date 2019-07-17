@@ -3,6 +3,7 @@ from ScopeFoundry.helper_funcs import sibling_path, load_qt_ui_file
 import numpy as np
 import time
 import pyqtgraph as pg
+import os
 
 # TODO h5 save
 
@@ -121,13 +122,14 @@ class PicoHarpHistogramMeasure(Measurement):
 
 
 
-        self.fname = "%i_picoharp.npz" % time.time()
+#        self.fname = "%i_picoharp.npz" % time.time()
 #        np.savez_compressed(self.fname, **save_dict)
-        print("TRPL Picoharp Saved", self.fname)
+#        print("TRPL Picoharp Saved", self.fname)
                                
     def update_display(self):
         ph = self.picoharp
-        self.plotdata.setData(ph.time_array[0:self.num_hist_chans]*1e-3, ph.histogram_data[0:self.num_hist_chans]) #got rid of +1
+#        self.plotdata.setData(ph.time_array*1e-3, ph.histogram_data+1)
+        self.plotdata.setData(ph.time_array[0:self.num_hist_chans]*1e-3, ph.histogram_data[0:self.num_hist_chans]+1)
         #self.fig.canvas.draw()
 
     def save_hist_data(self):
