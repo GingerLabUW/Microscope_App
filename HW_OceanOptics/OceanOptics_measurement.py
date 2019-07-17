@@ -89,7 +89,7 @@ class OceanOpticsMeasure(Measurement):
         if hasattr(self, 'spec') and hasattr(self, 'y'):
             time_remaining = (self.total_time - self.elapsed_time) #ms
             self.ui.time_remaining_label.setText("%.2f" % (time_remaining * 1e-3) + "s") #in seconds
-            self.ui.progressBar.setValue(time_remaining/self.total_time)
+            self.ui.progressBar.setValue((self.elapsed_time/self.total_time) * 100)
 
             self.plot.plot(self.spec.wavelengths(), self.y, pen='r', clear=True)
             pg.QtGui.QApplication.processEvents()
@@ -108,6 +108,7 @@ class OceanOpticsMeasure(Measurement):
         self.elapsed_time = 0 #ms
         while not self.interrupt_measurement_called:
             self._read_spectrometer()
+            self.elapsed_time = 0
             self.save_array[:,1] = self.y
             if self.ui.save_every_spec_checkBox.isChecked(): #while interrupt not called, inside, have an if for if interrupt is called 
                 self.save_array[:,0] = self.spec.wavelengths()
@@ -143,9 +144,6 @@ class OceanOpticsMeasure(Measurement):
                 Int_array[:,i] = data[1]
                 self.y = np.mean(Int_array, axis=-1)
                 self.elapsed_time += self.spec_hw.settings['intg_time'] #ms
-            self.elapsed_time = 0
-
-
 
     def check_filename(self, append):
         '''
