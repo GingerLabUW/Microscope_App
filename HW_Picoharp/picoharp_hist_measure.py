@@ -21,8 +21,7 @@ class PicoHarpHistogramMeasure(Measurement):
 #                                      dtype=int, vmin=1, vmax=2**16, initial=2**16)
 #         self.stored_histogram_channels.connect_bidir_to_widget(
 #                                            self.gui.ui.trpl_live_stored_channels_doubleSpinBox)
-        
-        S.New('save_h5', dtype=bool, initial=True)
+    
         S.New('continuous', dtype=bool, initial=False)
 
         # UI 
@@ -58,7 +57,6 @@ class PicoHarpHistogramMeasure(Measurement):
         ph_hw.settings.count_rate0.connect_to_widget(self.ui.ch0_label)#doubleSpinBox) ###
         ph_hw.settings.count_rate1.connect_to_widget(self.ui.ch1_label)#doubleSpinBox) ###
         ph_hw.settings.Resolution.connect_to_widget(self.ui.resolution_comboBox)
-        S.save_h5.connect_bidir_to_widget(self.ui.save_h5_checkBox)
         self.ui.save_data_pushButton.clicked.connect(self.save_hist_data)
 
         self.graph_layout = pg.GraphicsLayoutWidget()    

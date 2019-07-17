@@ -56,7 +56,7 @@ class OceanOptics_Scan(PiezoStage_Scan):
 		if hasattr(self, 'spec') and hasattr(self, 'pi_device') and hasattr(self, 'y'): #first, check if setup has happened
 			if not self.interrupt_measurement_called:
 				seconds_left = ((self.x_range * self.y_range) - self.pixels_scanned) * self.settings["intg_time"] * 1e-3
-				self.ui.estimated_time_label.setText("Estimated time remaining: " + str(seconds_left) + "s")
+				self.ui.estimated_time_label.setText("Estimated time remaining: " + "%.2f" % seconds_left + "s")
 			#plot wavelengths vs intensity
 			self.plot.plot(self.spec.wavelengths(), self.y, pen='r', clear=True) #plot wavelength vs intensity
 			self.graph_layout.show()
@@ -85,6 +85,8 @@ class OceanOptics_Scan(PiezoStage_Scan):
 		# Define empty array for image map
 		self.sum_intensities_image_map = np.zeros((self.x_range, self.y_range), dtype=float) #store sum of intensities for each pixel
 		self.spectrum_image_map = np.zeros((2048, self.x_range, self.y_range), dtype=float) #Store spectrum for each pixel
+		scan_time = self.x_range * self.y_range * self.settings["intg_time"] * 1e-3 #s
+		self.ui.estimated_scan_time_label.setText("Estimated scan time: " + "%.2f" % scan_time + "s")
 		
 	def scan_measure(self):
 		"""

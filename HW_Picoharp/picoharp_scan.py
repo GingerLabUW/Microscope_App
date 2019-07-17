@@ -53,7 +53,7 @@ class PicoHarp_Scan(PiezoStage_Scan):
         if hasattr(self, 'sum_intensities_image_map'):
             if not self.interrupt_measurement_called:
                 seconds_left = ((self.x_range * self.y_range) - self.pixels_scanned) * self.settings["Tacq"]
-                self.ui.estimated_time_label.setText("Estimated time remaining: " + str(seconds_left) + "s")
+                self.ui.estimated_time_label.setText("Estimated time remaining: " + "%.2f" % seconds_left + "s")
             self.img_item.setImage(self.sum_intensities_image_map)
             self.imv.setImage(img=self.hist_data, autoRange=False, autoLevels=True)
             self.imv.show()
@@ -121,6 +121,9 @@ class PicoHarp_Scan(PiezoStage_Scan):
         #self.time_data = np.zeros(shape=(hist_len, self.x_range, self.y_range))
         #Store histogram sums for each pixel
         self.sum_intensities_image_map = np.zeros((self.x_range, self.y_range), dtype=float)
+
+        scan_time = self.x_range * self.y_range * self.settings["Tacq"] * 1e-3 #s
+        self.ui.estimated_scan_time_label.setText("Estimated scan time: " + "%.2f" % scan_time + "s")
 
     def scan_measure(self):
         """

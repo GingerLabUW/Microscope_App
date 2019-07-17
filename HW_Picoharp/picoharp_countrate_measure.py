@@ -22,7 +22,6 @@ class PicoHarpCountrateMeasure(Measurement):
 #         self.stored_histogram_channels.connect_bidir_to_widget(
 #                                            self.gui.ui.trpl_live_stored_channels_doubleSpinBox)
         
-        S.New('save_h5', dtype=bool, initial=True)
         S.New('continuous', dtype=bool, initial=False)
         
         # UI 
@@ -59,7 +58,6 @@ class PicoHarpCountrateMeasure(Measurement):
         #ph.settings.histogram_channels.connect_bidir_to_widget(self.ui.histogram_channels_doubleSpinBox)
         ph_hw.settings.count_rate0.connect_to_widget(self.ui.ch0_label)#doubleSpinBox)
         ph_hw.settings.count_rate1.connect_to_widget(self.ui.ch1_label)#doubleSpinBox)
-        S.save_h5.connect_bidir_to_widget(self.ui.save_h5_checkBox)
         self.ui.save_data_pushButton.clicked.connect(self.save_countrates)
         #self.gui.ui.picoharp_acquire_one_pushButton.clicked.connect(self.start)
         #self.gui.ui.picoharp_interrupt_pushButton.clicked.connect(self.interrupt)
@@ -119,6 +117,7 @@ class PicoHarpCountrateMeasure(Measurement):
 #            if not self.settings['continuous']:
 #                break
         self.elasped_time = 0
+
         #if not continuous, clear time and count arrays
         #print "elasped_meas_time (final):", ph.read_elapsed_meas_time()
         
