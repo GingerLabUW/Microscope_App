@@ -1,0 +1,463 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1172</width>
+    <height>968</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="MinimumExpanding" vsizetype="Ignored">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>100</width>
+    <height>100</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout_3">
+    <item>
+     <widget class="QGroupBox" name="groupBox">
+      <property name="title">
+       <string>Settings</string>
+      </property>
+      <property name="flat">
+       <bool>true</bool>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="0" column="0">
+        <widget class="QGroupBox" name="groupBox_4">
+         <property name="title">
+          <string>Current position</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_7">
+          <item row="0" column="0">
+           <layout class="QGridLayout" name="gridLayout_5">
+            <item row="0" column="1">
+             <widget class="QDoubleSpinBox" name="x_pos_doubleSpinBox">
+              <property name="font">
+               <font>
+                <pointsize>8</pointsize>
+               </font>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QDoubleSpinBox" name="y_pos_doubleSpinBox">
+              <property name="font">
+               <font>
+                <pointsize>8</pointsize>
+               </font>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0" alignment="Qt::AlignRight">
+             <widget class="QLabel" name="label">
+              <property name="font">
+               <font>
+                <pointsize>8</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>X</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0" alignment="Qt::AlignRight">
+             <widget class="QLabel" name="label_2">
+              <property name="font">
+               <font>
+                <pointsize>8</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>Y</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QGroupBox" name="groupBox_6">
+         <property name="title">
+          <string>Scan settings</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_6">
+          <item row="1" column="0" colspan="2">
+           <layout class="QGridLayout" name="gridLayout_3">
+            <item row="1" column="5">
+             <widget class="QDoubleSpinBox" name="y_step_doubleSpinBox">
+              <property name="font">
+               <font>
+                <pointsize>8</pointsize>
+               </font>
+              </property>
+              <property name="value">
+               <double>0.100000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="4" alignment="Qt::AlignRight">
+             <widget class="QLabel" name="label_6">
+              <property name="font">
+               <font>
+                <pointsize>8</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>X Step (um)</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QDoubleSpinBox" name="x_start_doubleSpinBox">
+              <property name="font">
+               <font>
+                <pointsize>8</pointsize>
+               </font>
+              </property>
+              <property name="maximum">
+               <double>100.000000000000000</double>
+              </property>
+              <property name="value">
+               <double>50.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QDoubleSpinBox" name="y_start_doubleSpinBox">
+              <property name="font">
+               <font>
+                <pointsize>8</pointsize>
+               </font>
+              </property>
+              <property name="maximum">
+               <double>100.000000000000000</double>
+              </property>
+              <property name="value">
+               <double>50.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0" alignment="Qt::AlignRight">
+             <widget class="QLabel" name="label_8">
+              <property name="font">
+               <font>
+                <pointsize>8</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>Y Start (um)</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="2" alignment="Qt::AlignRight">
+             <widget class="QLabel" name="label_4">
+              <property name="font">
+               <font>
+                <pointsize>8</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>Y Scan Size (um)</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="4" alignment="Qt::AlignRight">
+             <widget class="QLabel" name="label_7">
+              <property name="font">
+               <font>
+                <pointsize>8</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>Y Step (um)</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="5">
+             <widget class="QDoubleSpinBox" name="x_step_doubleSpinBox">
+              <property name="font">
+               <font>
+                <pointsize>8</pointsize>
+               </font>
+              </property>
+              <property name="singleStep">
+               <double>1.000000000000000</double>
+              </property>
+              <property name="value">
+               <double>0.100000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="3">
+             <widget class="QDoubleSpinBox" name="x_size_doubleSpinBox">
+              <property name="font">
+               <font>
+                <pointsize>8</pointsize>
+               </font>
+              </property>
+              <property name="value">
+               <double>5.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="3">
+             <widget class="QDoubleSpinBox" name="y_size_doubleSpinBox">
+              <property name="font">
+               <font>
+                <pointsize>8</pointsize>
+               </font>
+              </property>
+              <property name="value">
+               <double>5.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0" alignment="Qt::AlignRight">
+             <widget class="QLabel" name="label_9">
+              <property name="font">
+               <font>
+                <pointsize>8</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>X Start (um)</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2" alignment="Qt::AlignRight">
+             <widget class="QLabel" name="label_5">
+              <property name="font">
+               <font>
+                <pointsize>8</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>X Scan Size (um)</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="0" column="0">
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <item>
+             <widget class="QLabel" name="label_3">
+              <property name="text">
+               <string>Scan direction</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="scan_comboBox">
+              <item>
+               <property name="text">
+                <string>XY</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>YX</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QGroupBox" name="groupBox_2">
+         <property name="title">
+          <string>Move stage to selected position</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <widget class="QCheckBox" name="save_positions_checkBox">
+            <property name="text">
+             <string>Save positions</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QGridLayout" name="gridLayout">
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_11">
+              <property name="text">
+               <string>Selected y</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_10">
+              <property name="text">
+               <string>Selected x</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QDoubleSpinBox" name="x_clicked_doubleSpinBox"/>
+            </item>
+            <item row="1" column="1">
+             <widget class="QDoubleSpinBox" name="y_clicked_doubleSpinBox"/>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="lock_position_checkBox">
+            <property name="text">
+             <string>Lock position</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="export_positions_pushButton">
+            <property name="text">
+             <string>Export positions</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="move_to_selected_pushButton">
+            <property name="text">
+             <string>Move</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="0" column="3">
+        <widget class="QGroupBox" name="details_groupBox">
+         <property name="title">
+          <string>Details</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout">
+          <item>
+           <widget class="QPushButton" name="save_image_pushButton">
+            <property name="text">
+             <string>Save intensities image</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="save_array_pushButton">
+            <property name="text">
+             <string>Save intensities array</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QGroupBox" name="groupBox_3">
+         <property name="title">
+          <string>Run</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_4">
+          <item row="2" column="0" colspan="2">
+           <widget class="QLabel" name="estimated_time_label">
+            <property name="text">
+             <string>Estimated time remaining: 0s</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QPushButton" name="start_scan_pushButton">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>Start scan</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QPushButton" name="interrupt_scan_pushButton">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>Interrupt scan</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0" colspan="2">
+           <widget class="QProgressBar" name="progressBar">
+            <property name="layoutDirection">
+             <enum>Qt::LeftToRight</enum>
+            </property>
+            <property name="value">
+             <number>0</number>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="estimated_scan_time_label">
+            <property name="text">
+             <string>Estimated scan time: 0s</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="stage_groupBox">
+      <property name="title">
+       <string>Stage</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_8"/>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1172</width>
+     <height>31</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <tabstops>
+  <tabstop>x_start_doubleSpinBox</tabstop>
+  <tabstop>y_start_doubleSpinBox</tabstop>
+  <tabstop>x_size_doubleSpinBox</tabstop>
+  <tabstop>y_size_doubleSpinBox</tabstop>
+  <tabstop>x_step_doubleSpinBox</tabstop>
+  <tabstop>y_step_doubleSpinBox</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>
