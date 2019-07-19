@@ -33,6 +33,8 @@ class OceanOptics_Scan(PiezoStage_Scan):
 		#scans_to_avg_spinBox = widgets[6]
 		spec_hw.settings.intg_time.connect_to_widget(intg_time_spinBox)
 		spec_hw.settings.correct_dark_counts.connect_to_widget(correct_dark_counts_checkBox)
+
+		intg_time_spinBox.valueChanged.connect(self.update_estimated_scan_time)
 		
 		#save data buttons
 		self.ui.save_image_pushButton.clicked.connect(self.save_intensities_image)
@@ -49,7 +51,13 @@ class OceanOptics_Scan(PiezoStage_Scan):
 		self.imv = pg.ImageView()
 		self.imv.getView().setAspectLocked(lock=False, ratio=1)
 		self.imv.getView().setMouseEnabled(x=True, y=True)
-		#TODO - connect widget to settings in spectrometer 
+		self.imv.getView().invertY(False)
+		roi_plot = self.imv.getRoiPlot().getPlotItem()
+		roi_plot.getAxis("bottom").setLabel(text="Wavelength", units="nm")
+
+	def update_estimated_scan_time(self):
+		scan_time = self.x_range * self.y_range * self.settings["intg_time"] * 1e-3 #s
+		self.ui.estimated_scan_time_label.setText("Estimated scan time: " + "%.2f" % scan_time + "s")
 
 	def update_display(self):
 		PiezoStage_Scan.update_display(self)
@@ -64,7 +72,7 @@ class OceanOptics_Scan(PiezoStage_Scan):
 
 			self.img_item.setImage(self.sum_intensities_image_map)#image=sum_disp_img, autoLevels=True, autoRange=False)
 			
-			self.imv.setImage(img=self.spectrum_image_map, autoRange=False, autoLevels=True)
+			self.imv.setImage(img=self.spectrum_image_map, autoRange=False, autoLevels=True, xvals=self.spec.wavelengths()) #adjust roi plot x axis
 			self.imv.show()
 			self.imv.window().setWindowFlag(QtCore.Qt.WindowCloseButtonHint, False) #disable closing image view window
 			
@@ -131,7 +139,7 @@ class OceanOptics_Scan(PiezoStage_Scan):
 
 	def save_intensities_data(self):
 		transposed = np.transpose(self.sum_intensities_image_map)
-		PiezoStage_Scan.save_intensities_data(transposed, 'oo')
+		PiezoStage_Scan.save_intensities_data(self, transposed, 'oo')
 
 	def save_intensities_image(self):
-		PiezoStage_Scan.save_intensities_image(self.sum_intensities_image_map, 'oo')
+		PiezoStage_Scan.save_intensities_image(self, self.sum_intensities_image_map, 'oo')

@@ -48,6 +48,9 @@ class PiezoStage_Scan(Measurement):
 
 		self.settings.New('lock_position', dtype=bool, initial=False)
 		self.settings.New('save_positions', dtype=bool, initial=False)
+
+		self.x_range = np.abs(int(np.ceil(self.settings['x_size']/self.settings['x_step'])))
+		self.y_range = np.abs(int(np.ceil(self.settings['y_size']/self.settings['y_step'])))
 		
 		# Define how often to update display during a run
 		self.display_update_period = 0.1 
@@ -120,6 +123,7 @@ class PiezoStage_Scan(Measurement):
 		self.scan_roi.addScaleHandle([1, 1], [0, 0])
 		self.scan_roi.addScaleHandle([0, 0], [1, 1])        
 		self.scan_roi.sigRegionChangeFinished.connect(self.mouse_update_scan_roi)
+		self.scan_roi.sigRegionChangeFinished.connect(self.update_ranges)
 		self.stage_plot.addItem(self.scan_roi)
 
 		self.ui.x_start_doubleSpinBox.valueChanged.connect(self.update_roi_start)
@@ -128,6 +132,11 @@ class PiezoStage_Scan(Measurement):
 		self.ui.y_size_doubleSpinBox.valueChanged.connect(self.update_roi_size)
 		self.ui.x_step_doubleSpinBox.valueChanged.connect(self.update_roi_start)
 		self.ui.y_step_doubleSpinBox.valueChanged.connect(self.update_roi_start)
+
+		self.ui.x_size_doubleSpinBox.valueChanged.connect(self.update_ranges)
+		self.ui.y_size_doubleSpinBox.valueChanged.connect(self.update_ranges)
+		self.ui.x_step_doubleSpinBox.valueChanged.connect(self.update_ranges)
+		self.ui.y_step_doubleSpinBox.valueChanged.connect(self.update_ranges)
 
 		#histogram for image
 		self.hist_lut = pg.HistogramLUTItem()
@@ -249,6 +258,19 @@ class PiezoStage_Scan(Measurement):
 		'''
 		self.scan_roi.setSize((self.settings['x_size'], self.settings['y_size']))
 
+	def update_ranges(self):
+		x_scan_size = self.settings["x_size"]
+		x_step = self.settings["x_step"]
+		y_scan_size = self.settings["y_size"]
+		y_step = self.settings["y_step"]
+		self.x_range = np.abs(int(np.ceil(x_scan_size/x_step)))
+		self.y_range = np.abs(int(np.ceil(y_scan_size/y_step)))
+		self.update_estimated_scan_time()
+
+	def update_estimated_scan_time(self):
+		"""implemented in hard-specific scan programs"""
+		pass
+
 	def update_arrow_pos(self):
 		'''
 		Update arrow position on image to stage position
@@ -291,8 +313,8 @@ class PiezoStage_Scan(Measurement):
 			self.x_step = 1#self.settings['x_step'] = 1
 			
 		#number of scans in x and y
-		self.y_range = np.abs(int(np.ceil(self.y_scan_size/self.y_step)))
-		self.x_range = np.abs(int(np.ceil(self.x_scan_size/self.x_step)))
+		# self.y_range = np.abs(int(np.ceil(self.y_scan_size/self.y_step)))
+		# self.x_range = np.abs(int(np.ceil(self.x_scan_size/self.x_step)))
 
 		self.pi_device.MOV(axes=self.axes, values=[self.x_start, self.y_start])
 		self.pi_device_hw.read_from_hardware()
