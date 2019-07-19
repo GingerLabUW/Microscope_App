@@ -59,6 +59,7 @@ class PicoHarpCountrateMeasure(Measurement):
         ph_hw.settings.count_rate0.connect_to_widget(self.ui.ch0_label)#doubleSpinBox)
         ph_hw.settings.count_rate1.connect_to_widget(self.ui.ch1_label)#doubleSpinBox)
         self.ui.save_data_pushButton.clicked.connect(self.save_countrates)
+        self.ui.clear_plot_pushButton.clicked.connect(self.clear_plot)
         #self.gui.ui.picoharp_acquire_one_pushButton.clicked.connect(self.start)
         #self.gui.ui.picoharp_interrupt_pushButton.clicked.connect(self.interrupt)
 
@@ -167,6 +168,13 @@ class PicoHarpCountrateMeasure(Measurement):
         append = '_countrate_data.txt' #string to append to sample name
         self.check_filename(append)
         np.savetxt(self.app.settings['save_dir']+"/"+ self.app.settings['sample'] + append, cr_data, fmt='%f')
+
+    def clear_plot(self):
+        self.plot.clear()
+        self.set_progress(0)
+        self.elapsed_time = 0
+        self.time_array = []
+        self.count_array = []
 
     def check_filename(self, append):
         '''

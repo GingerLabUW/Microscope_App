@@ -35,13 +35,9 @@ class PicoHarp_Scan(PiezoStage_Scan):
 		resolution_comboBox = widgets[4]
 		count_rate0_spinBox = widgets[6]
 		count_rate1_spinBox = widgets[9]
-		self.settings.Tacq.connect_to_widget(tacq_spinBox)
 		self.picoharp_hw.settings.Tacq.connect_to_widget(tacq_spinBox)
-		self.settings.Resolution.connect_to_widget(resolution_comboBox)
 		self.picoharp_hw.settings.Resolution.connect_to_widget(resolution_comboBox)
-		self.settings.count_rate0.connect_to_widget(count_rate0_spinBox)
 		self.picoharp_hw.settings.count_rate0.connect_to_widget(count_rate0_spinBox)
-		self.settings.count_rate1.connect_to_widget(count_rate1_spinBox)
 		self.picoharp_hw.settings.count_rate1.connect_to_widget(count_rate1_spinBox)
 
 		tacq_spinBox.valueChanged.connect(self.update_estimated_scan_time)
@@ -60,7 +56,6 @@ class PicoHarp_Scan(PiezoStage_Scan):
 	def update_estimated_scan_time(self):
 		scan_time = self.x_range * self.y_range * self.settings["Tacq"]
 		self.ui.estimated_scan_time_label.setText("Estimated scan time: " + "%.2f" % scan_time + "s")
-
 
 	def update_display(self):
 		PiezoStage_Scan.update_display(self)
