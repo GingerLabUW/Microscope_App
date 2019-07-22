@@ -23,8 +23,8 @@ class OceanOptics_Scan(PiezoStage_Scan):
 
 	def setup_figure(self):
 		PiezoStage_Scan.setup_figure(self)
-		self.ui.save_array_pushButton.clicked.connect(self.save_intensities_data)
-		self.ui.save_image_pushButton.clicked.connect(self.save_intensities_image)
+#		self.ui.save_array_pushButton.clicked.connect(self.save_intensities_data)
+#		self.ui.save_image_pushButton.clicked.connect(self.save_intensities_image)
 		spec_hw = self.app.hardware['oceanoptics']
 		details_groupBox = self.set_details_widget(widget = self.settings.New_UI(include=["intg_time", "correct_dark_counts", "scans_to_avg"]))
 		widgets = details_groupBox.findChildren(QtGui.QWidget)
@@ -53,7 +53,7 @@ class OceanOptics_Scan(PiezoStage_Scan):
 		self.imv.getView().setMouseEnabled(x=True, y=True)
 		self.imv.getView().invertY(False)
 		roi_plot = self.imv.getRoiPlot().getPlotItem()
-		roi_plot.getAxis("bottom").setLabel(text="Wavelength", units="nm")
+		roi_plot.getAxis("bottom").setLabel(text="Wavelength (nm)")
 
 	def update_estimated_scan_time(self):
 		scan_time = self.x_range * self.y_range * self.settings["intg_time"] * 1e-3 #s

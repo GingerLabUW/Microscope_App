@@ -20,15 +20,15 @@ class PicoHarp_Scan(PiezoStage_Scan):
 		self.picoharp_hw = self.app.hardware['picoharp']
 		self.pi_device_hw = self.app.hardware['piezostage']
 
-		self.settings.New("Tacq", unit="s", dtype=float, vmin=1e-3, vmax=100*60*60) #removed si=True to keep units from auto-changing
+		self.settings.New("Tacq", unit="s", dtype=float, vmin=1e-3, vmax=100*60*60, initial=1) #removed si=True to keep units from auto-changing
 		self.settings.New("Resolution", dtype=int, choices=[("4 ps", 4), ("8 ps", 8), ("16 ps", 16), ("32 ps", 32), ("64 ps", 64), ("128 ps", 128), ("256 ps", 256), ("512 ps", 512)], initial=4)
 		self.settings.New("count_rate0", dtype=int, ro=True, vmin=0, vmax=100e6)
 		self.settings.New("count_rate1", dtype=int, ro=True, vmin=0, vmax=100e6)
 
 	def setup_figure(self):
 		PiezoStage_Scan.setup_figure(self)
-		self.ui.save_array_pushButton.clicked.connect(self.save_intensities_data)
-		self.ui.save_image_pushButton.clicked.connect(self.save_intensities_image)
+#		self.ui.save_array_pushButton.clicked.connect(self.save_intensities_data)
+#		self.ui.save_image_pushButton.clicked.connect(self.save_intensities_image)
 		details_groupBox = self.set_details_widget(widget = self.settings.New_UI(include=["Tacq", "Resolution", "count_rate0", "count_rate1"]))
 		widgets = details_groupBox.findChildren(QtGui.QWidget)
 		tacq_spinBox = widgets[1]
@@ -41,6 +41,7 @@ class PicoHarp_Scan(PiezoStage_Scan):
 		self.picoharp_hw.settings.count_rate1.connect_to_widget(count_rate1_spinBox)
 
 		tacq_spinBox.valueChanged.connect(self.update_estimated_scan_time)
+		self.update_estimated_scan_time()
 
 		#save data buttons
 		self.ui.save_image_pushButton.clicked.connect(self.save_intensities_image)
@@ -51,7 +52,7 @@ class PicoHarp_Scan(PiezoStage_Scan):
 		self.imv.getView().setMouseEnabled(x=True, y=True)
 		self.imv.getView().invertY(False)
 		roi_plot = self.imv.getRoiPlot().getPlotItem()
-		roi_plot.getAxis("bottom").setLabel(text="Time", units="ns")
+		roi_plot.getAxis("bottom").setLabel(text="Time (ns)")
 
 	def update_estimated_scan_time(self):
 		scan_time = self.x_range * self.y_range * self.settings["Tacq"]

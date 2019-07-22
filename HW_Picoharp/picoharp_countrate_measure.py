@@ -67,7 +67,7 @@ class PicoHarpCountrateMeasure(Measurement):
         self.graph_layout = pg.GraphicsLayoutWidget()    
         
         self.plot = self.graph_layout.addPlot()
-        self.plotdata = self.plot.plot(pen='r')
+        #self.plotdata = self.plot.plot(pen='r')
         self.plot.setLogMode(False, True)
         
         self.ui.plot_groupBox.layout().addWidget(self.graph_layout)
@@ -102,8 +102,8 @@ class PicoHarpCountrateMeasure(Measurement):
                     if self.interrupt_measurement_called or self.elapsed_time > ph_hw.settings['Tacq']:
                         break
                 else:
-	                if self.interrupt_measurement_called:
-	                    break   
+                    if self.interrupt_measurement_called:
+                        break   
                 self.count_array.append(ph.read_count_rate1()) ###
                 self.time_array.append(self.elapsed_time)
                 self.elapsed_time += self.display_update_period
@@ -156,7 +156,8 @@ class PicoHarpCountrateMeasure(Measurement):
         ph = self.picoharp
         ###self.plotdata.setData(ph.time_array*1e-3, ph.histogram_data+1)
          ###
-        self.plotdata.setData(np.asarray(self.time_array), np.asarray(self.count_array)) ###
+        #self.plotdata.setData(np.asarray(self.time_array), np.asarray(self.count_array), pen='r') ###
+        self.plot.plot(np.asarray(self.time_array), np.asarray(self.count_array), pen='r')
  ###
 
         #self.fig.canvas.draw()

@@ -7,6 +7,7 @@ import pickle
 import os.path
 from pyqtgraph.Qt import QtGui, QtCore
 from pyqtgraph.Point import Point
+import customplotting.mscope as cpm
 
 class PiezoStage_Scan(Measurement):
 	name = "PiezoStage_Scan"
