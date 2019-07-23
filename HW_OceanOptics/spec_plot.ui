@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>706</width>
-    <height>400</height>
+    <width>792</width>
+    <height>394</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -34,6 +34,13 @@
      <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="0">
        <layout class="QGridLayout" name="gridLayout_4">
+        <item row="2" column="0">
+         <widget class="QCheckBox" name="correct_dark_counts_checkBox">
+          <property name="text">
+           <string>Correct dark counts</string>
+          </property>
+         </widget>
+        </item>
         <item row="1" column="0" alignment="Qt::AlignRight">
          <widget class="QLabel" name="label_2">
           <property name="text">
@@ -48,25 +55,11 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="0" alignment="Qt::AlignRight">
-         <widget class="QLabel" name="label">
-          <property name="text">
-           <string>Intg. time (ms)</string>
-          </property>
-         </widget>
-        </item>
         <item row="0" column="1">
          <widget class="QDoubleSpinBox" name="intg_time_spinBox"/>
         </item>
         <item row="1" column="1">
          <widget class="QDoubleSpinBox" name="scans_to_avg_spinBox"/>
-        </item>
-        <item row="0" column="5">
-         <widget class="QPushButton" name="start_pushButton">
-          <property name="text">
-           <string>Start</string>
-          </property>
-         </widget>
         </item>
         <item row="0" column="2">
          <spacer name="horizontalSpacer">
@@ -80,13 +73,6 @@
            </size>
           </property>
          </spacer>
-        </item>
-        <item row="1" column="5">
-         <widget class="QPushButton" name="interrupt_pushButton">
-          <property name="text">
-           <string>Interrupt</string>
-          </property>
-         </widget>
         </item>
         <item row="1" column="3">
          <widget class="QCheckBox" name="save_every_spec_checkBox">
@@ -108,10 +94,45 @@
           </property>
          </spacer>
         </item>
-        <item row="2" column="0">
-         <widget class="QCheckBox" name="correct_dark_counts_checkBox">
+        <item row="0" column="0" alignment="Qt::AlignRight">
+         <widget class="QLabel" name="label">
           <property name="text">
-           <string>Correct dark counts</string>
+           <string>Intg. time (ms)</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="5">
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>Estimated time remaining: </string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="5" colspan="2">
+         <widget class="QPushButton" name="interrupt_pushButton">
+          <property name="text">
+           <string>Interrupt</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="6">
+         <widget class="QLabel" name="time_remaining_label">
+          <property name="text">
+           <string>0s</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="5" colspan="2">
+         <widget class="QPushButton" name="start_pushButton">
+          <property name="text">
+           <string>Start</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="5">
+         <widget class="QProgressBar" name="progressBar">
+          <property name="value">
+           <number>24</number>
           </property>
          </widget>
         </item>

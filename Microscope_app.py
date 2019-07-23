@@ -35,6 +35,10 @@ class MicroscopeApp(BaseMicroscopeApp):
         self.add_measurement(PiezoStageIndependentMovement)
         from HW_PI_PiezoStage.PiezoStage_control import PiezoStageControl
         self.add_measurement(PiezoStageControl)
+        from HW_PI_PiezoStage.particle_selection import ParticleSelection
+        self.add_measurement(ParticleSelection)
+        from HW_OceanOptics.particle_spectra import ParticleSpectra
+        self.add_measurement(ParticleSpectra)
         # show ui
         self.ui.show()
         self.ui.activateWindow()

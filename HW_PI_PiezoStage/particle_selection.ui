@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>682</width>
+    <height>743</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <property name="tabShape">
+   <enum>QTabWidget::Triangular</enum>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout_2">
+    <item row="0" column="0">
+     <widget class="QGroupBox" name="image_groupBox">
+      <property name="title">
+       <string>Image</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_3"/>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QGroupBox" name="groupBox_2">
+      <property name="title">
+       <string>Settings</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_4">
+       <item row="0" column="0">
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="0" column="3">
+          <widget class="QComboBox" name="magnification_comboBox">
+           <item>
+            <property name="text">
+             <string>50</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>75</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>100</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="1" column="0" colspan="2">
+          <widget class="QCheckBox" name="select_point_checkBox">
+           <property name="text">
+            <string>Select point</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <widget class="QLabel" name="label_7">
+           <property name="text">
+            <string>Magnification</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0" colspan="2">
+          <widget class="QPushButton" name="load_image_pushButton">
+           <property name="text">
+            <string>Load image</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="1" column="0">
+        <widget class="QTabWidget" name="tabWidget">
+         <property name="tabShape">
+          <enum>QTabWidget::Rounded</enum>
+         </property>
+         <property name="currentIndex">
+          <number>1</number>
+         </property>
+         <property name="tabsClosable">
+          <bool>false</bool>
+         </property>
+         <property name="movable">
+          <bool>false</bool>
+         </property>
+         <property name="tabBarAutoHide">
+          <bool>false</bool>
+         </property>
+         <widget class="QWidget" name="tab">
+          <attribute name="title">
+           <string>2 points</string>
+          </attribute>
+          <layout class="QGridLayout" name="gridLayout_6">
+           <item row="0" column="0">
+            <layout class="QGridLayout" name="gridLayout_5">
+             <item row="0" column="2">
+              <widget class="QRadioButton" name="point2_radioButton">
+               <property name="text">
+                <string>Second point</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="3">
+              <widget class="QDoubleSpinBox" name="h1_spinBox"/>
+             </item>
+             <item row="5" column="2" alignment="Qt::AlignRight">
+              <widget class="QLabel" name="label_10">
+               <property name="text">
+                <string>dY:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="1">
+              <widget class="QLabel" name="dx_label">
+               <property name="text">
+                <string>0</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="3">
+              <widget class="QDoubleSpinBox" name="h2_spinBox"/>
+             </item>
+             <item row="3" column="1">
+              <widget class="QDoubleSpinBox" name="w2_spinBox"/>
+             </item>
+             <item row="4" column="1">
+              <widget class="QLabel" name="dw_label">
+               <property name="text">
+                <string>0</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="3">
+              <widget class="QLabel" name="dh_label">
+               <property name="text">
+                <string>0</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="0" alignment="Qt::AlignRight">
+              <widget class="QLabel" name="label_5">
+               <property name="text">
+                <string>dW:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="3">
+              <widget class="QLabel" name="dy_label">
+               <property name="text">
+                <string>0</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="2" alignment="Qt::AlignRight">
+              <widget class="QLabel" name="label_2">
+               <property name="text">
+                <string>H1:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="2" alignment="Qt::AlignRight">
+              <widget class="QLabel" name="label_4">
+               <property name="text">
+                <string>H2:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0" alignment="Qt::AlignRight">
+              <widget class="QLabel" name="label">
+               <property name="text">
+                <string>W1:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="2" alignment="Qt::AlignRight">
+              <widget class="QLabel" name="label_6">
+               <property name="text">
+                <string>dH:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="0" alignment="Qt::AlignRight">
+              <widget class="QLabel" name="label_8">
+               <property name="text">
+                <string>dX:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0" alignment="Qt::AlignRight">
+              <widget class="QLabel" name="label_3">
+               <property name="text">
+                <string>W2:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QDoubleSpinBox" name="w1_spinBox"/>
+             </item>
+             <item row="0" column="1">
+              <widget class="QRadioButton" name="point1_radioButton">
+               <property name="text">
+                <string>First point</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item row="1" column="0">
+            <widget class="QPushButton" name="move_stage_pushButton">
+             <property name="text">
+              <string>Move stage</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="tab_2">
+          <attribute name="title">
+           <string>Particle selection</string>
+          </attribute>
+          <layout class="QFormLayout" name="formLayout">
+           <item row="2" column="0">
+            <widget class="QCheckBox" name="first_point_checkBox">
+             <property name="text">
+              <string>First point as origin</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="0" colspan="2">
+            <widget class="QTextBrowser" name="textBrowser"/>
+           </item>
+           <item row="5" column="0">
+            <widget class="QPushButton" name="export_pushButton">
+             <property name="text">
+              <string>Export</string>
+             </property>
+            </widget>
+           </item>
+           <item row="7" column="0">
+            <widget class="QPushButton" name="clear_pushButton">
+             <property name="text">
+              <string>Clear selections</string>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="0">
+            <spacer name="verticalSpacer">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>682</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

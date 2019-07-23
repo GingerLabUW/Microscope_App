@@ -24,7 +24,7 @@ class PicoHarpHW(HardwareComponent):
         self.mode = self.settings.New("Mode", dtype=str, choices=[("HIST","HIST"),("T2","T2"),("T3","T3")], initial='HIST')
 
 
-        self.settings.New("Tacq", dtype=float, unit="s", si=True, vmin=1e-3, vmax=100*60*60)
+        self.settings.New("Tacq", dtype=float, unit="s", vmin=1e-3, vmax=100*60*60) #remove si=True to keep units from autochanging
         self.settings.New("Binning", dtype=int, choices=[(str(x), x) for x in range(0,8)]) ##binning/range todo: connect binning and resolution
         #self.settings.New("Resolution", dtype=int, unit="ps", si=False)
         self.settings.New("Resolution", dtype=int, choices=[("4 ps", 4), ("8 ps", 8), ("16 ps", 16), ("32 ps", 32), ("64 ps", 64), ("128 ps", 128), ("256 ps", 256), ("512 ps", 512)], initial=4)

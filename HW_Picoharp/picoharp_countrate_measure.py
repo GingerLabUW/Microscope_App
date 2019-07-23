@@ -3,6 +3,7 @@ from ScopeFoundry.helper_funcs import sibling_path, load_qt_ui_file
 import numpy as np
 import time
 import pyqtgraph as pg
+import os
 
 # TODO h5 save
 
@@ -21,7 +22,6 @@ class PicoHarpCountrateMeasure(Measurement):
 #         self.stored_histogram_channels.connect_bidir_to_widget(
 #                                            self.gui.ui.trpl_live_stored_channels_doubleSpinBox)
         
-        S.New('save_h5', dtype=bool, initial=True)
         S.New('continuous', dtype=bool, initial=False)
         
         # UI 
@@ -58,8 +58,8 @@ class PicoHarpCountrateMeasure(Measurement):
         #ph.settings.histogram_channels.connect_bidir_to_widget(self.ui.histogram_channels_doubleSpinBox)
         ph_hw.settings.count_rate0.connect_to_widget(self.ui.ch0_label)#doubleSpinBox)
         ph_hw.settings.count_rate1.connect_to_widget(self.ui.ch1_label)#doubleSpinBox)
-        S.save_h5.connect_bidir_to_widget(self.ui.save_h5_checkBox)
         self.ui.save_data_pushButton.clicked.connect(self.save_countrates)
+        self.ui.clear_plot_pushButton.clicked.connect(self.clear_plot)
         #self.gui.ui.picoharp_acquire_one_pushButton.clicked.connect(self.start)
         #self.gui.ui.picoharp_interrupt_pushButton.clicked.connect(self.interrupt)
 
@@ -67,7 +67,7 @@ class PicoHarpCountrateMeasure(Measurement):
         self.graph_layout = pg.GraphicsLayoutWidget()    
         
         self.plot = self.graph_layout.addPlot()
-        self.plotdata = self.plot.plot(pen='r')
+        #self.plotdata = self.plot.plot(pen='r')
         self.plot.setLogMode(False, True)
         
         self.ui.plot_groupBox.layout().addWidget(self.graph_layout)
@@ -88,8 +88,7 @@ class PicoHarpCountrateMeasure(Measurement):
 #            self.plot.enableAutoRange()
             #self.plot.setRange(disableAutoRange=False)
             #self.plot.setXLimits(xMin=0, xMax=None)
-        
-        print(ph.Tacq)
+
         sleep_time = self.display_update_period###min((max(0.1*ph.Tacq*1e-3, 0.010), 0.100)) # check every 1/10 of Tacq with limits of 10ms and 100ms
         #print("sleep_time", sleep_time, np.max(0.1*ph.Tacq*1e-3, 0.010))
         
@@ -103,8 +102,8 @@ class PicoHarpCountrateMeasure(Measurement):
                     if self.interrupt_measurement_called or self.elapsed_time > ph_hw.settings['Tacq']:
                         break
                 else:
-	                if self.interrupt_measurement_called:
-	                    break   
+                    if self.interrupt_measurement_called:
+                        break   
                 self.count_array.append(ph.read_count_rate1()) ###
                 self.time_array.append(self.elapsed_time)
                 self.elapsed_time += self.display_update_period
@@ -119,6 +118,7 @@ class PicoHarpCountrateMeasure(Measurement):
 #            if not self.settings['continuous']:
 #                break
         self.elasped_time = 0
+
         #if not continuous, clear time and count arrays
         #print "elasped_meas_time (final):", ph.read_elapsed_meas_time()
         
@@ -156,7 +156,8 @@ class PicoHarpCountrateMeasure(Measurement):
         ph = self.picoharp
         ###self.plotdata.setData(ph.time_array*1e-3, ph.histogram_data+1)
          ###
-        self.plotdata.setData(np.asarray(self.time_array), np.asarray(self.count_array)) ###
+        #self.plotdata.setData(np.asarray(self.time_array), np.asarray(self.count_array), pen='r') ###
+        self.plot.plot(np.asarray(self.time_array), np.asarray(self.count_array), pen='r')
  ###
 
         #self.fig.canvas.draw()
@@ -168,3 +169,23 @@ class PicoHarpCountrateMeasure(Measurement):
         append = '_countrate_data.txt' #string to append to sample name
         self.check_filename(append)
         np.savetxt(self.app.settings['save_dir']+"/"+ self.app.settings['sample'] + append, cr_data, fmt='%f')
+
+    def clear_plot(self):
+        self.plot.clear()
+        self.set_progress(0)
+        self.elapsed_time = 0
+        self.time_array = []
+        self.count_array = []
+
+    def check_filename(self, append):
+        '''
+        If no sample name given or duplicate sample name given, fix the problem by appending a unique number.
+        append - string to add to sample name (including file extension)
+        '''
+        samplename = self.app.settings['sample']
+        filename = samplename + append
+        directory = self.app.settings['save_dir']
+        if samplename == "":
+            self.app.settings['sample'] = int(time.time())
+        if (os.path.exists(directory+"/"+filename)):
+            self.app.settings['sample'] = samplename + str(int(time.time()))

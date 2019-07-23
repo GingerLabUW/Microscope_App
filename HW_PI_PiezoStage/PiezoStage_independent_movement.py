@@ -44,17 +44,30 @@ class PiezoStageIndependentMovement(Measurement):
 			self.ui.textBrowser.append(format(err))
 
 	def run(self):
+		"""
+		Move to each point specified in file, pausing for the set sleep time.
+		"""
 		if not hasattr(self, "position_array"):
 			self.ui.textBrowser.append("Must import text file before running.")
-		else:		
+		else:
 			self.pi_device = self.pi_device_hw.pi_device
 			self.axes = self.pi_device.axes[0:2]
 			num_points = self.position_array.shape[0] #get number of rows = number of points
+			# if self.settings["movement_type"] == "Absolute":
 			for i in range(num_points):
 				if self.interrupt_measurement_called:
 					break
-				move_here = self.position_array[i] #get next point for stage to move to
-				self.pi_device.MOV(axes=self.axes, values=[move_here[0], move_here[1]])
+				abs_mov = self.position_array[i] #get next point for stage to move to
+				self.pi_device.MOV(axes=self.axes, values=[abs_mov[0], abs_mov[1]])
 				self.pi_device_hw.read_from_hardware()
 				self.ui.textBrowser.append("Point #" + str(i+1) + " complete.")
 				time.sleep(self.settings['sleep_time'])
+			# elif self.settings["movement_type"] == "Relative":
+			# 	for i in range(num_points):
+			# 		if self.interrupt_measurement_called:
+			# 			break
+			# 		rel_mov = self.position_array[i]
+			# 		self.pi_device.MVR(axes=self.axes, values=[rel_mov[0], rel_mov[1]])
+			# 		self.pi_device_hw.read_from_hardware()
+			# 		self.ui.textBrowser.append("Movement #" + str(i+1) + " complete.")
+			# 		time.sleep(self.settings['sleep_time'])

@@ -20,23 +20,40 @@
       <property name="title">
        <string>Setup</string>
       </property>
-      <layout class="QFormLayout" name="formLayout">
-       <item row="1" column="0">
-        <widget class="QPushButton" name="import_pushButton">
-         <property name="text">
-          <string>Import stage positions</string>
-         </property>
-        </widget>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="2" column="1">
+        <widget class="QDoubleSpinBox" name="scans_to_avg_spinBox"/>
        </item>
        <item row="2" column="0">
         <widget class="QLabel" name="label_4">
          <property name="text">
-          <string>Sleep time</string>
+          <string>Scans to average</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="1">
-        <widget class="QDoubleSpinBox" name="sleep_time_spinBox"/>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>Integration time</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0" colspan="2">
+        <widget class="QPushButton" name="import_pushButton">
+         <property name="text">
+          <string>Import relative movements</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QDoubleSpinBox" name="intg_time_spinBox"/>
+       </item>
+       <item row="3" column="0">
+        <widget class="QCheckBox" name="correct_dark_counts_checkBox">
+         <property name="text">
+          <string>Correct dark counts</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -95,6 +112,14 @@
     <item row="2" column="0" colspan="2">
      <widget class="QTextBrowser" name="textBrowser"/>
     </item>
+    <item row="1" column="0" colspan="2">
+     <widget class="QGroupBox" name="plot_groupBox">
+      <property name="title">
+       <string>Spectrometer plot</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_2"/>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -103,7 +128,7 @@
      <x>0</x>
      <y>0</y>
      <width>612</width>
-     <height>31</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>

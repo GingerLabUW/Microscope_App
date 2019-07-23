@@ -72,32 +72,11 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>Store Hist Channels</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="0">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>Channel 0</string>
-        </property>
-       </widget>
-      </item>
       <item row="1" column="1">
        <widget class="QDoubleSpinBox" name="hist_channels_doubleSpinBox"/>
       </item>
       <item row="0" column="1">
        <widget class="QDoubleSpinBox" name="picoharp_tacq_doubleSpinBox"/>
-      </item>
-      <item row="4" column="1">
-       <widget class="QCheckBox" name="save_h5_checkBox">
-        <property name="text">
-         <string>Save H5 data</string>
-        </property>
-       </widget>
       </item>
       <item row="3" column="1">
        <widget class="QCheckBox" name="continuous_checkBox">
@@ -106,24 +85,45 @@
         </property>
        </widget>
       </item>
-      <item row="6" column="0">
+      <item row="5" column="0">
        <widget class="QLabel" name="label_4">
         <property name="text">
-         <string>Channel 2</string>
+         <string>Channel 1</string>
         </property>
        </widget>
       </item>
-      <item row="6" column="1">
+      <item row="5" column="1">
        <widget class="QLabel" name="ch1_label">
         <property name="text">
          <string>0</string>
         </property>
        </widget>
       </item>
-      <item row="5" column="1">
+      <item row="4" column="1">
        <widget class="QLabel" name="ch0_label">
         <property name="text">
          <string>0</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Store Hist Channels</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Channel 0</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>Resolution</string>
         </property>
        </widget>
       </item>
@@ -169,13 +169,6 @@
           <string>512 ps</string>
          </property>
         </item>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_5">
-        <property name="text">
-         <string>Resolution</string>
-        </property>
        </widget>
       </item>
      </layout>
