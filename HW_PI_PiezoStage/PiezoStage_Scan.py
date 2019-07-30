@@ -50,8 +50,9 @@ class PiezoStage_Scan(Measurement):
 		self.settings.New('lock_position', dtype=bool, initial=False)
 		self.settings.New('save_positions', dtype=bool, initial=False)
 
-		self.x_range = np.abs(int(np.ceil(self.settings['x_size']/self.settings['x_step'])))
-		self.y_range = np.abs(int(np.ceil(self.settings['y_size']/self.settings['y_step'])))
+		# self.x_range = np.abs(int(np.ceil(self.settings['x_size']/self.settings['x_step'])))
+		# self.y_range = np.abs(int(np.ceil(self.settings['y_size']/self.settings['y_step'])))
+		self.update_ranges()
 		
 		# Define how often to update display during a run
 		self.display_update_period = 0.1 
@@ -264,6 +265,20 @@ class PiezoStage_Scan(Measurement):
 		x_step = self.settings["x_step"]
 		y_scan_size = self.settings["y_size"]
 		y_step = self.settings["y_step"]
+
+		if self.y_scan_size == 0:
+			self.y_scan_size = 1
+			self.y_step = 1
+		
+		if self.x_scan_size == 0:
+			self.x_scan_size = 1
+			self.x_step = 1
+		
+		if self.y_step == 0:
+			self.y_step = 1
+			
+		if self.x_step == 0:
+			self.x_step = 1
 		self.x_range = np.abs(int(np.ceil(x_scan_size/x_step)))
 		self.y_range = np.abs(int(np.ceil(y_scan_size/y_step)))
 		self.update_estimated_scan_time()
