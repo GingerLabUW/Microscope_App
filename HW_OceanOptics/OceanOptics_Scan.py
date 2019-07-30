@@ -57,8 +57,11 @@ class OceanOptics_Scan(PiezoStage_Scan):
 		roi_plot.getAxis("bottom").setLabel(text="Wavelength (nm)")
 
 	def update_estimated_scan_time(self):
-		scan_time = self.x_range * self.y_range * self.settings["intg_time"] * 1e-3 #s
-		self.ui.estimated_scan_time_label.setText("Estimated scan time: " + "%.2f" % scan_time + "s")
+		try:
+			scan_time = self.x_range * self.y_range * self.settings["intg_time"] * 1e-3 #s
+			self.ui.estimated_scan_time_label.setText("Estimated scan time: " + "%.2f" % scan_time + "s")
+		except:
+			pass
 
 	def update_display(self):
 		PiezoStage_Scan.update_display(self)

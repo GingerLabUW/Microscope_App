@@ -261,10 +261,11 @@ class PiezoStage_Scan(Measurement):
 		self.scan_roi.setSize((self.settings['x_size'], self.settings['y_size']))
 
 	def update_ranges(self):
-		x_scan_size = self.settings["x_size"]
-		x_step = self.settings["x_step"]
-		y_scan_size = self.settings["y_size"]
-		y_step = self.settings["y_step"]
+		self.x_scan_size = self.settings['x_size']
+		self.y_scan_size = self.settings['y_size']
+		
+		self.x_step = self.settings['x_step']
+		self.y_step = self.settings['y_step']
 
 		if self.y_scan_size == 0:
 			self.y_scan_size = 1
@@ -279,8 +280,9 @@ class PiezoStage_Scan(Measurement):
 			
 		if self.x_step == 0:
 			self.x_step = 1
-		self.x_range = np.abs(int(np.ceil(x_scan_size/x_step)))
-		self.y_range = np.abs(int(np.ceil(y_scan_size/y_step)))
+
+		self.x_range = np.abs(int(np.ceil(self.x_scan_size/self.x_step)))
+		self.y_range = np.abs(int(np.ceil(self.y_scan_size/self.y_step)))
 		self.update_estimated_scan_time()
 
 	def update_estimated_scan_time(self):
@@ -310,26 +312,27 @@ class PiezoStage_Scan(Measurement):
 
 		self.x_start = self.settings['x_start']
 		self.y_start = self.settings['y_start']
+
+		###this block has been moved to update_ranges()		
+		# self.x_scan_size = self.settings['x_size']
+		# self.y_scan_size = self.settings['y_size']
 		
-		self.x_scan_size = self.settings['x_size']
-		self.y_scan_size = self.settings['y_size']
+		# self.x_step = self.settings['x_step']
+		# self.y_step = self.settings['y_step']
 		
-		self.x_step = self.settings['x_step']
-		self.y_step = self.settings['y_step']
+		# if self.y_scan_size == 0:
+		# 	self.y_scan_size = 1#self.settings['y_size'] = 1
+		# 	self.y_step = 1#self.settings['y_step'] = 1
 		
-		if self.y_scan_size == 0:
-			self.y_scan_size = 1#self.settings['y_size'] = 1
-			self.y_step = 1#self.settings['y_step'] = 1
+		# if self.x_scan_size == 0:
+		# 	self.x_scan_size = 1#self.settings['x_size'] = 1
+		# 	self.x_step = 1#self.settings['x_step'] = 1
 		
-		if self.x_scan_size == 0:
-			self.x_scan_size = 1#self.settings['x_size'] = 1
-			self.x_step = 1#self.settings['x_step'] = 1
-		
-		if self.y_step == 0:
-			self.y_step = 1#self.settings['y_step'] = 1
+		# if self.y_step == 0:
+		# 	self.y_step = 1#self.settings['y_step'] = 1
 			
-		if self.x_step == 0:
-			self.x_step = 1#self.settings['x_step'] = 1
+		# if self.x_step == 0:
+		# 	self.x_step = 1#self.settings['x_step'] = 1
 			
 		#number of scans in x and y
 		# self.y_range = np.abs(int(np.ceil(self.y_scan_size/self.y_step)))
