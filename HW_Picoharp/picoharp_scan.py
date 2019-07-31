@@ -167,9 +167,9 @@ class PicoHarp_Scan(PiezoStage_Scan):
 
 	def measure_hist(self):
 		ph = self.picoharp_hw.picoharp
-		
+		tacq = self.settings["Tacq"]
 		# print(ph.Tacq)                
-		ph.start_histogram()
+		ph.start_histogram(tacq)
 		while not ph.check_done_scanning():
 			if self.interrupt_measurement_called:
 				break
