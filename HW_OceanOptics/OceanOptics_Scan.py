@@ -58,7 +58,8 @@ class OceanOptics_Scan(PiezoStage_Scan):
 
 	def update_estimated_scan_time(self):
 		try:
-			scan_time = self.x_range * self.y_range * self.settings["intg_time"] * 1e-3 #s
+			self.overhead = self.x_range * self.y_range * .053 #TODO - test this number
+			scan_time = self.x_range * self.y_range * self.settings["intg_time"] * 1e-3 + self.overhead #s
 			self.ui.estimated_scan_time_label.setText("Estimated scan time: " + "%.2f" % scan_time + "s")
 		except:
 			pass
@@ -67,7 +68,7 @@ class OceanOptics_Scan(PiezoStage_Scan):
 		PiezoStage_Scan.update_display(self)
 		if hasattr(self, 'spec') and hasattr(self, 'pi_device') and hasattr(self, 'y'): #first, check if setup has happened
 			if not self.interrupt_measurement_called:
-				seconds_left = ((self.x_range * self.y_range) - self.pixels_scanned) * self.settings["intg_time"] * 1e-3
+				seconds_left = ((self.x_range * self.y_range) - self.pixels_scanned) * self.settings["intg_time"] * 1e-3 + self.overhead
 				self.ui.estimated_time_label.setText("Estimated time remaining: " + "%.2f" % seconds_left + "s")
 			#plot wavelengths vs intensity
 			self.plot.plot(self.spec.wavelengths(), self.y, pen='r', clear=True) #plot wavelength vs intensity

@@ -56,7 +56,8 @@ class PicoHarp_Scan(PiezoStage_Scan):
 
 	def update_estimated_scan_time(self):
 		try:
-			scan_time = self.x_range * self.y_range * self.settings["Tacq"]
+			self.overhead = self.x_range * self.y_range * .067 #TODO - test this number
+			scan_time = self.x_range * self.y_range * self.settings["Tacq"] + self.overhead
 			self.ui.estimated_scan_time_label.setText("Estimated scan time: " + "%.2f" % scan_time + "s")
 		except:
 			pass
@@ -65,7 +66,7 @@ class PicoHarp_Scan(PiezoStage_Scan):
 		PiezoStage_Scan.update_display(self)
 		if hasattr(self, 'sum_intensities_image_map'):
 			if not self.interrupt_measurement_called:
-				seconds_left = ((self.x_range * self.y_range) - self.pixels_scanned) * self.settings["Tacq"]
+				seconds_left = ((self.x_range * self.y_range) - self.pixels_scanned) * self.settings["Tacq"] + self.overhead
 				self.ui.estimated_time_label.setText("Estimated time remaining: " + "%.2f" % seconds_left + "s")
 			self.img_item.setImage(self.sum_intensities_image_map)
 
