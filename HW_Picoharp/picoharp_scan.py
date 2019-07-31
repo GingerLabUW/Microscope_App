@@ -137,7 +137,7 @@ class PicoHarp_Scan(PiezoStage_Scan):
 		#Store histogram sums for each pixel
 		self.sum_intensities_image_map = np.zeros((self.x_range, self.y_range), dtype=float)
 
-		scan_time = self.x_range * self.y_range * self.settings["Tacq"] * 1e-3 #s
+		scan_time = self.x_range * self.y_range * self.settings["Tacq"] #* 1e-3 #s
 		self.ui.estimated_scan_time_label.setText("Estimated scan time: " + "%.2f" % scan_time + "s")
 
 	def scan_measure(self):
@@ -166,10 +166,8 @@ class PicoHarp_Scan(PiezoStage_Scan):
 		#np.savez_compressed(data_filename,bins=self.time_data,hist=self.hist_data)
 
 	def measure_hist(self):
-		ph = self.picoharp_hw.picoharp
-		tacq = self.settings["Tacq"]
-		# print(ph.Tacq)                
-		ph.start_histogram(tacq)
+		ph = self.picoharp_hw.picoharp           
+		ph.start_histogram()
 		while not ph.check_done_scanning():
 			if self.interrupt_measurement_called:
 				break
