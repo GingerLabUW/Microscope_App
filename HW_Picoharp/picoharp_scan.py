@@ -161,7 +161,7 @@ class PicoHarp_Scan(PiezoStage_Scan):
 									"X scan size (um)": self.x_scan_size, "Y scan size (um)": self.y_scan_size,
 									"X step size (um)": self.x_step, "Y step size (um)": self.y_step},
 									"PicoHarp Parameters":{"Acquisition Time (s)": self.settings['Tacq'],
-															  "Resolution": self.settings['Resolution']} }
+															  "Resolution (ps)": self.settings['Resolution']} }
 
 		pickle.dump(save_dict, open(self.app.settings['save_dir']+"/"+self.app.settings['sample']+"_raw_PL_hist_data.pkl", "wb"))
 		#np.savez_compressed(data_filename,bins=self.time_data,hist=self.hist_data)
