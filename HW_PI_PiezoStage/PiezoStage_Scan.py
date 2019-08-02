@@ -50,8 +50,6 @@ class PiezoStage_Scan(Measurement):
         self.settings.New('lock_position', dtype=bool, initial=False)
         self.settings.New('save_positions', dtype=bool, initial=False)
 
-        # self.x_range = np.abs(int(np.ceil(self.settings['x_size']/self.settings['x_step'])))
-        # self.y_range = np.abs(int(np.ceil(self.settings['y_size']/self.settings['y_step'])))
         self.update_ranges()
         
         # Define how often to update display during a run
@@ -366,13 +364,11 @@ class PiezoStage_Scan(Measurement):
             self.vLine.setPos(middle_x)
 
     def run(self):
-        t3 = time.time()
         self.scan_complete = False
         self.pixels_scanned = 0 #keep track of scan/'pixel' number
         if (self.settings['scan_direction'] == 'XY'): #xy scan
             for i in range(self.y_range):
                 for j in range(self.x_range):
-                    t0 = time.time()
                     if self.interrupt_measurement_called:
                         break
                     #make sure the right indices of image arrays are updated
@@ -382,15 +378,10 @@ class PiezoStage_Scan(Measurement):
                         self.index_x = self.x_range - j - 1
                     if self.y_step < 0:
                         self.index_y = self.y_range - i - 1
-                    t1 = time.time()
                     self.scan_measure() #defined in hardware-specific scans
-#                    print(str(time.time()-t1), " scan measure")
-                    t2 = time.time()
                     self.pi_device.MVR(axes=self.axes[0], values=[self.x_step])
-#                    print(str(time.time()-t2), " mvr")
                     # self.pi_device_hw.read_from_hardware()
                     self.pixels_scanned+=1
-                    #print(str(time.time()-t0), " one pixel")
                 # TODO
                 # if statement needs to be modified to keep the stage at the finish y-pos for line scans in x, and same for y
                 if i == self.y_range-1: # this if statement is there to keep the stage at the finish position (in x) and not bring it back like we were doing during the scan 
@@ -402,7 +393,6 @@ class PiezoStage_Scan(Measurement):
                     # self.pi_device_hw.read_from_hardware()
                 if self.interrupt_measurement_called:
                     break
-            print(str(time.time()-t3), " scan time")
         elif (self.settings['scan_direction'] == 'YX'): #yx scan
             for i in range(self.x_range):
                 for j in range(self.y_range):

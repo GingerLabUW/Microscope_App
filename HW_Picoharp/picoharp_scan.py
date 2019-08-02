@@ -27,8 +27,6 @@ class PicoHarp_Scan(PiezoStage_Scan):
 
     def setup_figure(self):
         PiezoStage_Scan.setup_figure(self)
-#        self.ui.save_array_pushButton.clicked.connect(self.save_intensities_data)
-#        self.ui.save_image_pushButton.clicked.connect(self.save_intensities_image)
         details_groupBox = self.set_details_widget(widget = self.settings.New_UI(include=["Tacq", "Resolution", "count_rate0", "count_rate1"]))
         widgets = details_groupBox.findChildren(QtGui.QWidget)
         tacq_spinBox = widgets[1]
@@ -169,7 +167,6 @@ class PicoHarp_Scan(PiezoStage_Scan):
                                                               "Resolution (ps)": self.settings['Resolution']} }
 
         pickle.dump(save_dict, open(self.app.settings['save_dir']+"/"+self.app.settings['sample']+"_raw_PL_hist_data.pkl", "wb"))
-        #np.savez_compressed(data_filename,bins=self.time_data,hist=self.hist_data)
 
     def measure_hist(self):
         ph = self.picoharp_hw.picoharp           
