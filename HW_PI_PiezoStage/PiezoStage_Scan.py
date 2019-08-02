@@ -55,7 +55,7 @@ class PiezoStage_Scan(Measurement):
         self.update_ranges()
         
         # Define how often to update display during a run
-        self.display_update_period = 0.1 
+        self.display_update_period = .3
         
         # Convenient reference to the hardware used in the measurement
         self.spec_hw = self.app.hardware['oceanoptics']
@@ -366,6 +366,7 @@ class PiezoStage_Scan(Measurement):
             self.vLine.setPos(middle_x)
 
     def run(self):
+        t3 = time.time()
         self.scan_complete = False
         self.pixels_scanned = 0 #keep track of scan/'pixel' number
         if (self.settings['scan_direction'] == 'XY'): #xy scan
@@ -389,7 +390,7 @@ class PiezoStage_Scan(Measurement):
 #                    print(str(time.time()-t2), " mvr")
                     # self.pi_device_hw.read_from_hardware()
                     self.pixels_scanned+=1
-#                    print(str(time.time()-t0), " one pixel")
+                    #print(str(time.time()-t0), " one pixel")
                 # TODO
                 # if statement needs to be modified to keep the stage at the finish y-pos for line scans in x, and same for y
                 if i == self.y_range-1: # this if statement is there to keep the stage at the finish position (in x) and not bring it back like we were doing during the scan 
@@ -401,6 +402,7 @@ class PiezoStage_Scan(Measurement):
                     # self.pi_device_hw.read_from_hardware()
                 if self.interrupt_measurement_called:
                     break
+            print(str(time.time()-t3), " scan time")
         elif (self.settings['scan_direction'] == 'YX'): #yx scan
             for i in range(self.x_range):
                 for j in range(self.y_range):

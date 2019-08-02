@@ -146,11 +146,15 @@ class PicoHarp_Scan(PiezoStage_Scan):
         """
         Data collection for each pixel.
         """
+        t0 = time.time()
         data = self.measure_hist()
+        print(str(time.time()-t0), " measure_hist")
+        t1 = time.time()
         self.time_data[:, self.index_x, self.index_y], self.hist_data[:, self.index_x, self.index_y] = data
         self.sum_intensities_image_map[self.index_x, self.index_y] = sum(data[1])
-        self.time_data.flush()
-        self.hist_data.flush()
+#        self.time_data.flush()
+#        self.hist_data.flush()
+        print(str(time.time()-t1), " rest of scan_measure")
 
     def post_run(self):
         """
