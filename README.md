@@ -1,7 +1,8 @@
 # Microscope_App
 Confocal Microscope App
 
-## Dependencies
+## Requirements
+- Python 3.6.8
 - scopefoundry
 - numpy
 - pyqt
