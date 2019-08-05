@@ -3,11 +3,11 @@ Confocal Microscope App
 
 ## Dependencies
 - scopefoundry
-    - numpy
-    - pyqt
-    - qtpy
-    - h5py
-    - pyqtgraph
+- numpy
+- pyqt
+- qtpy
+- h5py
+- pyqtgraph
 - pillow
 - customplotting
 - seabreeze
