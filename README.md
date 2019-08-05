@@ -11,7 +11,7 @@ Confocal Microscope App
 - pyqtgraph
 - pillow
 - customplotting
-- seabreeze
+- python seabreeze
 - pipython (contact manufacturer to get software)
 
 ## Installing dependencies from command-line
