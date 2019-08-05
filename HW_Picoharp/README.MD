@@ -23,4 +23,6 @@ Edward S. Barnard <esbarnard@lbl.gov>
 - scopefoundry
 
 ## Installing dependencies from command-line
+```
 pip install git+git://github.com/ScopeFoundry/ScopeFoundry.git
+```
