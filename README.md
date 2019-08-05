@@ -12,12 +12,19 @@ Confocal Microscope App
 - pillow
 - customplotting
 - seabreeze
-- pipython
+- pipython (contact manufacturer to get software)
 
+## Installing dependencies from command-line
 ```
 conda install numpy pyqt qtpy h5py pyqtgraph
+conda install -c poehlmann python-seabreeze
 pip install git+git://github.com/ScopeFoundry/ScopeFoundry.git
 pip install pillow customplotting==0.1.4.dev0
-conda install -c poehlmann python-seabreeze
-python setup.py install
+```
+
+## Run instructions
+After setup, you can run the application by double-clicking Microscope_app.py.
+You can also run it from command-line:
+```
+python Microscope_app.py
 ```
