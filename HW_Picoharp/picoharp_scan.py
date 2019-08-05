@@ -27,12 +27,15 @@ class PicoHarp_Scan(PiezoStage_Scan):
 
     def setup_figure(self):
         PiezoStage_Scan.setup_figure(self)
+
+        #setup ui for picoharp specific settings
         details_groupBox = self.set_details_widget(widget = self.settings.New_UI(include=["Tacq", "Resolution", "count_rate0", "count_rate1"]))
         widgets = details_groupBox.findChildren(QtGui.QWidget)
         tacq_spinBox = widgets[1]
         resolution_comboBox = widgets[4]
         count_rate0_spinBox = widgets[6]
         count_rate1_spinBox = widgets[9]
+        #connect settings to ui
         self.picoharp_hw.settings.Tacq.connect_to_widget(tacq_spinBox)
         self.picoharp_hw.settings.Resolution.connect_to_widget(resolution_comboBox)
         self.picoharp_hw.settings.count_rate0.connect_to_widget(count_rate0_spinBox)
@@ -45,6 +48,7 @@ class PicoHarp_Scan(PiezoStage_Scan):
         self.ui.save_image_pushButton.clicked.connect(self.save_intensities_image)
         self.ui.save_array_pushButton.clicked.connect(self.save_intensities_data)
     
+    	#setup imageview
         self.imv = pg.ImageView()
         self.imv.getView().setAspectLocked(lock=False, ratio=1)
         self.imv.getView().setMouseEnabled(x=True, y=True)
@@ -54,7 +58,7 @@ class PicoHarp_Scan(PiezoStage_Scan):
 
     def update_estimated_scan_time(self):
         try:
-            self.overhead = self.x_range * self.y_range * .067 #TODO - test this number
+            self.overhead = self.x_range * self.y_range * .055 #determined by running scans and timing
             scan_time = self.x_range * self.y_range * self.settings["Tacq"] + self.overhead
             self.ui.estimated_scan_time_label.setText("Estimated scan time: " + "%.2f" % scan_time + "s")
         except:
@@ -67,31 +71,22 @@ class PicoHarp_Scan(PiezoStage_Scan):
             if not self.interrupt_measurement_called:
                 seconds_left = ((self.x_range * self.y_range) - self.pixels_scanned) * self.settings["Tacq"] + self.overhead
                 self.ui.estimated_time_label.setText("Estimated time remaining: " + "%.2f" % seconds_left + "s")
-            self.img_item.setImage(self.sum_intensities_image_map)
+            self.img_item.setImage(self.sum_intensities_image_map) #update stage image
 
+            #update imageview
             self.times = self.time_data[:, 0, 0]*1e-3
             self.imv.setImage(img=self.hist_data, autoRange=False, autoLevels=True, xvals=self.times)
             self.imv.show()
             self.imv.window().setWindowFlag(QtCore.Qt.WindowCloseButtonHint, False) #disable closing image view window
 
+            #update progress bar
             progress = 100 * ((self.pixels_scanned+1)/np.abs(self.x_range*self.y_range))
             self.ui.progressBar.setValue(progress)
             self.set_progress(progress)
             pg.QtGui.QApplication.processEvents()
 
     def pre_run(self):
-        """
-        numpy memmaps do not play well when being overwritten if they aren't closed.
-        However, any call to the memmap after it has closed will crash the Python program.
-        Since the run() function runs on a thread that constantly calls update_display() which
-        calls the memmaps to plot the data, then the program will crash if the garbage collection
-        is done in the main run thread.
-
-        Therefore, before the program runs and the update_display() function is called, we should
-        check whether the memmaps exist. If they do, we need to close them, delete them and then remove
-        the temporary filename on disk associated to the memmap.
-
-        """
+        """ Setup memmmaps and image where histogram data is stored"""
         # if hasattr(self,'time_data'): ###
         #     self.time_data._mmap.close()
         #     self.hist_data._mmap.close()
@@ -107,7 +102,6 @@ class PicoHarp_Scan(PiezoStage_Scan):
         PiezoStage_Scan.pre_run(self) #setup scan paramters
         self.picoharp = self.picoharp_hw.picoharp
         self.check_filename("_raw_PL_hist_data.pkl")
-
         self.num_hist_chans = self.app.hardware['picoharp'].calc_num_hist_chans()
         #self.ui.time_remaining_disp.setText(self.calc_time_left())
         #self.move_to_start()
@@ -129,11 +123,9 @@ class PicoHarp_Scan(PiezoStage_Scan):
         hist_len = self.num_hist_chans
 
         #Use memmaps to use less memory and store data into disk
-        self.hist_data= np.memmap(self.hist_filename,dtype='float32',mode='w+',shape=(hist_len, self.x_range, self.y_range))#len(XX[0,:]),len(YY[:,0])))
-        self.time_data= np.memmap(self.time_filename,dtype='float32',mode='w+',shape=(hist_len, self.x_range, self.y_range))#len(XX[0,:]),len(YY[:,0]))) ###TODO: memmap throwing errors
+        self.hist_data= np.memmap(self.hist_filename,dtype='float32',mode='w+',shape=(hist_len, self.x_range, self.y_range))
+        self.time_data= np.memmap(self.time_filename,dtype='float32',mode='w+',shape=(hist_len, self.x_range, self.y_range))
 
-        #self.hist_data = np.zeros(shape=(hist_len, self.x_range, self.y_range)) ###use array instead of memmap for now
-        #self.time_data = np.zeros(shape=(hist_len, self.x_range, self.y_range))
         #Store histogram sums for each pixel
         self.sum_intensities_image_map = np.zeros((self.x_range, self.y_range), dtype=float)
 
@@ -169,14 +161,13 @@ class PicoHarp_Scan(PiezoStage_Scan):
         pickle.dump(save_dict, open(self.app.settings['save_dir']+"/"+self.app.settings['sample']+"_raw_PL_hist_data.pkl", "wb"))
 
     def measure_hist(self):
+        """ Read from picoharp """
         ph = self.picoharp_hw.picoharp           
         ph.start_histogram()
         while not ph.check_done_scanning():
             if self.interrupt_measurement_called:
                 break
             ph.read_histogram_data()
-#            self.picoharp_hw.settings.count_rate0.read_from_hardware()
-#            self.picoharp_hw.settings.count_rate1.read_from_hardware()
             time.sleep(0.001)
     
         ph.stop_histogram()
@@ -184,7 +175,7 @@ class PicoHarp_Scan(PiezoStage_Scan):
         return ph.time_array[0:self.num_hist_chans], ph.histogram_data[0:self.num_hist_chans]
 
     def save_intensities_data(self):
-        transposed = np.transpose(self.sum_intensities_image_map)
+        transposed = np.transpose(self.sum_intensities_image_map) #transpose so data visually makes sense
         PiezoStage_Scan.save_intensities_data(self, transposed, 'ph')
 
     def save_intensities_image(self):

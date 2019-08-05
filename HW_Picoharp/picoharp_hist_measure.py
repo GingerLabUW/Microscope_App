@@ -47,16 +47,16 @@ class PicoHarpHistogramMeasure(Measurement):
 
         #connect events
         S.progress.connect_bidir_to_widget(self.ui.progressBar)
-        self.ui.start_pushButton.clicked.connect(self.start)
-        self.ui.interrupt_pushButton.clicked.connect(self.interrupt)
-        
         S.continuous.connect_to_widget(self.ui.continuous_checkBox)
-        
         ph_hw.settings.Tacq.connect_bidir_to_widget(self.ui.picoharp_tacq_doubleSpinBox)
         #ph.settings.histogram_channels.connect_bidir_to_widget(self.ui.histogram_channels_doubleSpinBox)
         ph_hw.settings.count_rate0.connect_to_widget(self.ui.ch0_label)#doubleSpinBox) ###
         ph_hw.settings.count_rate1.connect_to_widget(self.ui.ch1_label)#doubleSpinBox) ###
         ph_hw.settings.Resolution.connect_to_widget(self.ui.resolution_comboBox)
+
+        #setup ui signals
+        self.ui.start_pushButton.clicked.connect(self.start)
+        self.ui.interrupt_pushButton.clicked.connect(self.interrupt)
         self.ui.save_data_pushButton.clicked.connect(self.save_hist_data)
 
         self.graph_layout = pg.GraphicsLayoutWidget()    
@@ -71,7 +71,7 @@ class PicoHarpHistogramMeasure(Measurement):
     def run(self):
         ph_hw = self.app.hardware['picoharp']
         ph = self.picoharp = ph_hw.picoharp
-        self.num_hist_chans = self.app.hardware['picoharp'].calc_num_hist_chans()
+        self.num_hist_chans = self.app.hardware['picoharp'].calc_num_hist_chans() #calculate # of histogram channels
         #: type: ph: PicoHarp300
         
         #FIXME
@@ -87,9 +87,6 @@ class PicoHarpHistogramMeasure(Measurement):
                 if self.interrupt_measurement_called:
                     break
                 ph.read_histogram_data()
-                #ph_hw.settings.count_rate0.read_from_hardware() ###
-                #ph_hw.settings.count_rate1.read_from_hardware() ###
-                ph_hw.read_from_hardware()
                 time.sleep(sleep_time)
     
             ph.stop_histogram()
@@ -126,6 +123,7 @@ class PicoHarpHistogramMeasure(Measurement):
                                
     def update_display(self):
         ph = self.picoharp
+        self.picoharp_hw.read_from_hardware()
 #        self.plotdata.setData(ph.time_array*1e-3, ph.histogram_data+1)
         self.plotdata.setData(ph.time_array[0:self.num_hist_chans]*1e-3, ph.histogram_data[0:self.num_hist_chans]+1)
         #self.fig.canvas.draw()

@@ -19,8 +19,6 @@ class PiezoStage_Scan(Measurement):
         This is the place to load a user interface file,
         define settings, and set up data structures. 
         """
-        # self.name = "oceanoptics_scan_liveupdate"
-        
         # Define ui file to be used as a graphical interface
         # This file can be edited graphically with Qt Creator
         # sibling_path function allows python to find a file in the same folder
@@ -64,7 +62,7 @@ class PiezoStage_Scan(Measurement):
         self.scan_complete = False
 
         self.selected_positions = np.zeros((1000, 2))
-        self.selected_count = 0
+        self.selected_count = 0 #number of points selected
 
     def setup_figure(self):
         """
@@ -73,10 +71,7 @@ class PiezoStage_Scan(Measurement):
         build plots, etc.
         """
         
-        # connect ui widgets to measurement/hardware settings or functions
-        self.ui.start_scan_pushButton.clicked.connect(self.start)
-        self.ui.interrupt_scan_pushButton.clicked.connect(self.interrupt)
-
+        # connect settings to ui
         self.pi_device_hw.settings.x_position.connect_to_widget(self.ui.x_pos_doubleSpinBox)
         self.pi_device_hw.settings.y_position.connect_to_widget(self.ui.y_pos_doubleSpinBox)
         self.settings.scan_direction.connect_to_widget(self.ui.scan_comboBox)
@@ -91,24 +86,6 @@ class PiezoStage_Scan(Measurement):
         self.settings.lock_position.connect_to_widget(self.ui.lock_position_checkBox)
         self.settings.save_positions.connect_to_widget(self.ui.save_positions_checkBox)
         self.settings.progress.connect_to_widget(self.ui.progressBar)
-        self.ui.move_to_selected_pushButton.clicked.connect(self.move_to_selected)
-        self.ui.export_positions_pushButton.clicked.connect(self.export_positions)
-
-        #self.spec_hw.settings.intg_time.connect_to_widget(self.ui.intg_time_doubleSpinBox)
-        #self.spec_hw.settings.correct_dark_counts.connect_to_widget(self.ui.correct_dark_counts_checkBox)
-        #self.spec_measure.settings.scans_to_avg.connect_to_widget(self.ui.scans_to_avg_spinBox)
-
-        # Set up pyqtgraph graph_layout in the UI
-        #self.graph_layout=pg.GraphicsLayoutWidget()
-       # self.ui.plot_groupBox.layout().addWidget(self.graph_layout)
-
-        # # Create PlotItem object (a set of axes)  
-        # self.plot = self.graph_layout.addPlot(title="Spectrometer Live Reading")
-        # self.plot.setLabel('left', 'Intensity', unit='a.u.')
-        # self.plot.setLabel('bottom', 'Wavelength', unit='nm')
-        
-        # # # Create PlotDataItem object ( a scatter plot on the axes )
-        # self.optimize_plot_line = self.plot.plot([0])
 
         #stage ui base
         self.stage_layout=pg.GraphicsLayoutWidget()
@@ -125,6 +102,12 @@ class PiezoStage_Scan(Measurement):
         self.scan_roi.sigRegionChangeFinished.connect(self.mouse_update_scan_roi)
         self.scan_roi.sigRegionChangeFinished.connect(self.update_ranges)
         self.stage_plot.addItem(self.scan_roi)
+
+        #setup ui signals
+        self.ui.start_scan_pushButton.clicked.connect(self.start)
+        self.ui.interrupt_scan_pushButton.clicked.connect(self.interrupt)
+        self.ui.move_to_selected_pushButton.clicked.connect(self.move_to_selected)
+        self.ui.export_positions_pushButton.clicked.connect(self.export_positions)
 
         self.ui.x_start_doubleSpinBox.valueChanged.connect(self.update_roi_start)
         self.ui.y_start_doubleSpinBox.valueChanged.connect(self.update_roi_start)
@@ -164,12 +147,6 @@ class PiezoStage_Scan(Measurement):
         # pg.SignalProxy(self.stage_plot.scene().sigMouseMoved, rateLimit=60, slot=self.ch_move) #connect plot item to mouse moved, which handles crosshair movement
         self.stage_plot.scene().sigMouseClicked.connect(self.ch_click)
 
-        ##crosshair test code
-        #self.hLine.setPos(50)
-        #self.vLine.setPos(50)
-        #self.stage_plot.addItem(self.hLine)
-        #self.stage_plot.addItem(self.vLine)
-
     def ch_click(self, event):
         '''
         Handle crosshair clicking, which toggles movement on and off.
@@ -206,25 +183,21 @@ class PiezoStage_Scan(Measurement):
     #             self.hLine.setPos(mousePoint.y())
 
     def export_positions(self):
+        """ Export selected positions into txt. """
         self.check_filename("_selected_positions.txt")
         trimmed = self.selected_positions[~np.all(self.selected_positions == 0, axis=1)] #get rid of empty rows
         np.savetxt(self.app.settings['save_dir']+"/"+ self.app.settings['sample'] + "_selected_positions.txt", trimmed, fmt='%f')
 
     def move_to_selected(self):
-        '''
-        Move stage to position selected by crosshairs.
-        '''
+        """Move stage to position selected by crosshairs."""
         if self.scan_complete and hasattr(self, 'pi_device'):
             x = self.settings['x_clicked']
             y = self.settings['y_clicked']
             self.pi_device.MOV(axes=self.axes, values=[x, y])
             self.pi_device_hw.read_from_hardware()
 
-    
     def mouse_update_scan_roi(self):
-        '''
-        Update settings to reflect region of interest.
-        '''
+        """Update settings and spinboxes to reflect region of interest."""
         x0,y0 =  self.scan_roi.pos()
         w, h =  self.scan_roi.size()
         if self.settings['x_step'] > 0: 
@@ -241,9 +214,7 @@ class PiezoStage_Scan(Measurement):
         self.settings['y_size'] = h
 
     def update_roi_start(self):
-        '''
-        Update region of interest start position according to spinboxes
-        '''
+        """Update region of interest start position according to spinboxes"""
         x_roi = self.settings['x_start'] #default start values that work with positive x and y steps
         y_roi = self.settings['y_start']
         if self.settings['x_step'] < 0:
@@ -253,12 +224,14 @@ class PiezoStage_Scan(Measurement):
         self.scan_roi.setPos(x_roi, y_roi)
 
     def update_roi_size(self):
-        '''
-        Update region of interest size according to spinboxes
-        '''
+        ''' Update region of interest size according to spinboxes '''
         self.scan_roi.setSize((self.settings['x_size'], self.settings['y_size']))
 
     def update_ranges(self):
+        """ 
+        Update # of pixels calculation (x_range and y_range) when spinboxes change
+        This is important in getting estimated scan time before scan starts.
+        """
         self.x_scan_size = self.settings['x_size']
         self.y_scan_size = self.settings['y_size']
         
@@ -302,6 +275,7 @@ class PiezoStage_Scan(Measurement):
         self.pi_device = self.pi_device_hw.pi_device
         self.axes = self.pi_device_hw.axes
 
+        #disable roi and spinboxes during scan
         self.scan_roi.removeHandle(self.handle1)
         self.scan_roi.removeHandle(self.handle2)
         self.scan_roi.translatable = False
@@ -310,31 +284,6 @@ class PiezoStage_Scan(Measurement):
 
         self.x_start = self.settings['x_start']
         self.y_start = self.settings['y_start']
-
-        ###this block has been moved to update_ranges()        
-        # self.x_scan_size = self.settings['x_size']
-        # self.y_scan_size = self.settings['y_size']
-        
-        # self.x_step = self.settings['x_step']
-        # self.y_step = self.settings['y_step']
-        
-        # if self.y_scan_size == 0:
-        #     self.y_scan_size = 1#self.settings['y_size'] = 1
-        #     self.y_step = 1#self.settings['y_step'] = 1
-        
-        # if self.x_scan_size == 0:
-        #     self.x_scan_size = 1#self.settings['x_size'] = 1
-        #     self.x_step = 1#self.settings['x_step'] = 1
-        
-        # if self.y_step == 0:
-        #     self.y_step = 1#self.settings['y_step'] = 1
-            
-        # if self.x_step == 0:
-        #     self.x_step = 1#self.settings['x_step'] = 1
-            
-        #number of scans in x and y
-        # self.y_range = np.abs(int(np.ceil(self.y_scan_size/self.y_step)))
-        # self.x_range = np.abs(int(np.ceil(self.x_scan_size/self.x_step)))
 
         self.pi_device.MOV(axes=self.axes, values=[self.x_start, self.y_start])
         self.pi_device_hw.read_from_hardware()
@@ -424,6 +373,7 @@ class PiezoStage_Scan(Measurement):
         self.scan_complete = True
         
     def post_run(self):
+        """Re-enable roi and spinboxes. """
         self.handle1 = self.scan_roi.addScaleHandle([1, 1], [0, 0])
         self.handle2 = self.scan_roi.addScaleHandle([0, 0], [1, 1])
         self.scan_roi.translatable = True
@@ -431,16 +381,16 @@ class PiezoStage_Scan(Measurement):
             self.settings.as_dict()[lqname].change_readonly(False)
             
     def scan_measure(self):
-        '''
+        """
         Not defined in this class. This is defined in hardware-specific scans that inherit this class.
-        '''
+        """
         pass
 
     def check_filename(self, append):
-        '''
+        """
         If no sample name given or duplicate sample name given, fix the problem by appending a unique number.
         append - string to add to sample name (including file extension)
-        '''
+        """
         samplename = self.app.settings['sample']
         filename = samplename + append
         directory = self.app.settings['save_dir']
@@ -450,6 +400,7 @@ class PiezoStage_Scan(Measurement):
             self.app.settings['sample'] = samplename + str(int(time.time()))
     
     def set_details_widget(self, widget = None, ui_filename=None):
+        """ Helper function for setting up ui elements for settings. """
         #print('LOADING DETAIL UI')
         if ui_filename is not None:
             details_ui = load_qt_ui_file(ui_filename)

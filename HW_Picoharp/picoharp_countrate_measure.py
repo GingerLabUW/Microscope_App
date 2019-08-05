@@ -29,9 +29,9 @@ class PicoHarpCountrateMeasure(Measurement):
         self.ui = load_qt_ui_file(self.ui_filename)
         self.ui.setWindowTitle(self.name)
 
-        self.elapsed_time = 0 ###
-        self.count_array = [] ###
-        self.time_array = [] ###
+        self.elapsed_time = 0
+        self.count_array = [] #array storing countrate data
+        self.time_array = [] #array storing time points
         
     def setup_figure(self):
 #         self.fig = self.gui.add_figure("picoharp_live", self.gui.ui.picoharp_plot_widget)
@@ -47,32 +47,23 @@ class PicoHarpCountrateMeasure(Measurement):
         # hardware
         ph_hw = self.picoharp_hw = self.app.hardware['picoharp']
 
-        #connect events
+        #connect events/settings to ui
         S.progress.connect_bidir_to_widget(self.ui.progressBar)
         self.ui.start_pushButton.clicked.connect(self.start)
         self.ui.interrupt_pushButton.clicked.connect(self.interrupt)
-        
         S.continuous.connect_to_widget(self.ui.continuous_checkBox)
-        
         ph_hw.settings.Tacq.connect_bidir_to_widget(self.ui.picoharp_tacq_doubleSpinBox)
-        #ph.settings.histogram_channels.connect_bidir_to_widget(self.ui.histogram_channels_doubleSpinBox)
-        ph_hw.settings.count_rate0.connect_to_widget(self.ui.ch0_label)#doubleSpinBox)
-        ph_hw.settings.count_rate1.connect_to_widget(self.ui.ch1_label)#doubleSpinBox)
+        ph_hw.settings.count_rate0.connect_to_widget(self.ui.ch0_label)
+        ph_hw.settings.count_rate1.connect_to_widget(self.ui.ch1_label)
         self.ui.save_data_pushButton.clicked.connect(self.save_countrates)
         self.ui.clear_plot_pushButton.clicked.connect(self.clear_plot)
-        #self.gui.ui.picoharp_acquire_one_pushButton.clicked.connect(self.start)
-        #self.gui.ui.picoharp_interrupt_pushButton.clicked.connect(self.interrupt)
-
-
         self.graph_layout = pg.GraphicsLayoutWidget()    
-        
+    
         self.plot = self.graph_layout.addPlot()
-        #self.plotdata = self.plot.plot(pen='r')
         self.plot.setLogMode(False, True)
         
         self.ui.plot_groupBox.layout().addWidget(self.graph_layout)
         
-                
     def run(self):
         ph_hw = self.app.hardware['picoharp']
         ph = self.picoharp = ph_hw.picoharp
@@ -89,8 +80,7 @@ class PicoHarpCountrateMeasure(Measurement):
             #self.plot.setRange(disableAutoRange=False)
             #self.plot.setXLimits(xMin=0, xMax=None)
 
-        sleep_time = self.display_update_period###min((max(0.1*ph.Tacq*1e-3, 0.010), 0.100)) # check every 1/10 of Tacq with limits of 10ms and 100ms
-        #print("sleep_time", sleep_time, np.max(0.1*ph.Tacq*1e-3, 0.010))
+        sleep_time = self.display_update_period
         
         t0 = time.time()
         
@@ -98,37 +88,27 @@ class PicoHarpCountrateMeasure(Measurement):
             ph.start_histogram()
             while not ph.check_done_scanning():
                 self.set_progress( 100*(time.time() - t0)/ph_hw.settings['Tacq'] )
-                if not self.settings['continuous']:
+                if not self.settings['continuous']: #if not continuous measure, stop at interrupt or acquisition time has elapsed
                     if self.interrupt_measurement_called or self.elapsed_time > ph_hw.settings['Tacq']:
                         break
-                else:
+                else: 
                     if self.interrupt_measurement_called:
                         break   
-                self.count_array.append(ph.read_count_rate1()) ###
-                self.time_array.append(self.elapsed_time)
+                self.count_array.append(ph.read_count_rate1()) #append new countrate data to array
+                self.time_array.append(self.elapsed_time) #append time interval to array
                 self.elapsed_time += self.display_update_period
-                #ph_hw.settings.count_rate0.read_from_hardware() ##
-                #ph_hw.settings.count_rate1.read_from_hardware() ##
-                ph_hw.read_from_hardware()
+                
                 time.sleep(sleep_time)
     
             ph.stop_histogram()
             ph.read_histogram_data()
-        
-#            if not self.settings['continuous']:
-#                break
-        self.elasped_time = 0
 
-        #if not continuous, clear time and count arrays
-        #print "elasped_meas_time (final):", ph.read_elapsed_meas_time()
+        self.elasped_time = 0
         
         save_dict = {
                      'time_histogram': ph.histogram_data,
-                     'time_array': ph.time_array,
-                     #'elapsed_meas_time': ph.read_elapsed_meas_time()
+                     'time_array': ph.time_array
                     }               
-
-                    
 
         for lqname,lq in self.app.settings.as_dict().items():
             save_dict[lqname] = lq.val
@@ -139,12 +119,6 @@ class PicoHarpCountrateMeasure(Measurement):
         
         for lqname,lq in self.settings.as_dict().items():
             save_dict[self.name +"_"+ lqname] = lq.val
-
-
-
-        self.fname = "%i_picoharp.npz" % time.time()
-#        np.savez_compressed(self.fname, **save_dict)
-        print("TRPL Picoharp Saved", self.fname)
         
         if not self.settings['continuous']:
             self.elapsed_time = 0
@@ -154,13 +128,8 @@ class PicoHarpCountrateMeasure(Measurement):
                                
     def update_display(self):
         ph = self.picoharp
-        ###self.plotdata.setData(ph.time_array*1e-3, ph.histogram_data+1)
-         ###
-        #self.plotdata.setData(np.asarray(self.time_array), np.asarray(self.count_array), pen='r') ###
+        self.picoharp_hw.read_from_hardware()
         self.plot.plot(np.asarray(self.time_array), np.asarray(self.count_array), pen='r')
- ###
-
-        #self.fig.canvas.draw()
 
     def save_countrates(self):
         cr_data = np.zeros((len(self.time_array), 2))

@@ -9,11 +9,7 @@ import seabreeze.spectrometers as sb
 import os.path
 
 class OceanOpticsMeasure(Measurement):
-    
-    # this is the name of the measurement that ScopeFoundry uses 
-    # when displaying your measurement and saving data related to it    
-    
-    
+        
     def setup(self):
         """
         Runs once during App initialization.
@@ -147,7 +143,7 @@ class OceanOpticsMeasure(Measurement):
     def check_filename(self, append):
         '''
         If no sample name given or duplicate sample name given, fix the problem by appending a unique number.
-        append - string to add to sample name (including file extension)
+        append -- string to add to sample name (including file extension)
         '''
         samplename = self.app.settings['sample']
         filename = samplename + append

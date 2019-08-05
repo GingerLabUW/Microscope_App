@@ -21,11 +21,13 @@ class PiezoStageIndependentMovement(Measurement):
 		self.pi_device_hw = self.app.hardware['piezostage']
 
 	def setup_figure(self):
+		#connect settings to ui
 		self.settings.sleep_time.connect_to_widget(self.ui.sleep_time_spinBox)
 		self.pi_device_hw.settings.x_position.connect_to_widget(self.ui.x_position_label)
 		self.pi_device_hw.settings.y_position.connect_to_widget(self.ui.y_position_label)
-		self.ui.import_pushButton.clicked.connect(self.array_from_file)
 
+		#setup ui signals
+		self.ui.import_pushButton.clicked.connect(self.array_from_file)
 		self.ui.start_pushButton.clicked.connect(self.start)
 		self.ui.interrupt_pushButton.clicked.connect(self.interrupt)
 	
@@ -53,7 +55,6 @@ class PiezoStageIndependentMovement(Measurement):
 			self.pi_device = self.pi_device_hw.pi_device
 			self.axes = self.pi_device.axes[0:2]
 			num_points = self.position_array.shape[0] #get number of rows = number of points
-			# if self.settings["movement_type"] == "Absolute":
 			for i in range(num_points):
 				if self.interrupt_measurement_called:
 					break

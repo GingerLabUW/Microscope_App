@@ -21,23 +21,23 @@ class ParticleSpectra(Measurement):
         self.settings.New("intg_time", dtype=int, unit="ms", initial=3, vmin=3)
         self.settings.New("correct_dark_counts", dtype=bool, initial=True)
         self.settings.New("scans_to_avg", dtype=int, initial=1, vmin=1)
+
         #Load ui file and convert it to a live QWidget of the user interface
         self.ui = load_qt_ui_file(self.ui_filename)
+
         self.pi_device_hw = self.app.hardware['piezostage']
         self.spec_hw = self.app.hardware['oceanoptics']
         
     def setup_figure(self):
+        #set up ui signals
         self.pi_device_hw.settings.x_position.connect_to_widget(self.ui.x_position_label)
         self.pi_device_hw.settings.y_position.connect_to_widget(self.ui.y_position_label)
-        
         self.settings.intg_time.connect_to_widget(self.ui.intg_time_spinBox)
         self.spec_hw.settings.intg_time.connect_to_widget(self.ui.intg_time_spinBox)
         self.settings.correct_dark_counts.connect_to_widget(self.ui.correct_dark_counts_checkBox)
         self.spec_hw.settings.correct_dark_counts.connect_to_widget(self.ui.correct_dark_counts_checkBox)
         self.settings.scans_to_avg.connect_to_widget(self.ui.scans_to_avg_spinBox)
-
         self.ui.import_pushButton.clicked.connect(self.array_from_file)
-
         self.ui.start_pushButton.clicked.connect(self.start)
         self.ui.interrupt_pushButton.clicked.connect(self.interrupt)
         
@@ -105,6 +105,7 @@ class ParticleSpectra(Measurement):
                 rel_mov = self.movements_array[i]
                 self.pi_device.MVR(axes=self.axes, values=[rel_mov[0], rel_mov[1]]) #move stage
                 
+                #read spectrometer at each point
                 OceanOpticsMeasure._read_spectrometer(self)
                 save_array = np.zeros(shape=(2048, 2))
                 save_array[:,0] = self.spec.wavelengths()
