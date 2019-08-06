@@ -46,7 +46,7 @@ class PiezoStageControl(Measurement):
         #arrow indicating stage position
         self.current_stage_pos_arrow = pg.ArrowItem()
         self.current_stage_pos_arrow.setZValue(100)
-        self.current_stage_pos_arrow.setPos(0, 0)#self.pi_device_hw.settings['x_position'], self.pi_device_hw.settings['y_position'])
+        self.current_stage_pos_arrow.setPos(0, 0)
         self.stage_plot.addItem(self.current_stage_pos_arrow)
                 
     def move_up(self):
@@ -72,11 +72,6 @@ class PiezoStageControl(Measurement):
             self.pi_device.MVR(axes=self.axes[0], values=[-self.settings['step_size']])
             self.pi_device_hw.read_from_hardware()
             self.current_stage_pos_arrow.setPos(self.pi_device_hw.settings['x_position'], self.pi_device_hw.settings['y_position'])
-
-#    def update_display(self):
-#        x_pos = self.pi_device_hw.settings['x_position']
-#        y_pos = self.pi_device_hw.settings['y_position']
-#        self.current_stage_pos_arrow.setPos(x_pos, y_pos)
     
     def run(self):
         self.pi_device = self.pi_device_hw.pi_device

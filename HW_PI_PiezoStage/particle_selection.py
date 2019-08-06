@@ -173,16 +173,6 @@ class ParticleSelection(Measurement):
 
 				self.ui.textBrowser.append(text)
 
-				# if self.ui.first_point_checkBox.isChecked(): #if checked, set first point as origin
-				# 	if self.point_counter == 1:
-				# 		self.origin_x = mousePoint.x()
-				# 		self.origin_y = mousePoint.y()
-				# 		#self.ui.textBrowser.append("Using (" + str(round(mousePoint.x(),3)) + ", " + str(round(mousePoint.y(),3)) + ") as origin." )
-				# x_point = (mousePoint.x() - self.origin_x) * self.scaling_factor
-				# y_point = (mousePoint.y() - self.origin_y) * self.scaling_factor
-
-
-
 	def load_image(self):
 		"""
 		Prompts the user to select a text file containing image data.
@@ -206,10 +196,6 @@ class ParticleSelection(Measurement):
 				pass
 		except Exception as err:
 			print(format(err))
-
-#	def move_stage(self):
-#		print(hasattr(self, 'pi_device'))
-#		if hasattr(self, 'pi_device'):
 			
 	def export_relative_movements(self):
 		PiezoStage_Scan.check_filename(self, "_selected_relative_movements.txt") #make sure filename doesn't already exist

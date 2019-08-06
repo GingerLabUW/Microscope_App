@@ -86,34 +86,12 @@ class PicoHarp_Scan(PiezoStage_Scan):
             pg.QtGui.QApplication.processEvents()
 
     def pre_run(self):
-        """ Setup memmmaps and image where histogram data is stored"""
-        # if hasattr(self,'time_data'): ###
-        #     self.time_data._mmap.close()
-        #     self.hist_data._mmap.close()
-        #     delattr(self,'time_data')
-        #     delattr(self,'hist_data')
-        #     os.remove(self.time_filename)
-        #     os.remove(self.hist_filename)
-        ## set all logged quantities read only
-        #for lqname in "xdim ydim map_size".split():
-        #    self.settings.as_dict()[lqname].change_readonly(True)
-        #compute relevant scan parameters and move the APT motors to the start point of the scan
-        #self.compute_scan_params()
         PiezoStage_Scan.pre_run(self) #setup scan paramters
         self.picoharp = self.picoharp_hw.picoharp
         self.check_filename("_raw_PL_hist_data.pkl")
         self.num_hist_chans = self.app.hardware['picoharp'].calc_num_hist_chans()
-        #self.ui.time_remaining_disp.setText(self.calc_time_left())
-        #self.move_to_start()
-        
-        ###self.sleep_time = min((max(0.1*ph.Tacq*1e-3, 0.010), 0.100))
 
-        # XX, YY = np.meshgrid(np.arange(0,  x_scan_size, x_step),np.arange(0, y_scan_size, y_step))
-  #       YY = YY+y_start
-  #       XX = XX+x_start
-
-        dirname = self.app.settings['save_dir']
-        
+        dirname = self.app.settings['save_dir']        
         self.check_filename('_histdata.dat')
         sample_filename = self.app.settings['sample']
         self.hist_filename = os.path.join(dirname, sample_filename + '_histdata.dat')

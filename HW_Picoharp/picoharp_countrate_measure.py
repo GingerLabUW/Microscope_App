@@ -15,13 +15,7 @@ class PicoHarpCountrateMeasure(Measurement):
     def setup(self):
         self.display_update_period = 0.1 #seconds
 
-        S = self.settings
-#         self.stored_histogram_channels = self.add_logged_quantity(
-#                                       "stored_histogram_channels", 
-#                                      dtype=int, vmin=1, vmax=2**16, initial=2**16)
-#         self.stored_histogram_channels.connect_bidir_to_widget(
-#                                            self.gui.ui.trpl_live_stored_channels_doubleSpinBox)
-        
+        S = self.settings        
         S.New('continuous', dtype=bool, initial=False)
         
         # UI 
@@ -34,14 +28,6 @@ class PicoHarpCountrateMeasure(Measurement):
         self.time_array = [] #array storing time points
         
     def setup_figure(self):
-#         self.fig = self.gui.add_figure("picoharp_live", self.gui.ui.picoharp_plot_widget)
-#                     
-#         self.ax = self.fig.add_subplot(111)
-#         self.plotline, = self.ax.semilogy([0,20], [1,65535])
-#         self.ax.set_ylim(1e-1,1e5)
-#         self.ax.set_xlabel("Time (ns)")
-#         self.ax.set_ylabel("Counts")
-        
         S = self.settings
         
         # hardware
@@ -57,8 +43,8 @@ class PicoHarpCountrateMeasure(Measurement):
         ph_hw.settings.count_rate1.connect_to_widget(self.ui.ch1_label)
         self.ui.save_data_pushButton.clicked.connect(self.save_countrates)
         self.ui.clear_plot_pushButton.clicked.connect(self.clear_plot)
-        self.graph_layout = pg.GraphicsLayoutWidget()    
-    
+        
+        self.graph_layout = pg.GraphicsLayoutWidget()
         self.plot = self.graph_layout.addPlot()
         self.plot.setLogMode(False, True)
         

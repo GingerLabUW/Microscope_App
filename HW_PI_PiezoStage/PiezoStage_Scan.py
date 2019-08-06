@@ -329,17 +329,14 @@ class PiezoStage_Scan(Measurement):
                         self.index_y = self.y_range - i - 1
                     self.scan_measure() #defined in hardware-specific scans
                     self.pi_device.MVR(axes=self.axes[0], values=[self.x_step])
-                    # self.pi_device_hw.read_from_hardware()
                     self.pixels_scanned+=1
                 # TODO
                 # if statement needs to be modified to keep the stage at the finish y-pos for line scans in x, and same for y
                 if i == self.y_range-1: # this if statement is there to keep the stage at the finish position (in x) and not bring it back like we were doing during the scan 
                     self.pi_device.MVR(axes=self.axes[1], values=[self.y_step])
-                    # self.pi_device_hw.read_from_hardware()
                 else:                
                     self.pi_device.MVR(axes=self.axes[1], values=[self.y_step])
                     self.pi_device.MOV(axes=self.axes[0], values=[self.x_start])
-                    # self.pi_device_hw.read_from_hardware()
                 if self.interrupt_measurement_called:
                     break
         elif (self.settings['scan_direction'] == 'YX'): #yx scan
@@ -357,17 +354,14 @@ class PiezoStage_Scan(Measurement):
                         self.index_y = self.y_range - j - 1
                     self.scan_measure()
                     self.pi_device.MVR(axes=self.axes[1], values=[self.y_step])
-                    # self.pi_device_hw.read_from_hardware()
                     self.pixels_scanned+=1
                 # TODO
                 # if statement needs to be modified to keep the stage at the finish y-pos for line scans in x, and same for y
                 if i == self.x_range-1: # this if statement is there to keep the stage at the finish position (in x) and not bring it back like we were doing during the scan 
                     self.pi_device.MVR(axes=self.axes[0], values=[self.x_step])
-                    # self.pi_device_hw.read_from_hardware()
                 else:                
                     self.pi_device.MVR(axes=self.axes[0], values=[self.x_step])
                     self.pi_device.MOV(axes=self.axes[1], values=[self.y_start])
-                    # self.pi_device_hw.read_from_hardware()
                 if self.interrupt_measurement_called:
                     break
         self.scan_complete = True

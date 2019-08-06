@@ -63,12 +63,3 @@ class PiezoStageIndependentMovement(Measurement):
 				self.pi_device_hw.read_from_hardware()
 				self.ui.textBrowser.append("Point #" + str(i+1) + " complete.")
 				time.sleep(self.settings['sleep_time'])
-			# elif self.settings["movement_type"] == "Relative":
-			# 	for i in range(num_points):
-			# 		if self.interrupt_measurement_called:
-			# 			break
-			# 		rel_mov = self.position_array[i]
-			# 		self.pi_device.MVR(axes=self.axes, values=[rel_mov[0], rel_mov[1]])
-			# 		self.pi_device_hw.read_from_hardware()
-			# 		self.ui.textBrowser.append("Movement #" + str(i+1) + " complete.")
-			# 		time.sleep(self.settings['sleep_time'])
