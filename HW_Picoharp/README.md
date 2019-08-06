@@ -1,6 +1,4 @@
-ScopeFoundryHW.picoharp
-========================
-
+# HW_Picoharp
 PicoQuant PicoHarp 300 TCSPC system hardware plug-in for ScopeFoundry.
 
 This interface uses the phlib DLL from PicoQuant to
@@ -15,14 +13,16 @@ experiments and visualizing scientific data
 
 This software is not made by or endorsed by PicoQuant GmbH.
 
+This software has been modified from the original ScopeFoundry version to work with PicoHarp v2.3.
 
-Authors
-----------
-
+## Authors
 Edward S. Barnard <esbarnard@lbl.gov>
 
+## Requirements
+- Python 3.x
+- scopefoundry
 
-Requirements
-------------
-
-    * ScopeFoundry
+## Installing dependencies from command-line
+```
+pip install git+git://github.com/ScopeFoundry/ScopeFoundry.git
+```

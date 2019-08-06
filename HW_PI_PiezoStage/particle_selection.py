@@ -36,13 +36,13 @@ class ParticleSelection(Measurement):
 		#for selecting multiple points
 		self.point_counter = 0
 		self.relative_movements = []
-		self.origin_x = 0 
-		self.origin_y = 0
+		self.x_origin = 0 
+		self.y_origin = 0
 
 		self.pi_device_hw = self.app.hardware['piezostage']
 
 	def setup_figure(self):
-		
+		#connect settings to ui
 		self.settings.Magnification.connect_to_widget(self.ui.magnification_comboBox)
 		self.settings.W1.connect_to_widget(self.ui.w1_spinBox)
 		self.settings.H1.connect_to_widget(self.ui.h1_spinBox)
@@ -53,6 +53,7 @@ class ParticleSelection(Measurement):
 		self.settings.dX.connect_to_widget(self.ui.dx_label)
 		self.settings.dY.connect_to_widget(self.ui.dy_label)
 
+		#setup ui signals
 		self.ui.load_image_pushButton.clicked.connect(self.load_image)
 		self.ui.export_pushButton.clicked.connect(self.export_relative_movements)
 		self.ui.clear_pushButton.clicked.connect(self.clear_selections)
@@ -172,16 +173,6 @@ class ParticleSelection(Measurement):
 
 				self.ui.textBrowser.append(text)
 
-				# if self.ui.first_point_checkBox.isChecked(): #if checked, set first point as origin
-				# 	if self.point_counter == 1:
-				# 		self.origin_x = mousePoint.x()
-				# 		self.origin_y = mousePoint.y()
-				# 		#self.ui.textBrowser.append("Using (" + str(round(mousePoint.x(),3)) + ", " + str(round(mousePoint.y(),3)) + ") as origin." )
-				# x_point = (mousePoint.x() - self.origin_x) * self.scaling_factor
-				# y_point = (mousePoint.y() - self.origin_y) * self.scaling_factor
-
-
-
 	def load_image(self):
 		"""
 		Prompts the user to select a text file containing image data.
@@ -205,10 +196,6 @@ class ParticleSelection(Measurement):
 				pass
 		except Exception as err:
 			print(format(err))
-
-#	def move_stage(self):
-#		print(hasattr(self, 'pi_device'))
-#		if hasattr(self, 'pi_device'):
 			
 	def export_relative_movements(self):
 		PiezoStage_Scan.check_filename(self, "_selected_relative_movements.txt") #make sure filename doesn't already exist
@@ -220,22 +207,9 @@ class ParticleSelection(Measurement):
 		"""
 		self.point_counter = 0
 		self.relative_movements = []
-		self.origin_x = 0 
-		self.origin_y = 0
+		self.x_origin = 0 
+		self.y_origin = 0
 		self.ui.textBrowser.append("Selections cleared.")
-		
-	# def check_filename(self, append):
-	# 	'''
-	# 	If no sample name given or duplicate sample name given, fix the problem by appending a unique number.
-	# 	append - string to add to sample name (including file extension)
-	# 	'''
-	# 	samplename = self.app.settings['sample']
-	# 	filename = samplename + append
-	# 	directory = self.app.settings['save_dir']
-	# 	if samplename == "":
-	# 		self.app.settings['sample'] = int(time.time())
-	# 	if (os.path.exists(directory+"/"+filename)):
-	# 		self.app.settings['sample'] = samplename + str(int(time.time()))
 
 	def run(self):
 		"""

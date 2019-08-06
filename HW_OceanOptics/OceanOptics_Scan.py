@@ -23,18 +23,17 @@ class OceanOptics_Scan(PiezoStage_Scan):
 
 	def setup_figure(self):
 		PiezoStage_Scan.setup_figure(self)
-#		self.ui.save_array_pushButton.clicked.connect(self.save_intensities_data)
-#		self.ui.save_image_pushButton.clicked.connect(self.save_intensities_image)
 
+		#setup ui for ocean optics specific settings
 		spec_hw = self.app.hardware['oceanoptics']
 		details_groupBox = self.set_details_widget(widget = self.settings.New_UI(include=["intg_time", "correct_dark_counts", "scans_to_avg"]))
 		widgets = details_groupBox.findChildren(QtGui.QWidget)
 		intg_time_spinBox = widgets[1]
 		correct_dark_counts_checkBox = widgets[4]
 		#scans_to_avg_spinBox = widgets[6]
+		#connect settings to ui
 		spec_hw.settings.intg_time.connect_to_widget(intg_time_spinBox)
 		spec_hw.settings.correct_dark_counts.connect_to_widget(correct_dark_counts_checkBox)
-
 		intg_time_spinBox.valueChanged.connect(self.update_estimated_scan_time)
 		
 		#save data buttons
@@ -45,10 +44,12 @@ class OceanOptics_Scan(PiezoStage_Scan):
 		self.graph_layout=pg.GraphicsLayoutWidget()
 		self.plot = self.graph_layout.addPlot(title="Spectrometer Live Reading")
 		self.plot.setLabel('left', 'Intensity', unit='a.u.')
-		self.plot.setLabel('bottom', 'Wavelength', unit='nm')        
+		self.plot.setLabel('bottom', 'Wavelength', unit='nm') 
+
 		# # Create PlotDataItem object ( a scatter plot on the axes )
 		self.optimize_plot_line = self.plot.plot([0])
 		
+		#setup imageview
 		self.imv = pg.ImageView()
 		self.imv.getView().setAspectLocked(lock=False, ratio=1)
 		self.imv.getView().setMouseEnabled(x=True, y=True)
@@ -58,7 +59,7 @@ class OceanOptics_Scan(PiezoStage_Scan):
 
 	def update_estimated_scan_time(self):
 		try:
-			self.overhead = self.x_range * self.y_range * .053 #TODO - test this number
+			self.overhead = self.x_range * self.y_range * .058 #determined by running scans and timing
 			scan_time = self.x_range * self.y_range * self.settings["intg_time"] * 1e-3 + self.overhead #s
 			self.ui.estimated_scan_time_label.setText("Estimated scan time: " + "%.2f" % scan_time + "s")
 		except:
@@ -75,8 +76,9 @@ class OceanOptics_Scan(PiezoStage_Scan):
 			self.graph_layout.show()
 			self.graph_layout.window().setWindowFlag(QtCore.Qt.WindowCloseButtonHint, False) #disable closing image view window
 
-			self.img_item.setImage(self.sum_intensities_image_map)#image=sum_disp_img, autoLevels=True, autoRange=False)
+			self.img_item.setImage(self.sum_intensities_image_map) #update stage image
 			
+			#update imageview
 			self.imv.setImage(img=self.spectrum_image_map, autoRange=False, autoLevels=True, xvals=self.spec.wavelengths()) #adjust roi plot x axis
 			self.imv.show()
 			self.imv.window().setWindowFlag(QtCore.Qt.WindowCloseButtonHint, False) #disable closing image view window
@@ -143,7 +145,7 @@ class OceanOptics_Scan(PiezoStage_Scan):
 				self.y = np.mean(Int_array, axis=-1)
 
 	def save_intensities_data(self):
-		transposed = np.transpose(self.sum_intensities_image_map)
+		transposed = np.transpose(self.sum_intensities_image_map) #transpose so data visually makes sense
 		PiezoStage_Scan.save_intensities_data(self, transposed, 'oo')
 
 	def save_intensities_image(self):

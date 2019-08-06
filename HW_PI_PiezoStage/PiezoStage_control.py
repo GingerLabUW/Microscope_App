@@ -23,23 +23,19 @@ class PiezoStageControl(Measurement):
         
         
     def setup_figure(self):
-        
+        #connecting settings to ui
         self.pi_device_hw.settings.x_position.connect_to_widget(self.ui.x_label)
         self.pi_device_hw.settings.y_position.connect_to_widget(self.ui.y_label)
-        
         self.settings.step_size.connect_to_widget(self.ui.step_size_spinBox)
 
-#        self.ui.up_pushButton.clicked.connect(self.start) #TODO - bug: stage doesn't move until AFTER first click.
-#        self.ui.right_pushButton.clicked.connect(self.start)
-#        self.ui.down_pushButton.clicked.connect(self.start)
-#        self.ui.left_pushButton.clicked.connect(self.start)
+        #setup ui signals
         self.ui.start_pushButton.clicked.connect(self.start)
-        
         self.ui.up_pushButton.clicked.connect(self.move_up)
         self.ui.right_pushButton.clicked.connect(self.move_right)
         self.ui.down_pushButton.clicked.connect(self.move_down)
         self.ui.left_pushButton.clicked.connect(self.move_left)
 
+        #plot showing stage area
         self.stage_layout=pg.GraphicsLayoutWidget()
         self.ui.stage_groupBox.layout().addWidget(self.stage_layout)
         self.stage_plot = self.stage_layout.addPlot(title="Stage view")
@@ -47,9 +43,10 @@ class PiezoStageControl(Measurement):
         self.stage_plot.setYRange(0, 100)
         self.stage_plot.setLimits(xMin=0, xMax=100, yMin=0, yMax=100) 
 
+        #arrow indicating stage position
         self.current_stage_pos_arrow = pg.ArrowItem()
         self.current_stage_pos_arrow.setZValue(100)
-        self.current_stage_pos_arrow.setPos(0, 0)#self.pi_device_hw.settings['x_position'], self.pi_device_hw.settings['y_position'])
+        self.current_stage_pos_arrow.setPos(0, 0)
         self.stage_plot.addItem(self.current_stage_pos_arrow)
                 
     def move_up(self):
@@ -70,17 +67,11 @@ class PiezoStageControl(Measurement):
             self.pi_device_hw.read_from_hardware()
             self.current_stage_pos_arrow.setPos(self.pi_device_hw.settings['x_position'], self.pi_device_hw.settings['y_position'])
 
-
     def move_left(self):
         if hasattr(self, 'pi_device') and hasattr(self, 'axes'):
             self.pi_device.MVR(axes=self.axes[0], values=[-self.settings['step_size']])
             self.pi_device_hw.read_from_hardware()
             self.current_stage_pos_arrow.setPos(self.pi_device_hw.settings['x_position'], self.pi_device_hw.settings['y_position'])
-
-#    def update_display(self):
-#        x_pos = self.pi_device_hw.settings['x_position']
-#        y_pos = self.pi_device_hw.settings['y_position']
-#        self.current_stage_pos_arrow.setPos(x_pos, y_pos)
     
     def run(self):
         self.pi_device = self.pi_device_hw.pi_device
