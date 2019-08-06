@@ -141,10 +141,8 @@ class PiezoStage_Scan(Measurement):
         self.pi_device_hw.settings.y_position.updated_value.connect(self.update_arrow_pos, QtCore.Qt.UniqueConnection)
 
         #Define crosshairs that will show up after scan, event handling.
-        #self.enable_move_ch = False
         self.vLine = pg.InfiniteLine(angle=90, movable=False, pen='r')
         self.hLine = pg.InfiniteLine(angle=0, movable=False, pen='r')
-        # pg.SignalProxy(self.stage_plot.scene().sigMouseMoved, rateLimit=60, slot=self.ch_move) #connect plot item to mouse moved, which handles crosshair movement
         self.stage_plot.scene().sigMouseClicked.connect(self.ch_click)
 
     def ch_click(self, event):
@@ -162,25 +160,6 @@ class PiezoStage_Scan(Measurement):
                 self.selected_positions[self.selected_count, 0] = mousePoint.x()
                 self.selected_positions[self.selected_count, 1] = mousePoint.y()
                 self.selected_count += 1
-
-        #items = self.stage_plot.scene().items(pos) #get items at clicked position
-        # if (self.vLine in items or self.hLine in items): #if crosshair is clicked, toggle movement
-        #     self.enable_move_ch = not self.enable_move_ch
-        # if not self.enable_move_ch: #if crosshair has been dropped, update movement
-        #     ch_pos = self.stage_plot.vb.mapSceneToView(event.pos()) #convert device coordinates to scene coordinates
-        #     self.settings['x_clicked'] = ch_pos.x()
-        #     self.settings['y_clicked'] = ch_pos.y()
-
-    # def ch_move(self, event):
-    #     '''
-    #     Handle crosshair movement.
-    #     '''
-    #     pos = event[0]
-    #     if self.stage_plot.sceneBoundingRect().contains(pos): #check if mouse within bounds of stage plot
-    #         mousePoint = self.stage_plot.vb.mapSceneToView(pos) #convert device coordinates to scene coordinates
-    #         if self.enable_move_ch: #move crosshair only if toggled on by clicking
-    #             self.vLine.setPos(mousePoint.x())
-    #             self.hLine.setPos(mousePoint.y())
 
     def export_positions(self):
         """ Export selected positions into txt. """

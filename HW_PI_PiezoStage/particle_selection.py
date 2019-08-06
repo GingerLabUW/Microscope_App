@@ -36,8 +36,8 @@ class ParticleSelection(Measurement):
 		#for selecting multiple points
 		self.point_counter = 0
 		self.relative_movements = []
-		self.origin_x = 0 
-		self.origin_y = 0
+		self.x_origin = 0 
+		self.y_origin = 0
 
 		self.pi_device_hw = self.app.hardware['piezostage']
 
@@ -207,8 +207,8 @@ class ParticleSelection(Measurement):
 		"""
 		self.point_counter = 0
 		self.relative_movements = []
-		self.origin_x = 0 
-		self.origin_y = 0
+		self.x_origin = 0 
+		self.y_origin = 0
 		self.ui.textBrowser.append("Selections cleared.")
 
 	def run(self):
