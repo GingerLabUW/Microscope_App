@@ -408,4 +408,4 @@ class PiezoStage_Scan(Measurement):
         append = '_' + hw_name + '_intensity_sums.png'
         cpm.plot_confocal(intensities_array, stepsize=np.abs(self.settings['x_step']))
         self.check_filename(append)
-        cpm.plt.savefig(self.app.settings['save_dir'] + '/' + self.app.settings['sample'] + append, bbox_inches='tight', dpi=300)
+        plt.savefig(self.app.settings['save_dir'] + '/' + self.app.settings['sample'] + append, bbox_inches='tight', dpi=300)
