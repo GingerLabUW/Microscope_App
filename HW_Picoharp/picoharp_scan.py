@@ -48,7 +48,7 @@ class PicoHarp_Scan(PiezoStage_Scan):
         self.ui.save_image_pushButton.clicked.connect(self.save_intensities_image)
         self.ui.save_array_pushButton.clicked.connect(self.save_intensities_data)
     
-    	#setup imageview
+        #setup imageview
         self.imv = pg.ImageView()
         self.imv.getView().setAspectLocked(lock=False, ratio=1)
         self.imv.getView().setMouseEnabled(x=True, y=True)
@@ -86,43 +86,46 @@ class PicoHarp_Scan(PiezoStage_Scan):
             pg.QtGui.QApplication.processEvents()
 
     def pre_run(self):
-        PiezoStage_Scan.pre_run(self) #setup scan paramters
-        self.picoharp = self.picoharp_hw.picoharp
-        self.check_filename("_raw_PL_hist_data.pkl")
-        self.num_hist_chans = self.app.hardware['picoharp'].calc_num_hist_chans()
-
-        dirname = self.app.settings['save_dir']        
-        self.check_filename('_histdata.dat')
-        sample_filename = self.app.settings['sample']
-        self.hist_filename = os.path.join(dirname, sample_filename + '_histdata.dat')
-        self.check_filename('_timedata.dat')
-        self.time_filename = os.path.join(dirname,  sample_filename + '_timedata.dat')
-        
-        hist_len = self.num_hist_chans
-
-        #Use memmaps to use less memory and store data into disk
-        self.hist_data= np.memmap(self.hist_filename,dtype='float32',mode='w+',shape=(hist_len, self.x_range, self.y_range))
-        self.time_data= np.memmap(self.time_filename,dtype='float32',mode='w+',shape=(hist_len, self.x_range, self.y_range))
-
-        #Store histogram sums for each pixel
-        self.sum_intensities_image_map = np.zeros((self.x_range, self.y_range), dtype=float)
-
-        scan_time = self.x_range * self.y_range * self.settings["Tacq"] #* 1e-3 #s
-        self.ui.estimated_scan_time_label.setText("Estimated scan time: " + "%.2f" % scan_time + "s")
+        try:
+            PiezoStage_Scan.pre_run(self) #setup scan paramters
+            self.picoharp = self.picoharp_hw.picoharp
+            self.check_filename("_raw_PL_hist_data.pkl")
+            self.num_hist_chans = self.app.hardware['picoharp'].calc_num_hist_chans()
+    
+            dirname = self.app.settings['save_dir']        
+            self.check_filename('_histdata.dat')
+            sample_filename = self.app.settings['sample']
+            self.hist_filename = os.path.join(dirname, sample_filename + '_histdata.dat')
+            self.check_filename('_timedata.dat')
+            self.time_filename = os.path.join(dirname,  sample_filename + '_timedata.dat')
+            
+            hist_len = self.num_hist_chans
+    
+            #Use memmaps to use less memory and store data into disk
+            self.hist_data= np.memmap(self.hist_filename,dtype='float32',mode='w+',shape=(hist_len, self.x_range, self.y_range))
+            self.time_data= np.memmap(self.time_filename,dtype='float32',mode='w+',shape=(hist_len, self.x_range, self.y_range))
+    
+            #Store histogram sums for each pixel
+            self.sum_intensities_image_map = np.zeros((self.x_range, self.y_range), dtype=float)
+    
+            scan_time = self.x_range * self.y_range * self.settings["Tacq"] #* 1e-3 #s
+            self.ui.estimated_scan_time_label.setText("Estimated scan time: " + "%.2f" % scan_time + "s")
+        except:
+            pass
 
     def scan_measure(self):
         """
         Data collection for each pixel.
         """
-        t0 = time.time()
+        #t0 = time.time()
         data = self.measure_hist()
-        print(str(time.time()-t0), " measure_hist")
-        t1 = time.time()
+        #print(str(time.time()-t0), " measure_hist")
+        #t1 = time.time()
         self.time_data[:, self.index_x, self.index_y], self.hist_data[:, self.index_x, self.index_y] = data
         self.sum_intensities_image_map[self.index_x, self.index_y] = sum(data[1])
 #        self.time_data.flush()
 #        self.hist_data.flush()
-        print(str(time.time()-t1), " rest of scan_measure")
+        #print(str(time.time()-t1), " rest of scan_measure")
 
     def post_run(self):
         """
