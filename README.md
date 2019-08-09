@@ -10,6 +10,7 @@ Confocal Microscope App
 - h5py
 - pyqtgraph
 - pillow
+- serial
 - customplotting
 - python seabreeze
 - pipython (contact manufacturer to get software)
@@ -19,7 +20,7 @@ Confocal Microscope App
 conda install numpy pyqt qtpy h5py pyqtgraph
 conda install -c poehlmann python-seabreeze
 pip install git+git://github.com/ScopeFoundry/ScopeFoundry.git
-pip install pillow customplotting==0.1.4.dev0
+pip install pillow serial customplotting==0.1.4.dev0
 ```
 
 ## Run instructions
