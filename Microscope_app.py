@@ -41,6 +41,9 @@ class MicroscopeApp(BaseMicroscopeApp):
 		self.add_measurement(ParticleSelection)
 		from HW_OceanOptics.particle_spectra import ParticleSpectra
 		self.add_measurement(ParticleSpectra)
+
+		from HW_StepperMotor.StepperMotor_control import StepperMotorControl
+		self.add_measurement(StepperMotorControl)
 		
 
 		# show ui

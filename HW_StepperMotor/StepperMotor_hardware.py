@@ -7,7 +7,7 @@ class StepperMotorHW(HardwareComponent):
 	def setup(self):
 		# Define your hardware settings here.
 		# These settings will be displayed in the GUI and auto-saved with data files
-		self.name = "steppermotor"
+		self.name = "stepper_motor"
 		self.settings.New("port", dtype=str, choices=[("", ""), ("COM1", "COM1"), ("COM2", "COM2"), ("COM3", "COM3"), ("COM4", "COM4"),
 			("COM5", "COM5")], initial="COM5")
 		self.settings.New("baudrate", dtype=float, initial=115200)
@@ -57,16 +57,18 @@ class StepperMotorHW(HardwareComponent):
 			x_abs_pos = self.settings["x_abs"]
 			y_abs_pos = self.settings["y_abs"]
 			self.stepper_motor.goto([x_abs_pos, y_abs_pos])
-			self.settings.x_position.read_from_hardware()
-			self.settings.y_position.read_from_hardware()
+			self.read_position()
 
 	def rel_mov(self):
 		if hasattr(self, "stepper_motor"):
 			x_rel_pos = self.settings["x_rel"]
 			y_rel_pos = self.settings["y_rel"]
 			self.stepper_motor.goto([x_rel_pos, y_rel_pos, "r"])
-			self.settings.x_position.read_from_hardware()
-			self.settings.y_position.read_from_hardware()
+			self.read_position()
+
+	def read_position(self):
+		self.settings.x_position.read_from_hardware()
+		self.settings.y_position.read_from_hardware()
 	
 	def disconnect(self):
 		#Disconnect the device and remove connections from settings
