@@ -91,9 +91,9 @@ class StepperMotor_Scan(Measurement):
         self.stage_layout=pg.GraphicsLayoutWidget()
         self.ui.stage_groupBox.layout().addWidget(self.stage_layout)
         self.stage_plot = self.stage_layout.addPlot(title="Stage view")
-        self.stage_plot.setXRange(0, 100)
-        self.stage_plot.setYRange(0, 100)
-        self.stage_plot.setLimits(xMin=0, xMax=100, yMin=0, yMax=100) 
+        # self.stage_plot.setXRange(0, 100)
+        # self.stage_plot.setYRange(0, 100)
+        # self.stage_plot.setLimits(xMin=0, xMax=100, yMin=0, yMax=100) 
 
         #region of interest - allows user to select scan area
         self.scan_roi = pg.ROI([0,0],[25, 25], movable=True)

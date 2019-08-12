@@ -10,19 +10,19 @@ from pyqtgraph.Qt import QtGui, QtCore
 from pyqtgraph.Point import Point
 import customplotting.mscope as cpm
 
-class OceanOptics_Scan(StepperMotor_Scan):
+class OceanOpticsStepperMotor_Scan(StepperMotor_Scan):
 
     name = "OceanOpticsStepperMotor_Scan"
 
     def setup(self):
-        PiezoStage_Scan.setup(self)
+        StepperMotor_Scan.setup(self)
 
         self.settings.New("intg_time",dtype=int, unit='ms', initial=3, vmin=3)
         self.settings.New('correct_dark_counts', dtype=bool, initial=True)
         self.settings.New("scans_to_avg", dtype=int, initial=1, vmin=1)
 
     def setup_figure(self):
-        PiezoStage_Scan.setup_figure(self)
+        StepperMotor_Scan.setup_figure(self)
 
         #setup ui for ocean optics specific settings
         spec_hw = self.app.hardware['oceanoptics']
@@ -66,7 +66,7 @@ class OceanOptics_Scan(StepperMotor_Scan):
             pass
 
     def update_display(self):
-        PiezoStage_Scan.update_display(self)
+        StepperMotor_Scan.update_display(self)
         if hasattr(self, 'spec') and hasattr(self, 'pi_device') and hasattr(self, 'y'): #first, check if setup has happened
             if not self.interrupt_measurement_called:
                 seconds_left = ((self.x_range * self.y_range) - self.pixels_scanned) * self.settings["intg_time"] * 1e-3 + self.overhead
@@ -91,7 +91,7 @@ class OceanOptics_Scan(StepperMotor_Scan):
 
     def pre_run(self):
         try:
-            PiezoStage_Scan.pre_run(self) #setup scan parameters
+            StepperMotor_Scan.pre_run(self) #setup scan parameters
             self.spec = self.spec_hw.spec
             self.check_filename("_raw_PL_spectra_data.pkl")
             
@@ -119,7 +119,7 @@ class OceanOptics_Scan(StepperMotor_Scan):
         """
         Export data.
         """
-        PiezoStage_Scan.post_run(self)
+        StepperMotor_Scan.post_run(self)
         save_dict = {"Wavelengths": self.spec.wavelengths(), "Intensities": self.data_array,
                  "Scan Parameters":{"X scan start (um)": self.x_start, "Y scan start (um)": self.y_start,
                                     "X scan size (um)": self.x_scan_size, "Y scan size (um)": self.y_scan_size,
@@ -149,7 +149,7 @@ class OceanOptics_Scan(StepperMotor_Scan):
 
     def save_intensities_data(self):
         transposed = np.transpose(self.sum_intensities_image_map) #transpose so data visually makes sense
-        PiezoStage_Scan.save_intensities_data(self, transposed, 'oo')
+        StepperMotor_Scan.save_intensities_data(self, transposed, 'oo')
 
     def save_intensities_image(self):
-        PiezoStage_Scan.save_intensities_image(self, self.sum_intensities_image_map, 'oo')
+        StepperMotor_Scan.save_intensities_image(self, self.sum_intensities_image_map, 'oo')
