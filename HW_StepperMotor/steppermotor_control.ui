@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>479</width>
-    <height>643</height>
+    <width>655</width>
+    <height>276</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
      <rect>
       <x>13</x>
       <y>13</y>
-      <width>441</width>
+      <width>561</width>
       <height>171</height>
      </rect>
     </property>
@@ -81,8 +81,8 @@
       <rect>
        <x>190</x>
        <y>30</y>
-       <width>239</width>
-       <height>83</height>
+       <width>356</width>
+       <height>122</height>
       </rect>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
@@ -148,28 +148,14 @@
      </layout>
     </widget>
    </widget>
-   <widget class="QGroupBox" name="stage_groupBox">
-    <property name="geometry">
-     <rect>
-      <x>13</x>
-      <y>200</y>
-      <width>350</width>
-      <height>350</height>
-     </rect>
-    </property>
-    <property name="title">
-     <string>Stage view</string>
-    </property>
-    <layout class="QGridLayout" name="gridLayout"/>
-   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>479</width>
-     <height>21</height>
+     <width>655</width>
+     <height>31</height>
     </rect>
    </property>
   </widget>
