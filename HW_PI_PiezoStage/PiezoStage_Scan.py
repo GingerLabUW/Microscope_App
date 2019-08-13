@@ -406,6 +406,6 @@ class PiezoStage_Scan(Measurement):
         hw_name - string that describes intensities source (ie. oo for oceanoptics, ph for picoharp) 
         """
         append = '_' + hw_name + '_intensity_sums.png'
-        cpm.plot_confocal(intensities_array, stepsize=np.abs(self.settings['x_step']))
+        cpm.plot_confocal(intensities_array, FLIM_adjust=False, stepsize=np.abs(self.settings['x_step']))
         self.check_filename(append)
         plt.savefig(self.app.settings['save_dir'] + '/' + self.app.settings['sample'] + append, bbox_inches='tight', dpi=300)
