@@ -317,7 +317,7 @@ class StepperMotor_Scan(Measurement):
                 else:                
                     #self.pi_device.MVR(axes=self.axes[1], values=[self.y_step])
                     #self.pi_device.MOV(axes=self.axes[0], values=[self.x_start])
-                    self.stepper_motor.goto([self.x_start, self.stepper_motor_hw["y_position"]+self.y_step])
+                    self.stepper_motor.goto([self.x_start, self.stepper_motor_hw.settings["y_position"]+self.y_step])
                 if self.interrupt_measurement_called:
                     break
         elif (self.settings['scan_direction'] == 'YX'): #yx scan
@@ -345,7 +345,7 @@ class StepperMotor_Scan(Measurement):
                 else:                
                     #self.pi_device.MVR(axes=self.axes[0], values=[self.x_step])
                     #self.pi_device.MOV(axes=self.axes[1], values=[self.y_start])
-                    self.stepper_motor.goto([self.stepper_motor_hw["x_position"]+self.x_step, self.y_start])
+                    self.stepper_motor.goto([self.stepper_motor_hw.settings["x_position"]+self.x_step, self.y_start])
                 if self.interrupt_measurement_called:
                     break
         self.scan_complete = True
