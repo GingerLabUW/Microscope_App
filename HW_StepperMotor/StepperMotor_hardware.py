@@ -52,6 +52,11 @@ class StepperMotorHW(HardwareComponent):
 		self.stepper_motor.baudrate = self.settings["new_baudrate"]
 		self.settings.baudrate.read_from_hardware()
 
+	"""
+	Note about movement:
+	For distances less than 2.5um, the motors will round to one of the following: 
+	0, .63, 1.25, 1.88, or 2.5um.
+	"""
 	def abs_mov(self):
 		if hasattr(self, "stepper_motor"):
 			x_abs_pos = self.settings["x_abs"]

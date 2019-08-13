@@ -39,8 +39,8 @@ class StepperMotor_Scan(Measurement):
         self.settings.New('x_size', dtype=float, initial=1, unit='um', vmin=0)
         self.settings.New('y_size', dtype=float, initial=1, unit='um', vmin=0)
 
-        self.settings.New('x_step', dtype=float, initial=1, unit='um', vmin=-99, vmax=99)#vmin=.001)
-        self.settings.New('y_step', dtype=float, initial=1, unit='um', vmin=-99, vmax=99)#vmin=.001)
+        self.settings.New('x_step', dtype=float, initial=1, unit='um', vmin=-99, vmax=1000)#vmin=.001)
+        self.settings.New('y_step', dtype=float, initial=1, unit='um', vmin=-99, vmax=1000)#vmin=.001)
 
         self.settings.New('x_clicked', dtype=float, initial=0, unit='um', vmin=0, vmax=100, ro=True)
         self.settings.New('y_clicked', dtype=float, initial=0, unit='um', vmin=0, vmax=100, ro=True)
