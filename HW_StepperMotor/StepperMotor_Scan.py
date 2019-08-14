@@ -413,4 +413,4 @@ class StepperMotor_Scan(Measurement):
         append = '_' + hw_name + '_intensity_sums.png'
         cpm.plot_confocal(intensities_array, FLIM_adjust=False, stepsize=np.abs(self.settings['x_step']))
         self.check_filename(append)
-        plt.savefig(self.app.settings['save_dir'] + '/' + self.app.settings['sample'] + append, bbox_inches='tight', dpi=300)
+        cpm.plt.savefig(self.app.settings['save_dir'] + '/' + self.app.settings['sample'] + append, bbox_inches='tight', dpi=300)
