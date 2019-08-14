@@ -232,31 +232,17 @@
            <string>Particle selection</string>
           </attribute>
           <layout class="QFormLayout" name="formLayout">
-           <item row="2" column="0">
-            <widget class="QCheckBox" name="first_point_checkBox">
-             <property name="text">
-              <string>First point as origin</string>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="0" colspan="2">
+           <item row="3" column="0" colspan="2">
             <widget class="QTextBrowser" name="textBrowser"/>
            </item>
-           <item row="5" column="0">
+           <item row="4" column="0">
             <widget class="QPushButton" name="export_pushButton">
              <property name="text">
               <string>Export</string>
              </property>
             </widget>
            </item>
-           <item row="7" column="0">
-            <widget class="QPushButton" name="clear_pushButton">
-             <property name="text">
-              <string>Clear selections</string>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="0">
+           <item row="5" column="0">
             <spacer name="verticalSpacer">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
@@ -268,6 +254,13 @@
               </size>
              </property>
             </spacer>
+           </item>
+           <item row="6" column="0">
+            <widget class="QPushButton" name="clear_pushButton">
+             <property name="text">
+              <string>Clear selections</string>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>

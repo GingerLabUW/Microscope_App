@@ -58,7 +58,6 @@ class OceanOpticsMeasure(Measurement):
         self.ui.interrupt_pushButton.clicked.connect(self.interrupt)
         self.ui.saveSingle_pushButton.clicked.connect(self.save_single_spec)
         
-        self.settings.progress.connect_to_widget(self.ui.progressBar)
         self.settings.save_every_spec.connect_to_widget(self.ui.save_every_spec_checkBox)
         self.settings.scans_to_avg.connect_to_widget(self.ui.scans_to_avg_spinBox)
         self.spec_hw.settings.correct_dark_counts.connect_to_widget(self.ui.correct_dark_counts_checkBox)
@@ -83,10 +82,6 @@ class OceanOpticsMeasure(Measurement):
         its update frequency is defined by self.display_update_period
         """
         if hasattr(self, 'spec') and hasattr(self, 'y'):
-            time_remaining = (self.total_time - self.elapsed_time) #ms
-            self.ui.time_remaining_label.setText("%.2f" % (time_remaining * 1e-3) + "s") #in seconds
-            self.ui.progressBar.setValue((self.elapsed_time/self.total_time) * 100)
-
             self.plot.plot(self.spec.wavelengths(), self.y, pen='r', clear=True)
             pg.QtGui.QApplication.processEvents()
 
@@ -101,7 +96,6 @@ class OceanOpticsMeasure(Measurement):
         self.check_filename(".txt")
         self.spec = self.spec_hw.spec
         self.total_time = self.spec_hw.settings['intg_time'] * self.settings['scans_to_avg'] #ms
-        self.elapsed_time = 0 #ms
         while not self.interrupt_measurement_called:
             self._read_spectrometer()
             self.save_array[:,1] = self.y
@@ -111,7 +105,6 @@ class OceanOpticsMeasure(Measurement):
                 self.point_counter += 1
             if self.interrupt_measurement_called:
                 break
-        self.ui.time_remaining_label.setText("0s")
 
     def save_single_spec(self):
         '''
@@ -138,7 +131,6 @@ class OceanOpticsMeasure(Measurement):
                 data = self.spec.spectrum(correct_dark_counts=self.spec_hw.settings['correct_dark_counts']) #data as wavelengths, intensities array   
                 Int_array[:,i] = data[1]
                 self.y = np.mean(Int_array, axis=-1)
-                self.elapsed_time += self.spec_hw.settings['intg_time'] #ms
 
     def check_filename(self, append):
         '''
