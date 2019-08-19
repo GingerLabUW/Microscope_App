@@ -19,6 +19,8 @@ class MicroscopeApp(BaseMicroscopeApp):
 		self.add_hardware(PicoHarpHW(self))
 		from HW_StepperMotor.StepperMotor_hardware import StepperMotorHW
 		self.add_hardware(StepperMotorHW(self))
+		from HW_APD_StepperMotor.APD_StepperMotor_hardware import APDStepperMotorHW
+		self.add_hardware(APDStepperMotorHW(self))
 
 		#Add Measurement components
 		from HW_OceanOptics.OceanOptics_measurement import OceanOpticsMeasure
@@ -46,6 +48,9 @@ class MicroscopeApp(BaseMicroscopeApp):
 		self.add_measurement(OceanOpticsStepperMotor_Scan)
 		from HW_StepperMotor.StepperMotor_control import StepperMotorControl
 		self.add_measurement(StepperMotorControl)
+
+		from HW_Picoharp.picoharp_apd_scan import PicoHarp_APD_Scan
+		self.add_measurement(PicoHarp_APD_Scan)
 		
 
 		# show ui
