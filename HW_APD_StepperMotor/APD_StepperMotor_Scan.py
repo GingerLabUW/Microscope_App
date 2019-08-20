@@ -178,9 +178,9 @@ class APD_StepperMotor_Scan(Measurement):
 
         self.apd_steppermotor_hw.read_position()
 
-        #store motor start position for post-run
-        self.x_start = self.apd_steppermotor_hw.settings['x_position']
-        self.y_start = self.apd_steppermotor_hw.settings['y_position']
+        #store motor center position for post-run
+        self.x_center = self.apd_steppermotor_hw.settings['x_position']
+        self.y_center = self.apd_steppermotor_hw.settings['y_position']
 
         #determine relative movements to move stage to correct start position
         x_rel = -self.x_scan_size / 2
@@ -274,7 +274,7 @@ class APD_StepperMotor_Scan(Measurement):
         self.handle2 = self.scan_roi.addScaleHandle([0, 0], [1, 1])
         for lqname in "scan_direction x_size y_size x_step y_step".split():
             self.settings.as_dict()[lqname].change_readonly(False)
-        self.apd_steppermotor.goto([self.x_start, self.y_start]) #reset stepper motor position
+        self.apd_steppermotor.goto([self.x_center, self.y_center]) #reset stepper motor position
             
     def scan_measure(self):
         """
@@ -329,6 +329,6 @@ class APD_StepperMotor_Scan(Measurement):
         hw_name - string that describes intensities source (ie. oo for oceanoptics, ph for picoharp) 
         """
         append = '_' + hw_name + '_intensity_sums.png'
-        cpm.plot_confocal(intensities_array, FLIM_adjust=False, stepsize=np.abs(self.settings['x_step']))
+        cpm.plot_confocal(intensities_array, stepsize=np.abs(self.settings['x_step']))
         self.check_filename(append)
         cpm.plt.savefig(self.app.settings['save_dir'] + '/' + self.app.settings['sample'] + append, bbox_inches='tight', dpi=300)
