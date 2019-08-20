@@ -22,7 +22,7 @@ class APD_StepperMotor_Scan(Measurement):
         # This file can be edited graphically with Qt Creator
         # sibling_path function allows python to find a file in the same folder
         # as this python module
-        self.ui_filename = sibling_path(__file__, "stage_scan.ui")
+        self.ui_filename = sibling_path(__file__, "apd_stage_scan.ui")
         
         #Load ui file and convert it to a live QWidget of the user interface
         self.ui = load_qt_ui_file(self.ui_filename)
@@ -31,9 +31,7 @@ class APD_StepperMotor_Scan(Measurement):
         # This setting allows the option to save data to an h5 data file during a run
         # All settings are automatically added to the Microscope user interface
         self.settings.New("scan_direction", dtype=str, choices=[('XY', 'XY'), ('YX', 'YX')], initial='XY')
-
-        self.settings.New('x_start', dtype=float, unit='um', vmin=0)
-        self.settings.New('y_start', dtype=float, unit='um', vmin=0)
+        self.settings.New('magnification', dtype=float, vmin=1, vmax=1000, initial=1)
     
         self.settings.New('x_size', dtype=float, initial=1, unit='um', vmin=0)
         self.settings.New('y_size', dtype=float, initial=1, unit='um', vmin=0)
@@ -41,27 +39,15 @@ class APD_StepperMotor_Scan(Measurement):
         self.settings.New('x_step', dtype=float, initial=1, unit='um', vmin=-99, vmax=1000)#vmin=.001)
         self.settings.New('y_step', dtype=float, initial=1, unit='um', vmin=-99, vmax=1000)#vmin=.001)
 
-        self.settings.New('x_clicked', dtype=float, initial=0, unit='um', vmin=0, vmax=100, ro=True)
-        self.settings.New('y_clicked', dtype=float, initial=0, unit='um', vmin=0, vmax=100, ro=True)
-
-        self.settings.New('lock_position', dtype=bool, initial=False)
-        self.settings.New('save_positions', dtype=bool, initial=False)
-
         self.update_ranges()
         
         # Define how often to update display during a run
         self.display_update_period = .3
         
         # Convenient reference to the hardware used in the measurement
-        self.spec_hw = self.app.hardware['oceanoptics']
         self.apd_steppermotor_hw = self.app.hardware['apd_steppermotor']
         
-        self.spec_measure = self.app.measurements['oceanoptics_measure']
-
         self.scan_complete = False
-
-        self.selected_positions = np.zeros((1000, 2))
-        self.selected_count = 0 #number of points selected
 
     def setup_figure(self):
         """
@@ -74,28 +60,23 @@ class APD_StepperMotor_Scan(Measurement):
         self.apd_steppermotor_hw.settings.x_position.connect_to_widget(self.ui.x_pos_doubleSpinBox)
         self.apd_steppermotor_hw.settings.y_position.connect_to_widget(self.ui.y_pos_doubleSpinBox)
         self.settings.scan_direction.connect_to_widget(self.ui.scan_comboBox)
-        self.settings.x_start.connect_to_widget(self.ui.x_start_doubleSpinBox)
-        self.settings.y_start.connect_to_widget(self.ui.y_start_doubleSpinBox)    
+        self.settings.magnification.connect_to_widget(self.ui.magnification_spinBox)
         self.settings.x_size.connect_to_widget(self.ui.x_size_doubleSpinBox)
         self.settings.y_size.connect_to_widget(self.ui.y_size_doubleSpinBox)
         self.settings.x_step.connect_to_widget(self.ui.x_step_doubleSpinBox)
         self.settings.y_step.connect_to_widget(self.ui.y_step_doubleSpinBox)
-        self.settings.x_clicked.connect_to_widget(self.ui.x_clicked_doubleSpinBox)
-        self.settings.y_clicked.connect_to_widget(self.ui.y_clicked_doubleSpinBox)
-        self.settings.lock_position.connect_to_widget(self.ui.lock_position_checkBox)
-        self.settings.save_positions.connect_to_widget(self.ui.save_positions_checkBox)
         self.settings.progress.connect_to_widget(self.ui.progressBar)
 
         #stage ui base
         self.stage_layout=pg.GraphicsLayoutWidget()
         self.ui.stage_groupBox.layout().addWidget(self.stage_layout)
         self.stage_plot = self.stage_layout.addPlot(title="Stage view")
-        # self.stage_plot.setXRange(0, 100)
-        # self.stage_plot.setYRange(0, 100)
-        # self.stage_plot.setLimits(xMin=0, xMax=100, yMin=0, yMax=100) 
+        self.stage_plot.setXRange(0, 100000) # todo - figure out actual stage range
+        self.stage_plot.setYRange(0, 100000)
+        self.stage_plot.setLimits(xMin=0, xMax=1000000, yMin=0, yMax=100000) 
 
         #region of interest - allows user to select scan area
-        self.scan_roi = pg.ROI([0,0],[25, 25], movable=True)
+        self.scan_roi = pg.ROI([0,0],[25, 25], movable=False)
         self.handle1 = self.scan_roi.addScaleHandle([1, 1], [0, 0])
         self.handle2 = self.scan_roi.addScaleHandle([0, 0], [1, 1])        
         self.scan_roi.sigRegionChangeFinished.connect(self.mouse_update_scan_roi)
@@ -105,16 +86,9 @@ class APD_StepperMotor_Scan(Measurement):
         #setup ui signals
         self.ui.start_scan_pushButton.clicked.connect(self.start)
         self.ui.interrupt_scan_pushButton.clicked.connect(self.interrupt)
-        self.ui.move_to_selected_pushButton.clicked.connect(self.move_to_selected)
-        self.ui.export_positions_pushButton.clicked.connect(self.export_positions)
 
-        self.ui.x_start_doubleSpinBox.valueChanged.connect(self.update_roi_start)
-        self.ui.y_start_doubleSpinBox.valueChanged.connect(self.update_roi_start)
         self.ui.x_size_doubleSpinBox.valueChanged.connect(self.update_roi_size)
         self.ui.y_size_doubleSpinBox.valueChanged.connect(self.update_roi_size)
-        self.ui.x_step_doubleSpinBox.valueChanged.connect(self.update_roi_start)
-        self.ui.y_step_doubleSpinBox.valueChanged.connect(self.update_roi_start)
-
         self.ui.x_size_doubleSpinBox.valueChanged.connect(self.update_ranges)
         self.ui.y_size_doubleSpinBox.valueChanged.connect(self.update_ranges)
         self.ui.x_step_doubleSpinBox.valueChanged.connect(self.update_ranges)
@@ -139,67 +113,11 @@ class APD_StepperMotor_Scan(Measurement):
         self.apd_steppermotor_hw.settings.x_position.updated_value.connect(self.update_arrow_pos, QtCore.Qt.UniqueConnection)
         self.apd_steppermotor_hw.settings.y_position.updated_value.connect(self.update_arrow_pos, QtCore.Qt.UniqueConnection)
 
-        #Define crosshairs that will show up after scan, event handling.
-        self.vLine = pg.InfiniteLine(angle=90, movable=False, pen='r')
-        self.hLine = pg.InfiniteLine(angle=0, movable=False, pen='r')
-        self.stage_plot.scene().sigMouseClicked.connect(self.ch_click)
-
-    def ch_click(self, event):
-        '''
-        Handle crosshair clicking, which toggles movement on and off.
-        '''
-        pos = event.scenePos()
-        if not self.settings['lock_position'] and self.stage_plot.sceneBoundingRect().contains(pos):
-            mousePoint = self.stage_plot.vb.mapSceneToView(pos)
-            self.vLine.setPos(mousePoint.x())
-            self.hLine.setPos(mousePoint.y())
-            self.settings['x_clicked'] = mousePoint.x()
-            self.settings['y_clicked'] = mousePoint.y()
-            if self.settings['save_positions']:
-                self.selected_positions[self.selected_count, 0] = mousePoint.x()
-                self.selected_positions[self.selected_count, 1] = mousePoint.y()
-                self.selected_count += 1
-
-    def export_positions(self):
-        """ Export selected positions into txt. """
-        self.check_filename("_selected_positions.txt")
-        trimmed = self.selected_positions[~np.all(self.selected_positions == 0, axis=1)] #get rid of empty rows
-        np.savetxt(self.app.settings['save_dir']+"/"+ self.app.settings['sample'] + "_selected_positions.txt", trimmed, fmt='%f')
-
-    def move_to_selected(self):
-        """Move stage to position selected by crosshairs."""
-        if self.scan_complete and hasattr(self, "apd_steppermotor"):
-            x = self.settings['x_clicked']
-            y = self.settings['y_clicked']
-            self.apd_steppermotor.goto([x, y])
-            self.apd_steppermotor_hw.read_position()
-
     def mouse_update_scan_roi(self):
         """Update settings and spinboxes to reflect region of interest."""
-        x0,y0 =  self.scan_roi.pos()
         w, h =  self.scan_roi.size()
-        if self.settings['x_step'] > 0: 
-            self.settings['x_start'] = x0
-        else: 
-            self.settings['x_start'] = x0 + w
-
-        if self.settings['y_step'] > 0:
-            self.settings['y_start'] = y0
-        else:
-            self.settings['y_start'] = y0 + h 
-
         self.settings['x_size'] = w
         self.settings['y_size'] = h
-
-    def update_roi_start(self):
-        """Update region of interest start position according to spinboxes"""
-        x_roi = self.settings['x_start'] #default start values that work with positive x and y steps
-        y_roi = self.settings['y_start']
-        if self.settings['x_step'] < 0:
-            x_roi = self.settings['x_start'] - self.settings['x_size']
-        if self.settings['y_step'] < 0:
-            y_roi = self.settings['y_start'] - self.settings['y_size']
-        self.scan_roi.setPos(x_roi, y_roi)
 
     def update_roi_size(self):
         ''' Update region of interest size according to spinboxes '''
@@ -210,25 +128,25 @@ class APD_StepperMotor_Scan(Measurement):
         Update # of pixels calculation (x_range and y_range) when spinboxes change
         This is important in getting estimated scan time before scan starts.
         """
-        self.x_scan_size = self.settings['x_size']
-        self.y_scan_size = self.settings['y_size']
+        self.x_scan_size = self.settings['x_size'] * self.settings['magnification']
+        self.y_scan_size = self.settings['y_size'] * self.settings['magnification']
         
-        self.x_step = self.settings['x_step']
-        self.y_step = self.settings['y_step']
+        self.x_step = self.settings['x_step'] * self.settings['magnification']
+        self.y_step = self.settings['y_step'] * self.settings['magnification']
 
         if self.y_scan_size == 0:
-            self.y_scan_size = 1
-            self.y_step = 1
+            self.y_scan_size = self.settings['magnification']
+            self.y_step = self.settings['magnification']
         
         if self.x_scan_size == 0:
-            self.x_scan_size = 1
-            self.x_step = 1
+            self.x_scan_size = self.settings['magnification']
+            self.x_step = self.settings['magnification']
         
         if self.y_step == 0:
-            self.y_step = 1
+            self.y_step = self.settings['magnification']
             
         if self.x_step == 0:
-            self.x_step = 1
+            self.x_step = self.settings['magnification']
 
         self.x_range = np.abs(int(np.ceil(self.x_scan_size/self.x_step)))
         self.y_range = np.abs(int(np.ceil(self.y_scan_size/self.y_step)))
@@ -255,15 +173,24 @@ class APD_StepperMotor_Scan(Measurement):
         #disable roi and spinboxes during scan
         self.scan_roi.removeHandle(self.handle1)
         self.scan_roi.removeHandle(self.handle2)
-        self.scan_roi.translatable = False
-        for lqname in "scan_direction x_start y_start x_size y_size x_step y_step".split():
+        for lqname in "scan_direction x_size y_size x_step y_step".split():
             self.settings.as_dict()[lqname].change_readonly(True)
 
-        self.x_start = self.settings['x_start']
-        self.y_start = self.settings['y_start']
-
-        self.apd_steppermotor.goto([self.x_start, self.y_start])
         self.apd_steppermotor_hw.read_position()
+
+        #store motor start position for post-run
+        self.x_start = self.apd_steppermotor_hw.settings['x_position']
+        self.y_start = self.apd_steppermotor_hw.settings['y_position']
+
+        #determine relative movements to move stage to correct start position
+        x_rel = -self.x_scan_size / 2
+        y_rel = -self.y_scan_size / 2
+        if self.x_step < 0:
+            x_rel = x_rel * -1
+        if self.y_step < 0:
+            y_rel = y_rel * -1
+
+        self.apd_steppermotor.goto([x_rel, y_rel, "r"])
 
     def update_display(self):
         """
@@ -280,14 +207,6 @@ class APD_StepperMotor_Scan(Measurement):
             self.ui.estimated_time_label.setText("Estimated time remaining: 0s")
             self.ui.progressBar.setValue(100)
             self.set_progress(100)
-            self.stage_plot.addItem(self.hLine)
-            self.stage_plot.addItem(self.vLine)
-
-            x, y = self.scan_roi.pos()
-            middle_x = x + self.settings['x_size']/2
-            middle_y = y + self.settings['y_size']/2
-            self.hLine.setPos(middle_y)
-            self.vLine.setPos(middle_x)
 
     def run(self):
         self.scan_complete = False
@@ -316,7 +235,7 @@ class APD_StepperMotor_Scan(Measurement):
                 else:                
                     #self.pi_device.MVR(axes=self.axes[1], values=[self.y_step])
                     #self.pi_device.MOV(axes=self.axes[0], values=[self.x_start])
-                    self.apd_steppermotor.goto([self.x_start, self.apd_steppermotor_hw.settings["y_position"]+self.y_step])
+                    self.apd_steppermotor.goto([-self.x_scan_size, self.y_step, "r"])
                 if self.interrupt_measurement_called:
                     break
         elif (self.settings['scan_direction'] == 'YX'): #yx scan
@@ -344,7 +263,7 @@ class APD_StepperMotor_Scan(Measurement):
                 else:                
                     #self.pi_device.MVR(axes=self.axes[0], values=[self.x_step])
                     #self.pi_device.MOV(axes=self.axes[1], values=[self.y_start])
-                    self.apd_steppermotor.goto([self.apd_steppermotor_hw.settings["x_position"]+self.x_step, self.y_start])
+                    self.apd_steppermotor.goto([self.x_step, -self.y_scan_size, "r"])
                 if self.interrupt_measurement_called:
                     break
         self.scan_complete = True
@@ -353,9 +272,9 @@ class APD_StepperMotor_Scan(Measurement):
         """Re-enable roi and spinboxes. """
         self.handle1 = self.scan_roi.addScaleHandle([1, 1], [0, 0])
         self.handle2 = self.scan_roi.addScaleHandle([0, 0], [1, 1])
-        self.scan_roi.translatable = True
-        for lqname in "scan_direction x_start y_start x_size y_size x_step y_step".split():
+        for lqname in "scan_direction x_size y_size x_step y_step".split():
             self.settings.as_dict()[lqname].change_readonly(False)
+        self.apd_steppermotor.goto([self.x_start, self.y_start]) #reset stepper motor position
             
     def scan_measure(self):
         """

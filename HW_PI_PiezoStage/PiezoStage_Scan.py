@@ -54,10 +54,7 @@ class PiezoStage_Scan(Measurement):
         self.display_update_period = .3
         
         # Convenient reference to the hardware used in the measurement
-        self.spec_hw = self.app.hardware['oceanoptics']
         self.pi_device_hw = self.app.hardware['piezostage']
-        
-        self.spec_measure = self.app.measurements['oceanoptics_measure']
 
         self.scan_complete = False
 
