@@ -139,6 +139,8 @@ class PicoHarp_Scan(PiezoStage_Scan):
                                                               "Resolution (ps)": self.settings['Resolution']} }
 
         pickle.dump(save_dict, open(self.app.settings['save_dir']+"/"+self.app.settings['sample']+"_raw_PL_hist_data.pkl", "wb"))
+        os.remove(self.hist_filename)
+        os.remove(self.time_filename)
 
     def measure_hist(self):
         """ Read from picoharp """
