@@ -291,6 +291,7 @@ class PiezoStage_Scan(Measurement):
     def run(self):
         self.scan_complete = False
         self.pixels_scanned = 0 #keep track of scan/'pixel' number
+        t2 = time.time()
         if (self.settings['scan_direction'] == 'XY'): #xy scan
             for i in range(self.y_range):
                 for j in range(self.x_range):
@@ -323,7 +324,7 @@ class PiezoStage_Scan(Measurement):
                 if self.interrupt_measurement_called:
                     break
         elif (self.settings['scan_direction'] == 'YX'): #yx scan
-            t2 = time.time()
+            
             for i in range(self.x_range):
                 for j in range(self.y_range):
                     t0 = time.time()
@@ -357,8 +358,8 @@ class PiezoStage_Scan(Measurement):
                     self.pi_device.MOV(axes=self.axes[1], values=[self.y_start])
                 if self.interrupt_measurement_called:
                     break
-            if self.pi_device_hw.settings["debug_mode"]:
-                print("Total scan time: " + str(time.time() - t2))
+        if self.pi_device_hw.settings["debug_mode"]:
+            print("Total scan time: " + str(time.time() - t2))
         self.scan_complete = True
         
     def post_run(self):
