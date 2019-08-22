@@ -157,13 +157,17 @@ class PiezoStage_Scan(Measurement):
                 self.selected_positions[self.selected_count, 0] = mousePoint.x()
                 self.selected_positions[self.selected_count, 1] = mousePoint.y()
                 self.selected_count += 1
+                if self.pi_device_hw.settings["debug_mode"]:
+                    print("Point appended.")
 
     def export_positions(self):
         """ Export selected positions into txt. """
         self.check_filename("_selected_positions.txt")
         trimmed = self.selected_positions[~np.all(self.selected_positions == 0, axis=1)] #get rid of empty rows
         np.savetxt(self.app.settings['save_dir']+"/"+ self.app.settings['sample'] + "_selected_positions.txt", trimmed, fmt='%f')
-
+        if self.pi_device_hw.settings["debug_mode"]:
+            print("Selected points saved.")
+            
     def move_to_selected(self):
         """Move stage to position selected by crosshairs."""
         if self.scan_complete and hasattr(self, 'pi_device'):

@@ -25,7 +25,7 @@ class OceanOptics_Scan(PiezoStage_Scan):
         PiezoStage_Scan.setup_figure(self)
 
         #setup ui for ocean optics specific settings
-        spec_hw = self.app.hardware['oceanoptics']
+        self.spec_hw = self.app.hardware['oceanoptics']
         self.pi_device_hw = self.app.hardware['piezostage']
         
         details_groupBox = self.set_details_widget(widget = self.settings.New_UI(include=["intg_time", "correct_dark_counts", "scans_to_avg"]))
@@ -34,8 +34,8 @@ class OceanOptics_Scan(PiezoStage_Scan):
         correct_dark_counts_checkBox = widgets[4]
         #scans_to_avg_spinBox = widgets[6]
         #connect settings to ui
-        spec_hw.settings.intg_time.connect_to_widget(intg_time_spinBox)
-        spec_hw.settings.correct_dark_counts.connect_to_widget(correct_dark_counts_checkBox)
+        self.spec_hw.settings.intg_time.connect_to_widget(intg_time_spinBox)
+        self.spec_hw.settings.correct_dark_counts.connect_to_widget(correct_dark_counts_checkBox)
         intg_time_spinBox.valueChanged.connect(self.update_estimated_scan_time)
         
         #save data buttons
@@ -122,11 +122,12 @@ class OceanOptics_Scan(PiezoStage_Scan):
         """
         PiezoStage_Scan.post_run(self)
         save_dict = {"Wavelengths": self.spec.wavelengths(), "Intensities": self.data_array,
-                 "Scan Parameters":{"X scan start (um)": self.x_start, "Y scan start (um)": self.y_start,
+                 "Scan Parameters":{"Scan direction": self.settings["scan_direction"],
+                         "X scan start (um)": self.x_start, "Y scan start (um)": self.y_start,
                                     "X scan size (um)": self.x_scan_size, "Y scan size (um)": self.y_scan_size,
                                     "X step size (um)": self.x_step, "Y step size (um)": self.y_step},
                                     "OceanOptics Parameters":{"Integration Time (ms)": self.spec_hw.settings['intg_time'],
-                                                              "Scans Averages": self.spec_measure.settings['scans_to_avg'],
+                                                              "Scans Averages": self.settings['scans_to_avg'],
                                                               "Correct Dark Counts": self.spec_hw.settings['correct_dark_counts']}
                  }
 
@@ -142,7 +143,7 @@ class OceanOptics_Scan(PiezoStage_Scan):
             intg_time_ms = self.spec_hw.settings['intg_time']
             self.spec.integration_time_micros(intg_time_ms*1e3) #seabreeze error checking
             
-            scans_to_avg = self.spec_measure.settings['scans_to_avg']
+            scans_to_avg = self.settings['scans_to_avg']
             Int_array = np.zeros(shape=(2048,scans_to_avg))
             
             for i in range(scans_to_avg): #software average
