@@ -294,6 +294,7 @@ class PiezoStage_Scan(Measurement):
         if (self.settings['scan_direction'] == 'XY'): #xy scan
             for i in range(self.y_range):
                 for j in range(self.x_range):
+                    t0 = time.time()
                     if self.interrupt_measurement_called:
                         break
                     #make sure the right indices of image arrays are updated
@@ -303,9 +304,15 @@ class PiezoStage_Scan(Measurement):
                         self.index_x = self.x_range - j - 1
                     if self.y_step < 0:
                         self.index_y = self.y_range - i - 1
+                    t1 = time.time()
                     self.scan_measure() #defined in hardware-specific scans
+                    if self.pi_device_hw.settings["debug_mode"]:
+                        print("Scan measure time: " + str(time.time() -t0))
                     self.pi_device.MVR(axes=self.axes[0], values=[self.x_step])
                     self.pixels_scanned+=1
+
+                    if self.pi_device_hw.settings["debug_mode"]:
+                        print("Pixel scan time: " + str(time.time() - t0) )
                 # TODO
                 # if statement needs to be modified to keep the stage at the finish y-pos for line scans in x, and same for y
                 if i == self.y_range-1: # this if statement is there to keep the stage at the finish position (in x) and not bring it back like we were doing during the scan 
@@ -331,6 +338,8 @@ class PiezoStage_Scan(Measurement):
                     self.scan_measure()
                     self.pi_device.MVR(axes=self.axes[1], values=[self.y_step])
                     self.pixels_scanned+=1
+
+                    if self.
                 # TODO
                 # if statement needs to be modified to keep the stage at the finish y-pos for line scans in x, and same for y
                 if i == self.x_range-1: # this if statement is there to keep the stage at the finish position (in x) and not bring it back like we were doing during the scan 
@@ -349,6 +358,8 @@ class PiezoStage_Scan(Measurement):
         self.scan_roi.translatable = True
         for lqname in "scan_direction x_start y_start x_size y_size x_step y_step".split():
             self.settings.as_dict()[lqname].change_readonly(False)
+        if self.pi_device_hw.settings["debug_mode"]:
+            print("Scan complete.")
             
     def scan_measure(self):
         """
@@ -397,6 +408,9 @@ class PiezoStage_Scan(Measurement):
         transposed = np.transpose(intensities_array)
         np.savetxt(self.app.settings['save_dir']+"/"+ self.app.settings['sample'] + append, transposed, fmt='%f')
 
+        if self.pi_device_hw.settings["debug_mode"]:
+            print("Intensities array saved.")
+
     def save_intensities_image(self, intensities_array, hw_name):
         """
         intensities_array - array of intensities to save as image
@@ -406,3 +420,5 @@ class PiezoStage_Scan(Measurement):
         cpm.plot_confocal(intensities_array, stepsize=np.abs(self.settings['x_step']))
         self.check_filename(append)
         cpm.plt.savefig(self.app.settings['save_dir'] + '/' + self.app.settings['sample'] + append, bbox_inches='tight', dpi=300)
+        if self.pi_device_hw.settings["debug_mode"]:
+            print("Intensities image saved.")

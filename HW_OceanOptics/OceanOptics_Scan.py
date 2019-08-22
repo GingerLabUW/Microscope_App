@@ -26,6 +26,8 @@ class OceanOptics_Scan(PiezoStage_Scan):
 
         #setup ui for ocean optics specific settings
         spec_hw = self.app.hardware['oceanoptics']
+        self.pi_device_hw = self.app.hardware['piezostage']
+        
         details_groupBox = self.set_details_widget(widget = self.settings.New_UI(include=["intg_time", "correct_dark_counts", "scans_to_avg"]))
         widgets = details_groupBox.findChildren(QtGui.QWidget)
         intg_time_spinBox = widgets[1]
@@ -129,6 +131,8 @@ class OceanOptics_Scan(PiezoStage_Scan):
                  }
 
         pickle.dump(save_dict, open(self.app.settings['save_dir']+"/"+self.app.settings['sample']+"_raw_PL_spectra_data.pkl", "wb"))
+        if self.pi_device_hw.settings["debug_mode"]:
+            print("OceanOptics scan data saved.")
 
     def _read_spectrometer(self):
         '''
