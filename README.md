@@ -93,7 +93,7 @@ Confocal Microscope App
 ![PI Piezo Stage Control](https://github.com/SarthakJariwala/Microscope_App/blob/stepper_motor/Screenshots/Microscope_App_pi_control.png)
 ### Particle Selection
 ![Particle Selection](https://github.com/SarthakJariwala/Microscope_App/blob/stepper_motor/Screenshots/Microscope_App_particle_selection1.png)
-(https://github.com/SarthakJariwala/Microscope_App/blob/stepper_motor/Screenshots/Microscpoe_App_particle_selection2.png)
+(https://github.com/SarthakJariwala/Microscope_App/blob/stepper_motor/Screenshots/Microscope_App_particle_selection2.png)
 ### Particle Spectra Measurement
 ![Particle Spectra Measurement](https://github.com/SarthakJariwala/Microscope_App/blob/stepper_motor/Screenshots/Microscope_App_particle_spectra.png)
 ### Stepper Motor Control
