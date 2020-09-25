@@ -8,7 +8,6 @@ import pickle
 import os.path
 from pyqtgraph.Qt import QtGui, QtCore
 from pyqtgraph.Point import Point
-import customplotting.mscope as cpm
 
 class OceanOptics_Scan(PiezoStage_Scan):
 

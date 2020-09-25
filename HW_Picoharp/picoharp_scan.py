@@ -8,7 +8,6 @@ import pickle
 import os.path
 from pyqtgraph.Qt import QtGui, QtCore, QtWidgets
 from pyqtgraph.Point import Point
-import customplotting.mscope as cpm
 
 class PicoHarp_Scan(PiezoStage_Scan):
 
