@@ -7,7 +7,7 @@ import pickle
 import os.path
 from pyqtgraph.Qt import QtGui, QtCore
 from pyqtgraph.Point import Point
-import customplotting.mscope as cpm
+import seaborn_image as isns
 
 class PiezoStage_Scan(Measurement):
     name = "PiezoStage_Scan"
@@ -406,6 +406,7 @@ class PiezoStage_Scan(Measurement):
         hw_name - string that describes intensities source (ie. oo for oceanoptics, ph for picoharp) 
         """
         append = '_' + hw_name + '_intensity_sums.png'
-        cpm.plot_confocal(intensities_array, stepsize=np.abs(self.settings['x_step']))
+        isns.imgplot(intensities_array, dx=np.abs(self.settings['x_step']), units=self.settings['x_step'].unit)
+        # cpm.plot_confocal(intensities_array, stepsize=np.abs(self.settings['x_step']))
         self.check_filename(append)
         plt.savefig(self.app.settings['save_dir'] + '/' + self.app.settings['sample'] + append, bbox_inches='tight', dpi=300)
