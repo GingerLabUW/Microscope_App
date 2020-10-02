@@ -1,49 +1,44 @@
-from HW_PI_PiezoStage.PiezoStage_Scan import PiezoStage_Scan
+from HW_APD_StepperMotor.APD_StepperMotor_Scan import APD_StepperMotor_Scan
 from ScopeFoundry import Measurement
 from ScopeFoundry.helper_funcs import sibling_path, load_qt_ui_file
 import pyqtgraph as pg
 import numpy as np
 import time
 import pickle
-import os.path
 from pyqtgraph.Qt import QtGui, QtCore, QtWidgets
 from pyqtgraph.Point import Point
 import customplotting.mscope as cpm
 
-class PicoHarp_Scan(PiezoStage_Scan):
+class PicoHarp_APD_Scan(APD_StepperMotor_Scan):
 
-    name = "PicoHarp_Scan"
+    name = "PicoHarp_APD_Scan"
 
     def setup(self):
-        PiezoStage_Scan.setup(self)
+        APD_StepperMotor_Scan.setup(self)
 
         self.picoharp_hw = self.app.hardware['picoharp']
-        self.pi_device_hw = self.app.hardware['piezostage']
+        self.apd_steppermotor_hw = self.app.hardware['apd_steppermotor']
 
         self.settings.New("Tacq", unit="s", dtype=float, vmin=1e-3, vmax=100*60*60, initial=1) #removed si=True to keep units from auto-changing
         self.settings.New("Resolution", dtype=int, choices=[("4 ps", 4), ("8 ps", 8), ("16 ps", 16), ("32 ps", 32), ("64 ps", 64), ("128 ps", 128), ("256 ps", 256), ("512 ps", 512)], initial=4)
         self.settings.New("count_rate0", dtype=int, ro=True, vmin=0, vmax=100e6)
         self.settings.New("count_rate1", dtype=int, ro=True, vmin=0, vmax=100e6)
-        self.settings.New("flush_data", dtype=bool, initial=False)
 
     def setup_figure(self):
-        PiezoStage_Scan.setup_figure(self)
+        APD_StepperMotor_Scan.setup_figure(self)
 
         #setup ui for picoharp specific settings
-        details_groupBox = self.set_details_widget(widget = self.settings.New_UI(include=["Tacq", "Resolution", "count_rate0", "count_rate1", "flush_data"]))
+        details_groupBox = self.set_details_widget(widget = self.settings.New_UI(include=["Tacq", "Resolution", "count_rate0", "count_rate1"]))
         widgets = details_groupBox.findChildren(QtGui.QWidget)
         tacq_spinBox = widgets[1]
         resolution_comboBox = widgets[4]
         count_rate0_spinBox = widgets[6]
         count_rate1_spinBox = widgets[9]
-        flush_data_checkBox = widgets[12]
-        
         #connect settings to ui
         self.picoharp_hw.settings.Tacq.connect_to_widget(tacq_spinBox)
         self.picoharp_hw.settings.Resolution.connect_to_widget(resolution_comboBox)
         self.picoharp_hw.settings.count_rate0.connect_to_widget(count_rate0_spinBox)
         self.picoharp_hw.settings.count_rate1.connect_to_widget(count_rate1_spinBox)
-        self.settings.flush_data.connect_to_widget(flush_data_checkBox)
 
         tacq_spinBox.valueChanged.connect(self.update_estimated_scan_time)
         self.update_estimated_scan_time()
@@ -69,8 +64,8 @@ class PicoHarp_Scan(PiezoStage_Scan):
             pass
             
     def update_display(self):
-        PiezoStage_Scan.update_display(self)
-        if hasattr(self, 'sum_intensities_image_map') and hasattr(self, 'hist_data'):
+        APD_StepperMotor_Scan.update_display(self)
+        if hasattr(self, 'sum_intensities_image_map'):
             self.picoharp_hw.read_from_hardware()
             if not self.interrupt_measurement_called:
                 per_pixel = self.scan_time/(self.x_range * self.y_range)
@@ -92,7 +87,7 @@ class PicoHarp_Scan(PiezoStage_Scan):
 
     def pre_run(self):
         try:
-            PiezoStage_Scan.pre_run(self) #setup scan paramters
+            APD_StepperMotor_Scan.pre_run(self) #setup scan paramters
             self.picoharp = self.picoharp_hw.picoharp
             self.check_filename("_raw_PL_hist_data.pkl")
             self.num_hist_chans = self.app.hardware['picoharp'].calc_num_hist_chans()
@@ -126,40 +121,23 @@ class PicoHarp_Scan(PiezoStage_Scan):
         #t1 = time.time()
         self.time_data[:, self.index_x, self.index_y], self.hist_data[:, self.index_x, self.index_y] = data
         self.sum_intensities_image_map[self.index_x, self.index_y] = sum(data[1])
-        if self.settings['flush_data']:
-            if (self.settings['scan_direction'] == 'XY' and self.pixels_scanned % self.x_range == 0) or \
-                    ((self.settings['scan_direction'] == 'YX' and self.pixels_scanned % self.y_range == 0)):       
-                self.time_data.flush()
-                self.hist_data.flush()
-                if self.pi_device_hw.settings["debug_mode"]:
-                    print("flushing")
-
+#        self.time_data.flush()
+#        self.hist_data.flush()
         #print(str(time.time()-t1), " rest of scan_measure")
 
     def post_run(self):
         """
         Export data.
         """
-        PiezoStage_Scan.post_run(self)
+        APD_StepperMotor_Scan.post_run(self)
         save_dict = {"Histogram data": self.hist_data, "Time data": self.time_data,
-                 "Scan Parameters":{"Scan direction": self.settings["scan_direction"],
-                                     "X scan start (um)": self.x_start, "Y scan start (um)": self.y_start,
+                 "Scan Parameters":{"X scan start (um)": self.x_start, "Y scan start (um)": self.y_start,
                                     "X scan size (um)": self.x_scan_size, "Y scan size (um)": self.y_scan_size,
                                     "X step size (um)": self.x_step, "Y step size (um)": self.y_step},
                                     "PicoHarp Parameters":{"Acquisition Time (s)": self.settings['Tacq'],
                                                               "Resolution (ps)": self.settings['Resolution']} }
 
         pickle.dump(save_dict, open(self.app.settings['save_dir']+"/"+self.app.settings['sample']+"_raw_PL_hist_data.pkl", "wb"))
-        if self.pi_device_hw.settings["debug_mode"]:
-            print("Picoharp scan data saved.")
-        self.hist_data._mmap.close()
-        del self.hist_data
-        os.remove(self.hist_filename)
-        
-        self.time_data._mmap.close()
-        del self.time_data
-        os.remove(self.time_filename)
-
 
     def measure_hist(self):
         """ Read from picoharp """
@@ -177,7 +155,7 @@ class PicoHarp_Scan(PiezoStage_Scan):
 
     def save_intensities_data(self):
         transposed = np.transpose(self.sum_intensities_image_map) #transpose so data visually makes sense
-        PiezoStage_Scan.save_intensities_data(self, transposed, 'ph')
+        APD_StepperMotor_Scan.save_intensities_data(self, transposed, 'ph')
 
     def save_intensities_image(self):
-        PiezoStage_Scan.save_intensities_image(self, self.sum_intensities_image_map, 'ph')
+        APD_StepperMotor_Scan.save_intensities_image(self, self.sum_intensities_image_map, 'ph')

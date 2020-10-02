@@ -9,8 +9,8 @@ from pyqtgraph.Qt import QtGui, QtCore
 from pyqtgraph.Point import Point
 import customplotting.mscope as cpm
 
-class PiezoStage_Scan(Measurement):
-    name = "PiezoStage_Scan"
+class StepperMotor_Scan(Measurement):
+    name = "StepperMotor_Scan"
 
     
     def setup(self):
@@ -39,8 +39,8 @@ class PiezoStage_Scan(Measurement):
         self.settings.New('x_size', dtype=float, initial=1, unit='um', vmin=0)
         self.settings.New('y_size', dtype=float, initial=1, unit='um', vmin=0)
 
-        self.settings.New('x_step', dtype=float, initial=1, unit='um', vmin=-99, vmax=99)#vmin=.001)
-        self.settings.New('y_step', dtype=float, initial=1, unit='um', vmin=-99, vmax=99)#vmin=.001)
+        self.settings.New('x_step', dtype=float, initial=1, unit='um', vmin=-99, vmax=1000)#vmin=.001)
+        self.settings.New('y_step', dtype=float, initial=1, unit='um', vmin=-99, vmax=1000)#vmin=.001)
 
         self.settings.New('x_clicked', dtype=float, initial=0, unit='um', vmin=0, vmax=100, ro=True)
         self.settings.New('y_clicked', dtype=float, initial=0, unit='um', vmin=0, vmax=100, ro=True)
@@ -54,7 +54,10 @@ class PiezoStage_Scan(Measurement):
         self.display_update_period = .3
         
         # Convenient reference to the hardware used in the measurement
-        self.pi_device_hw = self.app.hardware['piezostage']
+        self.spec_hw = self.app.hardware['oceanoptics']
+        self.stepper_motor_hw = self.app.hardware['stepper_motor']
+        
+        self.spec_measure = self.app.measurements['oceanoptics_measure']
 
         self.scan_complete = False
 
@@ -69,8 +72,8 @@ class PiezoStage_Scan(Measurement):
         """
         
         # connect settings to ui
-        self.pi_device_hw.settings.x_position.connect_to_widget(self.ui.x_pos_doubleSpinBox)
-        self.pi_device_hw.settings.y_position.connect_to_widget(self.ui.y_pos_doubleSpinBox)
+        self.stepper_motor_hw.settings.x_position.connect_to_widget(self.ui.x_pos_doubleSpinBox)
+        self.stepper_motor_hw.settings.y_position.connect_to_widget(self.ui.y_pos_doubleSpinBox)
         self.settings.scan_direction.connect_to_widget(self.ui.scan_comboBox)
         self.settings.x_start.connect_to_widget(self.ui.x_start_doubleSpinBox)
         self.settings.y_start.connect_to_widget(self.ui.y_start_doubleSpinBox)    
@@ -88,9 +91,9 @@ class PiezoStage_Scan(Measurement):
         self.stage_layout=pg.GraphicsLayoutWidget()
         self.ui.stage_groupBox.layout().addWidget(self.stage_layout)
         self.stage_plot = self.stage_layout.addPlot(title="Stage view")
-        self.stage_plot.setXRange(0, 100)
-        self.stage_plot.setYRange(0, 100)
-        self.stage_plot.setLimits(xMin=0, xMax=100, yMin=0, yMax=100) 
+        # self.stage_plot.setXRange(0, 100)
+        # self.stage_plot.setYRange(0, 100)
+        # self.stage_plot.setLimits(xMin=0, xMax=100, yMin=0, yMax=100) 
 
         #region of interest - allows user to select scan area
         self.scan_roi = pg.ROI([0,0],[25, 25], movable=True)
@@ -134,8 +137,8 @@ class PiezoStage_Scan(Measurement):
         self.current_stage_pos_arrow = pg.ArrowItem()
         self.current_stage_pos_arrow.setZValue(100)
         self.stage_plot.addItem(self.current_stage_pos_arrow)
-        self.pi_device_hw.settings.x_position.updated_value.connect(self.update_arrow_pos, QtCore.Qt.UniqueConnection)
-        self.pi_device_hw.settings.y_position.updated_value.connect(self.update_arrow_pos, QtCore.Qt.UniqueConnection)
+        self.stepper_motor_hw.settings.x_position.updated_value.connect(self.update_arrow_pos, QtCore.Qt.UniqueConnection)
+        self.stepper_motor_hw.settings.y_position.updated_value.connect(self.update_arrow_pos, QtCore.Qt.UniqueConnection)
 
         #Define crosshairs that will show up after scan, event handling.
         self.vLine = pg.InfiniteLine(angle=90, movable=False, pen='r')
@@ -157,24 +160,20 @@ class PiezoStage_Scan(Measurement):
                 self.selected_positions[self.selected_count, 0] = mousePoint.x()
                 self.selected_positions[self.selected_count, 1] = mousePoint.y()
                 self.selected_count += 1
-                if self.pi_device_hw.settings["debug_mode"]:
-                    print("Point appended.")
 
     def export_positions(self):
         """ Export selected positions into txt. """
         self.check_filename("_selected_positions.txt")
         trimmed = self.selected_positions[~np.all(self.selected_positions == 0, axis=1)] #get rid of empty rows
         np.savetxt(self.app.settings['save_dir']+"/"+ self.app.settings['sample'] + "_selected_positions.txt", trimmed, fmt='%f')
-        if self.pi_device_hw.settings["debug_mode"]:
-            print("Selected points saved.")
-            
+
     def move_to_selected(self):
         """Move stage to position selected by crosshairs."""
-        if self.scan_complete and hasattr(self, 'pi_device'):
+        if self.scan_complete and hasattr(self, "stepper_motor"):
             x = self.settings['x_clicked']
             y = self.settings['y_clicked']
-            self.pi_device.MOV(axes=self.axes, values=[x, y])
-            self.pi_device_hw.read_from_hardware()
+            self.stepper_motor.goto([x, y])
+            self.stepper_motor_hw.read_position()
 
     def mouse_update_scan_roi(self):
         """Update settings and spinboxes to reflect region of interest."""
@@ -244,16 +243,15 @@ class PiezoStage_Scan(Measurement):
         '''
         Update arrow position on image to stage position
         '''
-        x = self.pi_device_hw.settings['x_position']
-        y = self.pi_device_hw.settings['y_position']
+        x = self.stepper_motor_hw.settings['x_position']
+        y = self.stepper_motor_hw.settings['y_position']
         self.current_stage_pos_arrow.setPos(x,y)
 
     def pre_run(self):
         """
         Define devices, scan parameters, and move stage to start.
         """
-        self.pi_device = self.pi_device_hw.pi_device
-        self.axes = self.pi_device_hw.axes
+        self.stepper_motor = self.stepper_motor_hw.stepper_motor
 
         #disable roi and spinboxes during scan
         self.scan_roi.removeHandle(self.handle1)
@@ -265,8 +263,8 @@ class PiezoStage_Scan(Measurement):
         self.x_start = self.settings['x_start']
         self.y_start = self.settings['y_start']
 
-        self.pi_device.MOV(axes=self.axes, values=[self.x_start, self.y_start])
-        self.pi_device_hw.read_from_hardware()
+        self.stepper_motor.goto([self.x_start, self.y_start])
+        self.stepper_motor_hw.read_position()
 
     def update_display(self):
         """
@@ -274,7 +272,7 @@ class PiezoStage_Scan(Measurement):
         This function runs repeatedly and automatically during the measurement run.
         its update frequency is defined by self.display_update_period
         """
-        self.pi_device_hw.read_from_hardware()
+        self.stepper_motor_hw.read_position()
         roi_pos = self.scan_roi.pos()
         self.img_item_rect = QtCore.QRectF(roi_pos[0], roi_pos[1], self.settings['x_size'], self.settings['y_size'])
         self.img_item.setRect(self.img_item_rect)
@@ -295,11 +293,9 @@ class PiezoStage_Scan(Measurement):
     def run(self):
         self.scan_complete = False
         self.pixels_scanned = 0 #keep track of scan/'pixel' number
-        t2 = time.time()
         if (self.settings['scan_direction'] == 'XY'): #xy scan
             for i in range(self.y_range):
                 for j in range(self.x_range):
-                    t0 = time.time()
                     if self.interrupt_measurement_called:
                         break
                     #make sure the right indices of image arrays are updated
@@ -309,29 +305,24 @@ class PiezoStage_Scan(Measurement):
                         self.index_x = self.x_range - j - 1
                     if self.y_step < 0:
                         self.index_y = self.y_range - i - 1
-                    t1 = time.time()
                     self.scan_measure() #defined in hardware-specific scans
-                    if self.pi_device_hw.settings["debug_mode"]:
-                        print("Scan measure time: " + str(time.time() - t1))
-                    self.pi_device.MVR(axes=self.axes[0], values=[self.x_step])
+                    self.stepper_motor.goto([self.x_step, 0, "r"])
+                    #self.pi_device.MVR(axes=self.axes[0], values=[self.x_step])
                     self.pixels_scanned+=1
-
-                    if self.pi_device_hw.settings["debug_mode"]:
-                        print("Pixel scan time: " + str(time.time() - t0) )
                 # TODO
                 # if statement needs to be modified to keep the stage at the finish y-pos for line scans in x, and same for y
                 if i == self.y_range-1: # this if statement is there to keep the stage at the finish position (in x) and not bring it back like we were doing during the scan 
-                    self.pi_device.MVR(axes=self.axes[1], values=[self.y_step])
+                    #self.pi_device.MVR(axes=self.axes[1], values=[self.y_step])
+                    self.stepper_motor.goto([0, self.y_step, "r"])
                 else:                
-                    self.pi_device.MVR(axes=self.axes[1], values=[self.y_step])
-                    self.pi_device.MOV(axes=self.axes[0], values=[self.x_start])
+                    #self.pi_device.MVR(axes=self.axes[1], values=[self.y_step])
+                    #self.pi_device.MOV(axes=self.axes[0], values=[self.x_start])
+                    self.stepper_motor.goto([self.x_start, self.stepper_motor_hw.settings["y_position"]+self.y_step])
                 if self.interrupt_measurement_called:
                     break
         elif (self.settings['scan_direction'] == 'YX'): #yx scan
-            
             for i in range(self.x_range):
                 for j in range(self.y_range):
-                    t0 = time.time()
                     if self.interrupt_measurement_called:
                         break
 
@@ -342,28 +333,21 @@ class PiezoStage_Scan(Measurement):
                         self.index_x = self.x_range - i - 1
                     if self.y_step < 0:
                         self.index_y = self.y_range - j - 1
-
-                    t1 = time.time()
                     self.scan_measure()
-                    if self.pi_device_hw.settings["debug_mode"]:
-                        print("Scan measure time: " + str(time.time()-t1))
-
-                    self.pi_device.MVR(axes=self.axes[1], values=[self.y_step])
+                    #self.pi_device.MVR(axes=self.axes[1], values=[self.y_step])
+                    self.stepper_motor.goto([0, self.y_step, "r"])
                     self.pixels_scanned+=1
-
-                    if self.pi_device_hw.settings["debug_mode"]:
-                        print("Pixel scan time: " + str(time.time() - t0))
                 # TODO
                 # if statement needs to be modified to keep the stage at the finish y-pos for line scans in x, and same for y
                 if i == self.x_range-1: # this if statement is there to keep the stage at the finish position (in x) and not bring it back like we were doing during the scan 
-                    self.pi_device.MVR(axes=self.axes[0], values=[self.x_step])
+                    #self.pi_device.MVR(axes=self.axes[0], values=[self.x_step])
+                    self.stepper_motor.goto([self.x_step, 0, "r"])
                 else:                
-                    self.pi_device.MVR(axes=self.axes[0], values=[self.x_step])
-                    self.pi_device.MOV(axes=self.axes[1], values=[self.y_start])
+                    #self.pi_device.MVR(axes=self.axes[0], values=[self.x_step])
+                    #self.pi_device.MOV(axes=self.axes[1], values=[self.y_start])
+                    self.stepper_motor.goto([self.stepper_motor_hw.settings["x_position"]+self.x_step, self.y_start])
                 if self.interrupt_measurement_called:
                     break
-        if self.pi_device_hw.settings["debug_mode"]:
-            print("Total scan time: " + str(time.time() - t2))
         self.scan_complete = True
         
     def post_run(self):
@@ -373,8 +357,6 @@ class PiezoStage_Scan(Measurement):
         self.scan_roi.translatable = True
         for lqname in "scan_direction x_start y_start x_size y_size x_step y_step".split():
             self.settings.as_dict()[lqname].change_readonly(False)
-        if self.pi_device_hw.settings["debug_mode"]:
-            print("Scan complete.")
             
     def scan_measure(self):
         """
@@ -423,17 +405,12 @@ class PiezoStage_Scan(Measurement):
         transposed = np.transpose(intensities_array)
         np.savetxt(self.app.settings['save_dir']+"/"+ self.app.settings['sample'] + append, transposed, fmt='%f')
 
-        if self.pi_device_hw.settings["debug_mode"]:
-            print("Intensities array saved.")
-
     def save_intensities_image(self, intensities_array, hw_name):
         """
         intensities_array - array of intensities to save as image
         hw_name - string that describes intensities source (ie. oo for oceanoptics, ph for picoharp) 
         """
         append = '_' + hw_name + '_intensity_sums.png'
-        cpm.plot_confocal(intensities_array, stepsize=np.abs(self.settings['x_step']))
+        cpm.plot_confocal(intensities_array, FLIM_adjust=False, stepsize=np.abs(self.settings['x_step']))
         self.check_filename(append)
         cpm.plt.savefig(self.app.settings['save_dir'] + '/' + self.app.settings['sample'] + append, bbox_inches='tight', dpi=300)
-        if self.pi_device_hw.settings["debug_mode"]:
-            print("Intensities image saved.")

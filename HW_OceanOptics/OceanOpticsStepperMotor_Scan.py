@@ -1,4 +1,4 @@
-from HW_PI_PiezoStage.PiezoStage_Scan import PiezoStage_Scan
+from HW_StepperMotor.StepperMotor_Scan import StepperMotor_Scan
 from ScopeFoundry import Measurement
 from ScopeFoundry.helper_funcs import sibling_path, load_qt_ui_file
 import pyqtgraph as pg
@@ -10,32 +10,30 @@ from pyqtgraph.Qt import QtGui, QtCore
 from pyqtgraph.Point import Point
 import customplotting.mscope as cpm
 
-class OceanOptics_Scan(PiezoStage_Scan):
+class OceanOpticsStepperMotor_Scan(StepperMotor_Scan):
 
-    name = "OceanOptics_Scan"
+    name = "OceanOpticsStepperMotor_Scan"
 
     def setup(self):
-        PiezoStage_Scan.setup(self)
+        StepperMotor_Scan.setup(self)
 
         self.settings.New("intg_time",dtype=int, unit='ms', initial=3, vmin=3)
         self.settings.New('correct_dark_counts', dtype=bool, initial=True)
         self.settings.New("scans_to_avg", dtype=int, initial=1, vmin=1)
 
     def setup_figure(self):
-        PiezoStage_Scan.setup_figure(self)
+        StepperMotor_Scan.setup_figure(self)
 
         #setup ui for ocean optics specific settings
-        self.spec_hw = self.app.hardware['oceanoptics']
-        self.pi_device_hw = self.app.hardware['piezostage']
-        
+        spec_hw = self.app.hardware['oceanoptics']
         details_groupBox = self.set_details_widget(widget = self.settings.New_UI(include=["intg_time", "correct_dark_counts", "scans_to_avg"]))
         widgets = details_groupBox.findChildren(QtGui.QWidget)
         intg_time_spinBox = widgets[1]
         correct_dark_counts_checkBox = widgets[4]
         #scans_to_avg_spinBox = widgets[6]
         #connect settings to ui
-        self.spec_hw.settings.intg_time.connect_to_widget(intg_time_spinBox)
-        self.spec_hw.settings.correct_dark_counts.connect_to_widget(correct_dark_counts_checkBox)
+        spec_hw.settings.intg_time.connect_to_widget(intg_time_spinBox)
+        spec_hw.settings.correct_dark_counts.connect_to_widget(correct_dark_counts_checkBox)
         intg_time_spinBox.valueChanged.connect(self.update_estimated_scan_time)
         
         #save data buttons
@@ -62,17 +60,16 @@ class OceanOptics_Scan(PiezoStage_Scan):
     def update_estimated_scan_time(self):
         try:
             self.overhead = self.x_range * self.y_range * .058 #determined by running scans and timing
-            self.scan_time = self.x_range * self.y_range * self.settings["intg_time"] * 1e-3 + self.overhead #s
-            self.ui.estimated_scan_time_label.setText("Estimated scan time: " + "%.2f" % self.scan_time + "s")
+            scan_time = self.x_range * self.y_range * self.settings["intg_time"] * 1e-3 + self.overhead #s
+            self.ui.estimated_scan_time_label.setText("Estimated scan time: " + "%.2f" % scan_time + "s")
         except:
             pass
 
     def update_display(self):
-        PiezoStage_Scan.update_display(self)
+        StepperMotor_Scan.update_display(self)
         if hasattr(self, 'spec') and hasattr(self, 'pi_device') and hasattr(self, 'y'): #first, check if setup has happened
             if not self.interrupt_measurement_called:
-                per_pixel = self.scan_time/(self.x_range * self.y_range)
-                seconds_left = per_pixel * (self.x_range * self.y_range - self.pixels_scanned)
+                seconds_left = ((self.x_range * self.y_range) - self.pixels_scanned) * self.settings["intg_time"] * 1e-3 + self.overhead
                 self.ui.estimated_time_label.setText("Estimated time remaining: " + "%.2f" % seconds_left + "s")
             #plot wavelengths vs intensity
             self.plot.plot(self.spec.wavelengths(), self.y, pen='r', clear=True) #plot wavelength vs intensity
@@ -94,7 +91,7 @@ class OceanOptics_Scan(PiezoStage_Scan):
 
     def pre_run(self):
         try:
-            PiezoStage_Scan.pre_run(self) #setup scan parameters
+            StepperMotor_Scan.pre_run(self) #setup scan parameters
             self.spec = self.spec_hw.spec
             self.check_filename("_raw_PL_spectra_data.pkl")
             
@@ -104,6 +101,8 @@ class OceanOptics_Scan(PiezoStage_Scan):
             # Define empty array for image map
             self.sum_intensities_image_map = np.zeros((self.x_range, self.y_range), dtype=float) #store sum of intensities for each pixel
             self.spectrum_image_map = np.zeros((2048, self.x_range, self.y_range), dtype=float) #Store spectrum for each pixel
+            scan_time = self.x_range * self.y_range * self.settings["intg_time"] * 1e-3 #s
+            self.ui.estimated_scan_time_label.setText("Estimated scan time: " + "%.2f" % scan_time + "s")
         except:
             pass
         
@@ -120,20 +119,17 @@ class OceanOptics_Scan(PiezoStage_Scan):
         """
         Export data.
         """
-        PiezoStage_Scan.post_run(self)
+        StepperMotor_Scan.post_run(self)
         save_dict = {"Wavelengths": self.spec.wavelengths(), "Intensities": self.data_array,
-                 "Scan Parameters":{"Scan direction": self.settings["scan_direction"],
-                         "X scan start (um)": self.x_start, "Y scan start (um)": self.y_start,
+                 "Scan Parameters":{"X scan start (um)": self.x_start, "Y scan start (um)": self.y_start,
                                     "X scan size (um)": self.x_scan_size, "Y scan size (um)": self.y_scan_size,
                                     "X step size (um)": self.x_step, "Y step size (um)": self.y_step},
                                     "OceanOptics Parameters":{"Integration Time (ms)": self.spec_hw.settings['intg_time'],
-                                                              "Scans Averages": self.settings['scans_to_avg'],
+                                                              "Scans Averages": self.spec_measure.settings['scans_to_avg'],
                                                               "Correct Dark Counts": self.spec_hw.settings['correct_dark_counts']}
                  }
 
         pickle.dump(save_dict, open(self.app.settings['save_dir']+"/"+self.app.settings['sample']+"_raw_PL_spectra_data.pkl", "wb"))
-        if self.pi_device_hw.settings["debug_mode"]:
-            print("OceanOptics scan data saved.")
 
     def _read_spectrometer(self):
         '''
@@ -143,7 +139,7 @@ class OceanOptics_Scan(PiezoStage_Scan):
             intg_time_ms = self.spec_hw.settings['intg_time']
             self.spec.integration_time_micros(intg_time_ms*1e3) #seabreeze error checking
             
-            scans_to_avg = self.settings['scans_to_avg']
+            scans_to_avg = self.spec_measure.settings['scans_to_avg']
             Int_array = np.zeros(shape=(2048,scans_to_avg))
             
             for i in range(scans_to_avg): #software average
@@ -153,7 +149,7 @@ class OceanOptics_Scan(PiezoStage_Scan):
 
     def save_intensities_data(self):
         transposed = np.transpose(self.sum_intensities_image_map) #transpose so data visually makes sense
-        PiezoStage_Scan.save_intensities_data(self, transposed, 'oo')
+        StepperMotor_Scan.save_intensities_data(self, transposed, 'oo')
 
     def save_intensities_image(self):
-        PiezoStage_Scan.save_intensities_image(self, self.sum_intensities_image_map, 'oo')
+        StepperMotor_Scan.save_intensities_image(self, self.sum_intensities_image_map, 'oo')
