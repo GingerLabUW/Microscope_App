@@ -17,7 +17,6 @@ class PicoHarpG2Measure(Measurement):
         # self.ui = load_qt_ui_file(self.ui_filename)
         # self.ui.setWindowTitle(self.name)
 
-        self.elapsed_time = 0  # double check this! 
         self.count_rate_0_array = []
         self.count_rate_1_array = []
         self.time_array = []
@@ -50,50 +49,47 @@ class PicoHarpG2Measure(Measurement):
         t0 = time.time()
         
         while not self.interrupt_measurement_called:
+            self.time_array.append(time.time() - t0) #append time interval in seconds to array
             self.count_rate_0_array.append(ph.read_count_rate0()) #append new countrate data to array
             self.count_rate_1_array.append(ph.read_count_rate1())
-            self.time_array.append(self.elapsed_time) #append time interval to array
-            self.elapsed_time += self.display_update_period
 
-        self.elasped_time = 0
-        
-        save_dict = {
-                     'time_histogram': ph.histogram_data,
-                     'time_array': ph.time_array
-                    }               
+            time.sleep(sleep_time) # TODO double check this in practice
 
-        for lqname,lq in self.app.settings.as_dict().items():
-            save_dict[lqname] = lq.val
+        # save app and hardware settings
+        # for lqname,lq in self.app.settings.as_dict().items():
+        #     save_dict[lqname] = lq.val
         
-        for hc in self.app.hardware.values():
-            for lqname,lq in hc.settings.as_dict().items():
-                save_dict[hc.name + "_" + lqname] = lq.val
+        # for hc in self.app.hardware.values():
+        #     for lqname,lq in hc.settings.as_dict().items():
+        #         save_dict[hc.name + "_" + lqname] = lq.val
         
-        for lqname,lq in self.settings.as_dict().items():
-            save_dict[self.name +"_"+ lqname] = lq.val
+        # for lqname,lq in self.settings.as_dict().items():
+        #     save_dict[self.name +"_"+ lqname] = lq.val
         
-        if not self.settings['continuous']:
-            self.elapsed_time = 0
-            self.time_array = []
-            self.count_array = []
+        # set all coutrate and time arrays to defaults 
+        self.time_array = []
+        self.count_rate_0_array = []
+        self.count_rate_1_array = []
         self.interrupt()
                                
     def update_display(self):
-        ph = self.picoharp
-        self.picoharp_hw.read_from_hardware()
-        self.plot.plot(np.asarray(self.time_array), np.asarray(self.count_array), pen='r')
+        self.plot_count_rate_0.plot(
+            np.asarray(self.time_array), np.asarray(self.count_rate_0_array), pen='r'
+        )
+        self.plot_count_rate_1.plot(
+            np.asarray(self.time_array), np.asarray(self.count_rate_1_array), pen='r'
+        )
 
-    def save_countrates(self):
-        cr_data = np.zeros((len(self.time_array), 2))
-        cr_data[:,0] = self.time_array #set first column with time data
-        cr_data[:,1] = self.count_array #set second column with countrate data
-        append = '_countrate_data.txt' #string to append to sample name
-        self.check_filename(append)
-        np.savetxt(self.app.settings['save_dir']+"/"+ self.app.settings['sample'] + append, cr_data, fmt='%f')
+    # def save_countrates(self):
+    #     cr_data = np.zeros((len(self.time_array), 2))
+    #     cr_data[:,0] = self.time_array #set first column with time data
+    #     cr_data[:,1] = self.count_array #set second column with countrate data
+    #     append = '_countrate_data.txt' #string to append to sample name
+    #     self.check_filename(append)
+    #     np.savetxt(self.app.settings['save_dir']+"/"+ self.app.settings['sample'] + append, cr_data, fmt='%f')
 
-    def clear_plot(self):
-        self.plot.clear()
-        self.set_progress(0)
-        self.elapsed_time = 0
-        self.time_array = []
-        self.count_array = []
+    # def clear_plot(self):
+    #     self.plot.clear()
+    #     self.elapsed_time = 0
+    #     self.time_array = []
+    #     self.count_array = []
