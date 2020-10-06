@@ -3,6 +3,7 @@ from ScopeFoundry.helper_funcs import sibling_path, load_qt_ui_file
 import numpy as np
 import pyqtgraph as pg
 import os
+import time
 
 class PicoHarpG2Measure(Measurement):
     name = "picoharp_g2_measure"
@@ -10,7 +11,7 @@ class PicoHarpG2Measure(Measurement):
     hardware_requirements = ["picoharp"]
 
     def setup(self):
-        self.display_update_period = 0.1 #seconds
+        self.display_update_period = 0.25 #seconds
 
         # UI 
         self.ui_filename = sibling_path(__file__,"picoharp_g2_measure.ui")
@@ -27,7 +28,7 @@ class PicoHarpG2Measure(Measurement):
         # conect ui buttons to functions
         self.ui.start_pushButton.clicked.connect(self.start)
         self.ui.interrupt_pushButton.clicked.connect(self.interrupt)
-        # self.ui.save_data_pushButton.clicked.connect(self.save_countrates)
+        self.ui.save_data_pushButton.clicked.connect(self.save_countrates)
         self.ui.clear_plot_pushButton.clicked.connect(self.clear_plot)
 
         # connect picoharp settings to widgets in the current measurement panel
@@ -75,6 +76,9 @@ class PicoHarpG2Measure(Measurement):
         
         # for lqname,lq in self.settings.as_dict().items():
         #     save_dict[self.name +"_"+ lqname] = lq.val
+
+        self.save_array = np.array([self.time_array, self.count_rate_0_array, self.count_rate_1_array]).T
+        print(len(self.save_array))
         
         # set all coutrate and time arrays to defaults 
         self.time_array = []
@@ -92,13 +96,10 @@ class PicoHarpG2Measure(Measurement):
             pen="8ecae6"
         )
 
-    # def save_countrates(self):
-    #     cr_data = np.zeros((len(self.time_array), 2))
-    #     cr_data[:,0] = self.time_array #set first column with time data
-    #     cr_data[:,1] = self.count_array #set second column with countrate data
-    #     append = '_countrate_data.txt' #string to append to sample name
-    #     self.check_filename(append)
-    #     np.savetxt(self.app.settings['save_dir']+"/"+ self.app.settings['sample'] + append, cr_data, fmt='%f')
+    def save_countrates(self):
+        append = '_countrate_data.txt' #string to append to sample name
+        self.check_filename(append)
+        np.savetxt(self.app.settings['save_dir']+"/"+ self.app.settings['sample'] + append, self.save_array, fmt='%f')
 
     def clear_plot(self):
         self.plot_count_rate_0.clear()
@@ -106,3 +107,16 @@ class PicoHarpG2Measure(Measurement):
         self.time_array = []
         self.count_rate_0_array = []
         self.count_rate_1_array = []
+    
+    def check_filename(self, append):
+        '''
+        If no sample name given or duplicate sample name given, fix the problem by appending a unique number.
+        append - string to add to sample name (including file extension)
+        '''
+        samplename = self.app.settings['sample']
+        filename = samplename + append
+        directory = self.app.settings['save_dir']
+        if samplename == "":
+            self.app.settings['sample'] = int(time.time())
+        if (os.path.exists(directory+"/"+filename)):
+            self.app.settings['sample'] = samplename + str(int(time.time()))
