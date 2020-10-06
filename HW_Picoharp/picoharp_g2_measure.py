@@ -11,7 +11,10 @@ class PicoHarpG2Measure(Measurement):
     hardware_requirements = ["picoharp"]
 
     def setup(self):
-        self.display_update_period = 0.25 #seconds
+        self.display_update_period = 0.1 #seconds
+
+        # settings
+        self.settings.New("update_period", unit="ms", dtype=int, vmin=1, vmax=100*60*60, initial=1)
 
         # UI 
         self.ui_filename = sibling_path(__file__,"picoharp_g2_measure.ui")
@@ -32,7 +35,7 @@ class PicoHarpG2Measure(Measurement):
         self.ui.clear_plot_pushButton.clicked.connect(self.clear_plot)
 
         # connect picoharp settings to widgets in the current measurement panel
-        # ph_hw.settings.Tacq.connect_bidir_to_widget(self.ui.picoharp_tacq_doubleSpinBox)
+        self.settings.update_period.connect_to_widget(self.ui.update_time_doubleSpinBox)
         ph_hw.settings.count_rate0.connect_to_widget(self.ui.ch0_label)
         ph_hw.settings.count_rate1.connect_to_widget(self.ui.ch1_label)
         
@@ -55,7 +58,8 @@ class PicoHarpG2Measure(Measurement):
         ph_hw = self.app.hardware['picoharp']
         ph = self.picoharp = ph_hw.picoharp
         
-        sleep_time = self.display_update_period
+        sleep_time = 1e-3 * self.settings["update_period"] # this is in ms, so convert to s
+        
         
         t0 = time.time()
         
@@ -78,7 +82,6 @@ class PicoHarpG2Measure(Measurement):
         #     save_dict[self.name +"_"+ lqname] = lq.val
 
         self.save_array = np.array([self.time_array, self.count_rate_0_array, self.count_rate_1_array]).T
-        print(len(self.save_array))
         
         # set all coutrate and time arrays to defaults 
         self.time_array = []
@@ -99,7 +102,12 @@ class PicoHarpG2Measure(Measurement):
     def save_countrates(self):
         append = '_countrate_data.txt' #string to append to sample name
         self.check_filename(append)
-        np.savetxt(self.app.settings['save_dir']+"/"+ self.app.settings['sample'] + append, self.save_array, fmt='%f')
+        np.savetxt(
+            self.app.settings['save_dir']+"/"+ self.app.settings['sample'] + append,
+            self.save_array,
+            fmt='%f',
+            header="Time (s), Countrate 0, Countrate 1"
+        )
 
     def clear_plot(self):
         self.plot_count_rate_0.clear()
