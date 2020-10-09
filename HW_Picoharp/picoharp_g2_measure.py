@@ -90,14 +90,24 @@ class PicoHarpG2Measure(Measurement):
         self.interrupt()
                                
     def update_display(self):
-        self.plot_count_rate_0.plot(
-            np.asarray(self.time_array), np.asarray(self.count_rate_0_array),
-            pen="8ecae6"
-        )
-        self.plot_count_rate_1.plot(
-            np.asarray(self.time_array), np.asarray(self.count_rate_1_array),
-            pen="8ecae6"
-        )
+        # only update plots id time_array and count_rate arrays are of 
+        # the same length
+        # since, time array and count rate array are being updated within 
+        # the while loop and in a different thread than plot update, there 
+        # are occasionally length mismatches
+        # 
+        # This is a temp fix - maybe there is an elegant fix but this works 
+        if len(self.time_array) == len(self.count_rate_0_array):
+            self.plot_count_rate_0.plot(
+                np.asarray(self.time_array), np.asarray(self.count_rate_0_array),
+                pen="8ecae6"
+            )
+        
+        if len(self.time_array) == len(self.count_rate_1_array):
+            self.plot_count_rate_1.plot(
+                np.asarray(self.time_array), np.asarray(self.count_rate_1_array),
+                pen="8ecae6"
+            )
 
     def save_countrates(self):
         append = '_countrate_data.txt' #string to append to sample name
