@@ -56,32 +56,48 @@ class PicoHarpHistogramMeasure(Measurement):
         ph = self.picoharp = ph_hw.picoharp
         self.num_hist_chans = self.app.hardware['picoharp'].calc_num_hist_chans() #calculate # of histogram channels
         #: type: ph: PicoHarp300
+
+        if ph.mode == "T2":
+            while not self.interrupt_measurement_called:
+                ph.start_measure()
+                while not ph.check_done_scanning():
+                    if self.interrupt_measurement_called:
+                        break
+                    nactual_value, _ = ph.read_fifo()
+                
+                ph.stop_measure()
+                nactual_value, _ = ph.read_fifo()
+
+            save_dict = {
+                "ttr_buffer" : ph.ttr_buffer[0:nactual_value]
+            }
         
-        #FIXME
-        #self.plotline.set_xdata(ph.time_array*1e-3)
-        sleep_time = min((max(0.1*ph.Tacq*1e-3, 0.010), 0.100)) # check every 1/10 of Tacq with limits of 10ms and 100ms
+        elif ph.mode == "HIST":        
+            #FIXME
+            #self.plotline.set_xdata(ph.time_array*1e-3)
+            sleep_time = min((max(0.1*ph.Tacq*1e-3, 0.010), 0.100)) # check every 1/10 of Tacq with limits of 10ms and 100ms
+            
+            t0 = time.time()
+            
+            while not self.interrupt_measurement_called:
+                ph.start_histogram()
+                while not ph.check_done_scanning():
+                    self.set_progress( 100*(time.time() - t0)/ph_hw.settings['Tacq'] )
+                    if self.interrupt_measurement_called:
+                        break
+                    ph.read_histogram_data()
+                    time.sleep(sleep_time)
         
-        t0 = time.time()
-        
-        while not self.interrupt_measurement_called:
-            ph.start_histogram()
-            while not ph.check_done_scanning():
-                self.set_progress( 100*(time.time() - t0)/ph_hw.settings['Tacq'] )
-                if self.interrupt_measurement_called:
-                    break
+                ph.stop_histogram()
                 ph.read_histogram_data()
-                time.sleep(sleep_time)
-    
-            ph.stop_histogram()
-            ph.read_histogram_data()
-        
-            if not self.settings['continuous']:
-                break
-        
-        save_dict = {
-                     'time_histogram': ph.histogram_data[0:self.num_hist_chans],
-                     'time_array': ph.time_array[0:self.num_hist_chans],
-                    }               
+            
+                if not self.settings['continuous']:
+                    break
+            
+            save_dict = {
+                        'time_histogram': ph.histogram_data[0:self.num_hist_chans],
+                        'time_array': ph.time_array[0:self.num_hist_chans],
+                        }               
 
         for lqname,lq in self.app.settings.as_dict().items():
             save_dict[lqname] = lq.val
