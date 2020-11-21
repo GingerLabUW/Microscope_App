@@ -22,6 +22,11 @@ class PicoHarpHistogramMeasure(Measurement):
         self.ui_filename = sibling_path(__file__,"picoharp_hist_measure.ui")
         self.ui = load_qt_ui_file(self.ui_filename)
         self.ui.setWindowTitle(self.name)
+
+        # setup countrate lists for T2 mode
+        self.count_rate_0_array = []
+        self.count_rate_1_array = []
+        self.count_rate_time_array = []
     
     def setup_figure(self):
         S = self.settings
@@ -49,6 +54,19 @@ class PicoHarpHistogramMeasure(Measurement):
         self.plot.setLogMode(False, True)
         
         self.ui.plot_groupBox.layout().addWidget(self.graph_layout)
+
+        # For plotting channel 0 & 1 countrate while in T2 mode
+        # setup plots
+        self.channel_graph_layout = pg.GraphicsLayoutWidget()
+        self.plot_count_rate_0 = self.channel_graph_layout.addPlot(
+            row=0, col=0, title="Channel 0", labels={"bottom" : "Time (s)"}
+            )        
+        self.plot_count_rate_1 = self.channel_graph_layout.addPlot(
+            row=1, col=0, title="Channel 1", labels={"bottom" : "Time (s)"}
+            )
+        # set log in y axis
+        self.plot_count_rate_0.setLogMode(False, True)
+        self.plot_count_rate_1.setLogMode(False, True)
         
                 
     def run(self):
@@ -56,6 +74,10 @@ class PicoHarpHistogramMeasure(Measurement):
         ph = self.picoharp = ph_hw.picoharp
         self.num_hist_chans = self.app.hardware['picoharp'].calc_num_hist_chans() #calculate # of histogram channels
         #: type: ph: PicoHarp300
+        # NOTE - Xudong wants this update to be user defined
+        sleep_time = min((max(0.1*ph.Tacq*1e-3, 0.010), 0.100)) # check every 1/10 of Tacq with limits of 10ms and 100ms
+            
+        t0 = time.time()
 
         if ph.mode == "T2":
             while not self.interrupt_measurement_called:
@@ -64,12 +86,18 @@ class PicoHarpHistogramMeasure(Measurement):
                     if self.interrupt_measurement_called:
                         break
                     nactual_value, _ = ph.read_fifo()
+                    
+                    # update channel countrates and time array
+                    self.count_rate_time_array.append(time.time() - t0) #append time interval in seconds to array
+                    self.count_rate_0_array.append(ph.read_count_rate0()) #append new countrate data to array
+                    self.count_rate_1_array.append(ph.read_count_rate1())
+                    time.sleep(sleep_time)
                 
                 ph.stop_measure()
                 nactual_value, _ = ph.read_fifo()
 
             save_dict = {
-                "ttr_buffer" : ph.ttr_buffer[0:nactual_value]
+                "ttr_buffer" : ph.tttr_buffer[0:nactual_value]
             }
         
         elif ph.mode == "HIST":        
@@ -86,6 +114,11 @@ class PicoHarpHistogramMeasure(Measurement):
                     if self.interrupt_measurement_called:
                         break
                     ph.read_histogram_data()
+
+                    # For G2 HIST mode - update channel countrates and time array
+                    self.count_rate_time_array.append(time.time() - t0) #append time interval in seconds to array
+                    self.count_rate_0_array.append(ph.read_count_rate0()) #append new countrate data to array
+                    self.count_rate_1_array.append(ph.read_count_rate1())
                     time.sleep(sleep_time)
         
                 ph.stop_histogram()
@@ -113,10 +146,32 @@ class PicoHarpHistogramMeasure(Measurement):
         ph = self.picoharp
         self.picoharp_hw.read_from_hardware()
 #        self.plotdata.setData(ph.time_array*1e-3, ph.histogram_data+1)
-        self.plotdata.setData(ph.time_array[0:self.num_hist_chans]*1e-3, ph.histogram_data[0:self.num_hist_chans]+1)
-        #self.fig.canvas.draw()
+
+        if ph.mode == "HIST":
+            self.plotdata.setData(ph.time_array[0:self.num_hist_chans]*1e-3, ph.histogram_data[0:self.num_hist_chans]+1)
+
+        if self.ui.plot_channels_checkBox.isChecked():
+            # only update plots id countrate_time_array and count_rate arrays are of 
+            # the same length
+            # since, time array and count rate array are being updated within 
+            # the while loop and in a different thread than plot update, there 
+            # are occasionally length mismatches
+            # 
+            # This is a temp fix - maybe there is an elegant fix but this works 
+            if len(self.count_rate_time_array) == len(self.count_rate_0_array):
+                self.plot_count_rate_0.plot(
+                    np.asarray(self.count_rate_time_array), np.asarray(self.count_rate_0_array),
+                    pen="8ecae6"
+                )
+            
+            if len(self.count_rate_time_array) == len(self.count_rate_1_array):
+                self.plot_count_rate_1.plot(
+                    np.asarray(self.count_rate_time_array), np.asarray(self.count_rate_1_array),
+                    pen="8ecae6"
+                )
 
     def save_hist_data(self):
+        # TODO - Update save hist data to h5
         ph = self.picoharp
         hist_data = np.zeros((ph.time_array[0:self.num_hist_chans].shape[0], 2)) #check what the shape of this array should be when testing
         hist_data[:,0] = ph.time_array[0:self.num_hist_chans] #set first column with time data

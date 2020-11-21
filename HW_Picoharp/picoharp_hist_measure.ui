@@ -65,6 +65,12 @@
       <string>PicoHarp</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
+      <item row="1" column="1">
+       <widget class="QDoubleSpinBox" name="hist_channels_doubleSpinBox"/>
+      </item>
+      <item row="0" column="1">
+       <widget class="QDoubleSpinBox" name="picoharp_tacq_doubleSpinBox"/>
+      </item>
       <item row="0" column="0">
        <widget class="QLabel" name="label">
         <property name="text">
@@ -72,23 +78,17 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
-       <widget class="QDoubleSpinBox" name="hist_channels_doubleSpinBox"/>
-      </item>
-      <item row="0" column="1">
-       <widget class="QDoubleSpinBox" name="picoharp_tacq_doubleSpinBox"/>
-      </item>
-      <item row="3" column="1">
-       <widget class="QCheckBox" name="continuous_checkBox">
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_5">
         <property name="text">
-         <string>Continuous</string>
+         <string>Resolution</string>
         </property>
        </widget>
       </item>
-      <item row="5" column="0">
-       <widget class="QLabel" name="label_4">
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>Channel 1</string>
+         <string>Store Hist Channels</string>
         </property>
        </widget>
       </item>
@@ -103,27 +103,6 @@
        <widget class="QLabel" name="ch0_label">
         <property name="text">
          <string>0</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>Store Hist Channels</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>Channel 0</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_5">
-        <property name="text">
-         <string>Resolution</string>
         </property>
        </widget>
       </item>
@@ -169,6 +148,34 @@
           <string>512 ps</string>
          </property>
         </item>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QCheckBox" name="continuous_checkBox">
+        <property name="text">
+         <string>Continuous</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Channel 1</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Channel 0</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0" colspan="2">
+       <widget class="QCheckBox" name="plot_channels_checkBox">
+        <property name="text">
+         <string>Plot Channel countrates</string>
+        </property>
        </widget>
       </item>
      </layout>
