@@ -1,0 +1,10 @@
+h5py==3.1.0
+numpy>=1.15.1
+PyQt5==5.15.1
+pyqtgraph==0.11.0
+qtconsole==4.7.7
+QtPy==1.9.0
+ScopeFoundry==1.1.1
+seabreeze==1.3.0
+pillow==8.0.1
+customplotting==0.1.4.2

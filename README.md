@@ -1,30 +1,17 @@
 # Microscope_App
-Confocal Microscope App
-
-## Requirements
-- Python 3.6.8
-- scopefoundry
-- numpy
-- pyqt
-- qtpy
-- h5py
-- pyqtgraph
-- pillow
-- customplotting
-- python seabreeze
-- pipython (contact manufacturer to get software)
+Application for controlling Ginger lab inverted confocal microscope.
 
 ## Installing dependencies from command-line
-```
-conda install numpy pyqt qtpy h5py pyqtgraph
-conda install -c poehlmann python-seabreeze
-pip install git+git://github.com/ScopeFoundry/ScopeFoundry.git
-pip install pillow customplotting==0.1.4.dev0
+First, create a new conda environment
+```bash
+conda create -n "microscope-app" python=3.7 -y
+conda activate microscope-app
+pip install -r requirements.txt
+pip install "HW_PI_PiezoStage/PIPython/"
 ```
 
-## Run instructions
-After setup, you can run the application by double-clicking Microscope_app.py.
-You can also run it from command-line:
-```
+## Run instructions from command line
+In the newly created conda environment with all the dependencies
+```bash
 python Microscope_app.py
 ```
