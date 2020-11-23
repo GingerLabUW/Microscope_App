@@ -74,12 +74,12 @@ class PicoHarpHistogramMeasure(Measurement):
         ph = self.picoharp = ph_hw.picoharp
         self.num_hist_chans = self.app.hardware['picoharp'].calc_num_hist_chans() #calculate # of histogram channels
         #: type: ph: PicoHarp300
-        # NOTE - Xudong wants this update to be user defined
-        sleep_time = min((max(0.1*ph.Tacq*1e-3, 0.010), 0.100)) # check every 1/10 of Tacq with limits of 10ms and 100ms
-            
-        t0 = time.time()
 
         if ph.mode == "T2":
+            # check every 1/10 of Tacq with limits of 10ms and 50ms
+            sleep_time = min((max(0.1*ph.Tacq*1e-3, 0.010), 0.050))
+            t0 = time.time()
+            
             while not self.interrupt_measurement_called:
                 ph.start_measure()
                 while not ph.check_done_scanning():
@@ -100,11 +100,9 @@ class PicoHarpHistogramMeasure(Measurement):
                 "ttr_buffer" : ph.tttr_buffer[0:nactual_value]
             }
         
-        elif ph.mode == "HIST":        
-            #FIXME
-            #self.plotline.set_xdata(ph.time_array*1e-3)
-            sleep_time = min((max(0.1*ph.Tacq*1e-3, 0.010), 0.100)) # check every 1/10 of Tacq with limits of 10ms and 100ms
-            
+        elif ph.mode == "HIST":
+            # check every 1/10 of Tacq with limits of 10ms and 50ms
+            sleep_time = min((max(0.1*ph.Tacq*1e-3, 0.010), 0.050))
             t0 = time.time()
             
             while not self.interrupt_measurement_called:
