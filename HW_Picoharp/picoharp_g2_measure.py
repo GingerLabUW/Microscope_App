@@ -67,6 +67,8 @@ class PicoHarpG2Measure(Measurement):
             self.time_array.append(time.time() - t0) #append time interval in seconds to array
             self.count_rate_0_array.append(ph.read_count_rate0()) #append new countrate data to array
             self.count_rate_1_array.append(ph.read_count_rate1())
+            self.ui.ch0_label.setText(f"{ph.read_count_rate0()}")
+            self.ui.ch1_label.setText(f"{ph.read_count_rate1()}")
 
             time.sleep(sleep_time) # TODO double check this in practice
 
