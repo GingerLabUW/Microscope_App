@@ -59,6 +59,7 @@ class PicoHarpG2Measure(Measurement):
         ph = self.picoharp = ph_hw.picoharp
         
         sleep_time = 1e-3 * self.settings["update_period"] # this is in ms, so convert to s
+        self.display_update_period = sleep_time #change interface update time to match user input update_period
         
         
         t0 = time.time()
