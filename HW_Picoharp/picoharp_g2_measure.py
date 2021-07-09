@@ -77,11 +77,13 @@ class PicoHarpG2Measure(Measurement):
             while current_time_ms - start_time_ms < intg_time:
                 counts_0.append(ph.read_count_rate0())
                 counts_1.append(ph.read_count_rate1())
-                self.ui.ch0_label.setText(f"{ph.read_count_rate0()}")
-                self.ui.ch1_label.setText(f"{ph.read_count_rate1()}")
                 current_time_ms = self.unix_time_millis(datetime.now())
-            self.count_rate_0_array.append(np.sum(counts_0))
-            self.count_rate_1_array.append(np.sum(counts_1))
+            total_counts_0 = np.sum(counts_0)
+            total_counts_1 = np.sum(counts_1)
+            self.count_rate_0_array.append(total_counts_0)
+            self.count_rate_1_array.append(total_counts_1)
+            self.ui.ch0_label.setText(f"{total_counts_0}")
+            self.ui.ch1_label.setText(f"{total_counts_1}")
             self.time_array.append(time.time() - t0) #append time interval in seconds to array
 
 
