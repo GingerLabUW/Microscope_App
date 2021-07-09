@@ -58,7 +58,7 @@ class PicoHarpG2Measure(Measurement):
         self.ui.plot_groupBox.layout().addWidget(self.graph_layout)
     
 
-    def unix_time_millis(dt):
+    def unix_time_millis(self, dt):
         return round((dt - epoch).total_seconds() * 1000.0)
     
     def run(self):
@@ -67,7 +67,7 @@ class PicoHarpG2Measure(Measurement):
         
         intg_time = self.settings["update_period"] #in ms
         
-        t0 = self.unix_time_millis(datetime.now())/1000 ##time.time() #pre-measurement time in ms
+        t0 = self.unix_time_millis(datetime.now()) ##time.time() #pre-measurement time in ms
         
         while not self.interrupt_measurement_called:
             start_time_ms = self.unix_time_millis(datetime.now())
