@@ -67,7 +67,7 @@ class PicoHarpG2Measure(Measurement):
         
         intg_time = self.settings["update_period"] #in ms
         
-        t0 = self.unix_time_millis(datetime.now()) ##time.time() #pre-measurement time in ms
+        t0 = time.time() #start time in s
         
         while not self.interrupt_measurement_called:
             start_time_ms = self.unix_time_millis(datetime.now())
@@ -82,7 +82,7 @@ class PicoHarpG2Measure(Measurement):
                 current_time_ms = self.unix_time_millis(datetime.now())
             self.count_rate_0_array.append(np.sum(counts_0))
             self.count_rate_1_array.append(np.sum(counts_1))
-            self.time_array.append((self.unix_time_millis(datetime.now())/1000) - t0) #append time interval in seconds to array
+            self.time_array.append(time.time() - t0) #append time interval in seconds to array
 
 
             #time.sleep(sleep_time) # TODO double check this in practice
