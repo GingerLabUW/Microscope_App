@@ -4,6 +4,9 @@ import numpy as np
 import pyqtgraph as pg
 import os
 import time
+from datetime import datetime
+
+epoch = datetime.utcfromtimestamp(0)
 
 class PicoHarpG2Measure(Measurement):
     name = "picoharp_g2_measure"
@@ -54,24 +57,35 @@ class PicoHarpG2Measure(Measurement):
 
         self.ui.plot_groupBox.layout().addWidget(self.graph_layout)
     
+
+    def unix_time_millis(dt):
+        return round((dt - epoch).total_seconds() * 1000.0)
+    
     def run(self):
         ph_hw = self.app.hardware['picoharp']
         ph = self.picoharp = ph_hw.picoharp
         
-        sleep_time = 1e-3 * self.settings["update_period"] # this is in ms, so convert to s
-        self.display_update_period = sleep_time #change interface update time to match user input update_period
+        intg_time = self.settings["update_period"] #in ms
         
-        
-        t0 = time.time()
+        t0 = self.unix_time_millis(datetime.now())/1000 ##time.time() #pre-measurement time in ms
         
         while not self.interrupt_measurement_called:
-            self.time_array.append(time.time() - t0) #append time interval in seconds to array
-            self.count_rate_0_array.append(ph.read_count_rate0()) #append new countrate data to array
-            self.count_rate_1_array.append(ph.read_count_rate1())
-            self.ui.ch0_label.setText(f"{ph.read_count_rate0()}")
-            self.ui.ch1_label.setText(f"{ph.read_count_rate1()}")
+            start_time_ms = self.unix_time_millis(datetime.now())
+            current_time_ms = start_time_ms
+            counts_0 = []
+            counts_1 = []
+            while current_time_ms - start_time_ms < intg_time:
+                counts_0.append(ph.read_count_rate0())
+                counts_1.append(ph.read_count_rate1())
+                self.ui.ch0_label.setText(f"{ph.read_count_rate0()}")
+                self.ui.ch1_label.setText(f"{ph.read_count_rate1()}")
+                current_time_ms = self.unix_time_millis(datetime.now())
+            self.count_rate_0_array.append(np.sum(counts_0))
+            self.count_rate_1_array.append(np.sum(counts_1))
+            self.time_array.append((self.unix_time_millis(datetime.now())/1000) - t0) #append time interval in seconds to array
 
-            time.sleep(sleep_time) # TODO double check this in practice
+
+            #time.sleep(sleep_time) # TODO double check this in practice
 
         # save app and hardware settings
         # for lqname,lq in self.app.settings.as_dict().items():
