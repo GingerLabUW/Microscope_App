@@ -85,7 +85,7 @@ class PicoHarpG2Measure(Measurement):
         
         # for lqname,lq in self.settings.as_dict().items():
         #     save_dict[self.name +"_"+ lqname] = lq.val    
-    def read_over_intg_time(self, intg_time, label_count0, label_count1):
+    def read_over_intg_time(self, intg_time, count0_field, count1_field):
         start_time_ms = self.unix_time_millis(datetime.now())
         current_time_ms = start_time_ms
         counts_0 = []
@@ -96,8 +96,12 @@ class PicoHarpG2Measure(Measurement):
             current_time_ms = self.unix_time_millis(datetime.now())
         total_counts_0 = np.sum(counts_0)
         total_counts_1 = np.sum(counts_1)
-        label_count0.setText(f"{total_counts_0}")
-        label_count1.setText(f"{total_counts_1}")
+        try: #if label
+            count0_field.setText(f"{total_counts_0}")
+            count1_field.setText(f"{total_counts_1}")
+        except: #if spinbox
+            count0_field.setValue(total_counts_0)
+            count1_field.setValue(total_counts_1)
         self.count_rate_0_array.append(count0)
         self.count_rate_1_array.append(count1)
         self.time_array.append(time.time() - self.t0) #append time interval in seconds to array
