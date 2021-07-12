@@ -67,7 +67,7 @@ class PicoHarpG2Measure(Measurement):
         
         intg_time = self.settings["update_period"] #in ms
         
-        t0 = time.time() #start time in s
+        self.t0 = time.time() #start time in s
         
         while not self.interrupt_measurement_called:
             start_time_ms = self.unix_time_millis(datetime.now())
@@ -80,11 +80,10 @@ class PicoHarpG2Measure(Measurement):
                 current_time_ms = self.unix_time_millis(datetime.now())
             total_counts_0 = np.sum(counts_0)
             total_counts_1 = np.sum(counts_1)
-            self.count_rate_0_array.append(total_counts_0)
-            self.count_rate_1_array.append(total_counts_1)
+            self.record_data_point(total_counts_0, total_counts_1)
             self.ui.ch0_label.setText(f"{total_counts_0}")
             self.ui.ch1_label.setText(f"{total_counts_1}")
-            self.time_array.append(time.time() - t0) #append time interval in seconds to array
+            
 
 
             #time.sleep(sleep_time) # TODO double check this in practice
@@ -107,6 +106,12 @@ class PicoHarpG2Measure(Measurement):
         self.count_rate_0_array = []
         self.count_rate_1_array = []
         self.interrupt()
+    
+    def record_data_point(self, count0, count1):
+        self.count_rate_0_array.append(count0)
+        self.count_rate_1_array.append(count1)
+        self.time_array.append(time.time() - self.t0) #append time interval in seconds to array
+        
                                
     def update_display(self):
         # only update plots id time_array and count_rate arrays are of 
