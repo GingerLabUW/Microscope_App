@@ -61,29 +61,16 @@ class PicoHarpG2Measure(Measurement):
     def unix_time_millis(self, dt):
         return round((dt - epoch).total_seconds() * 1000.0)
     
-    def run(self):
-        ph_hw = self.app.hardware['picoharp']
-        ph = self.picoharp = ph_hw.picoharp
+    def pre_run(self):
+        self.time_array = []
+        self.count_rate_0_array = []
+        self.count_rate_1_array = []
         
+    def run(self):
         intg_time = self.settings["update_period"] #in ms
         
-        self.t0 = time.time() #start time in s
-        
         while not self.interrupt_measurement_called:
-            start_time_ms = self.unix_time_millis(datetime.now())
-            current_time_ms = start_time_ms
-            counts_0 = []
-            counts_1 = []
-            while current_time_ms - start_time_ms < intg_time:
-                counts_0.append(ph.read_count_rate0())
-                counts_1.append(ph.read_count_rate1())
-                current_time_ms = self.unix_time_millis(datetime.now())
-            total_counts_0 = np.sum(counts_0)
-            total_counts_1 = np.sum(counts_1)
-            self.record_data_point(total_counts_0, total_counts_1)
-            self.ui.ch0_label.setText(f"{total_counts_0}")
-            self.ui.ch1_label.setText(f"{total_counts_1}")
-            
+            self.read_over_intg_time(intg_time, self.ui.ch0_label, self.ui.ch1_label)
 
 
             #time.sleep(sleep_time) # TODO double check this in practice
@@ -97,8 +84,25 @@ class PicoHarpG2Measure(Measurement):
         #         save_dict[hc.name + "_" + lqname] = lq.val
         
         # for lqname,lq in self.settings.as_dict().items():
-        #     save_dict[self.name +"_"+ lqname] = lq.val
-
+        #     save_dict[self.name +"_"+ lqname] = lq.val    
+    def read_over_intg_time(self, intg_time, label_count0, label_count1):
+        start_time_ms = self.unix_time_millis(datetime.now())
+        current_time_ms = start_time_ms
+        counts_0 = []
+        counts_1 = []
+        while current_time_ms - start_time_ms < intg_time:
+            counts_0.append(ph.read_count_rate0())
+            counts_1.append(ph.read_count_rate1())
+            current_time_ms = self.unix_time_millis(datetime.now())
+        total_counts_0 = np.sum(counts_0)
+        total_counts_1 = np.sum(counts_1)
+        label_count0.setText(f"{total_counts_0}")
+        label_count1.setText(f"{total_counts_1}")
+        self.count_rate_0_array.append(count0)
+        self.count_rate_1_array.append(count1)
+        self.time_array.append(time.time() - self.t0) #append time interval in seconds to array
+        
+    def post_run(self):
         self.save_array = np.array([self.time_array, self.count_rate_0_array, self.count_rate_1_array]).T
         
         # set all coutrate and time arrays to defaults 
@@ -106,13 +110,7 @@ class PicoHarpG2Measure(Measurement):
         self.count_rate_0_array = []
         self.count_rate_1_array = []
         self.interrupt()
-    
-    def record_data_point(self, count0, count1):
-        self.count_rate_0_array.append(count0)
-        self.count_rate_1_array.append(count1)
-        self.time_array.append(time.time() - self.t0) #append time interval in seconds to array
-        
-                               
+                                    
     def update_display(self):
         # only update plots id time_array and count_rate arrays are of 
         # the same length
