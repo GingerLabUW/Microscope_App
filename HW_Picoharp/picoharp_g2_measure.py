@@ -68,7 +68,7 @@ class PicoHarpG2Measure(Measurement):
         
     def run(self):
         intg_time = self.settings["update_period"] #in ms
-        
+        self.t0 = time.time()
         while not self.interrupt_measurement_called:
             self.read_over_intg_time(intg_time, self.ui.ch0_label, self.ui.ch1_label)
 
@@ -102,8 +102,8 @@ class PicoHarpG2Measure(Measurement):
         except: #if spinbox
             count0_field.setValue(total_counts_0)
             count1_field.setValue(total_counts_1)
-        self.count_rate_0_array.append(count0)
-        self.count_rate_1_array.append(count1)
+        self.count_rate_0_array.append(total_counts_0)
+        self.count_rate_1_array.append(total_counts_1)
         self.time_array.append(time.time() - self.t0) #append time interval in seconds to array
         
     def post_run(self):
