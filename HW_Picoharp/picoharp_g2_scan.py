@@ -23,7 +23,7 @@ class PicoHarp_G2_Scan(PicoHarp_Scan):
 		self.pi_device_hw = self.app.hardware['piezostage']
 		
 	def setup_figure(self):
-		PiezoHarp_Scan.setup_figure(self)
+		PicoHarp_Scan.setup_figure(self)
 
 	def update_estimated_scan_time(self):
 		try:
