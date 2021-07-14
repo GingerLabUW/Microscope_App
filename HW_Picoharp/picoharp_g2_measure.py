@@ -5,6 +5,7 @@ import pyqtgraph as pg
 import os
 import time
 from datetime import datetime
+from HW_Picoharp import helper_funcs
 
 epoch = datetime.utcfromtimestamp(0)
 
@@ -57,18 +58,19 @@ class PicoHarpG2Measure(Measurement):
 
         self.ui.plot_groupBox.layout().addWidget(self.graph_layout)
     
-
-    def unix_time_millis(self, dt):
-        return round((dt - epoch).total_seconds() * 1000.0)
+#
+#    def unix_time_millis(self, dt):
+#        return round((dt - epoch).total_seconds() * 1000.0)
     
     def pre_run(self):
         self.time_array = []
         self.count_rate_0_array = []
         self.count_rate_1_array = []
+        self.ph = self.picoharp_hw.picoharp
+        self.t0 = time.time()
         
     def run(self):
-        intg_time = self.settings["update_period"] #in ms
-        self.t0 = time.time()
+        intg_time = self.settings["update_period"] #in ms       
         while not self.interrupt_measurement_called:
             self.read_over_intg_time(intg_time, self.ui.ch0_label, self.ui.ch1_label)
 
@@ -86,14 +88,15 @@ class PicoHarpG2Measure(Measurement):
         # for lqname,lq in self.settings.as_dict().items():
         #     save_dict[self.name +"_"+ lqname] = lq.val    
     def read_over_intg_time(self, intg_time, count0_field, count1_field):
-        start_time_ms = self.unix_time_millis(datetime.now())
+
+        start_time_ms = helper_funcs.unix_time_millis(datetime.now())
         current_time_ms = start_time_ms
         counts_0 = []
         counts_1 = []
         while current_time_ms - start_time_ms < intg_time:
-            counts_0.append(ph.read_count_rate0())
-            counts_1.append(ph.read_count_rate1())
-            current_time_ms = self.unix_time_millis(datetime.now())
+            counts_0.append(self.ph.read_count_rate0())
+            counts_1.append(self.ph.read_count_rate1())
+            current_time_ms = helper_funcs.unix_time_millis(datetime.now())
         total_counts_0 = np.sum(counts_0)
         total_counts_1 = np.sum(counts_1)
         try: #if label

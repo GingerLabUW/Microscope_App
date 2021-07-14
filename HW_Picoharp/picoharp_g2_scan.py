@@ -11,6 +11,8 @@ import os.path
 from pyqtgraph.Qt import QtGui, QtCore, QtWidgets
 from pyqtgraph.Point import Point
 import customplotting.mscope as cpm
+from datetime import datetime
+from HW_Picoharp import helper_funcs
 
 class PicoHarp_G2_Scan(PicoHarp_Scan):
 
@@ -18,7 +20,6 @@ class PicoHarp_G2_Scan(PicoHarp_Scan):
 
 	def setup(self):
 		PicoHarp_Scan.setup(self)
-
 		self.picoharp_hw = self.app.hardware['picoharp']
 		self.pi_device_hw = self.app.hardware['piezostage']
 		
@@ -52,12 +53,18 @@ class PicoHarp_G2_Scan(PicoHarp_Scan):
 		except:
 			pass
 
+	def run(self):
+		PicoHarp_Scan.run(self)
+		
 	def scan_measure(self):
 		"""
 		Data collection for each pixel.
 		"""
-		PicoHarpG2Measure.read_over_intg_time(self.settings.Tacq, self.count_rate0_spinBox, self.count_rate1_spinBox)
+		PicoHarpG2Measure.read_over_intg_time(self, self.settings['Tacq'] * 1000, self.count_rate0_spinBox, self.count_rate1_spinBox)
 	
+	def save_intensities_data(self):
+		PiezoStage_Scan.save_intensities_data(self, self.save_array.T, 'g2_scan')
+ 	
 	def post_run(self):
 		"""
 		Export data.
