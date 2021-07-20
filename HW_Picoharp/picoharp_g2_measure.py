@@ -75,7 +75,7 @@ class PicoHarpG2Measure(Measurement):
             self.read_over_intg_time(intg_time, self.ui.ch0_label, self.ui.ch1_label)
 
 
-            #time.sleep(sleep_time) # TODO double check this in practice
+            #time.sleep(sleep_time) # TODO double check his in practice
 
         # save app and hardware settings
         # for lqname,lq in self.app.settings.as_dict().items():
@@ -105,8 +105,9 @@ class PicoHarpG2Measure(Measurement):
         except: #if spinbox
             count0_field.setValue(total_counts_0)
             count1_field.setValue(total_counts_1)
-        self.count_rate_0_array.append(total_counts_0)
-        self.count_rate_1_array.append(total_counts_1)
+        intg_time_s = intg_time / 1000
+        self.count_rate_0_array.append(total_counts_0 / intg_time_s) #append counts per second
+        self.count_rate_1_array.append(total_counts_1 / intg_time_s)
         self.time_array.append(time.time() - self.t0) #append time interval in seconds to array
         
     def post_run(self):
